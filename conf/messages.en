@@ -996,7 +996,7 @@ cds.subscription.date-of-establishment.error.required.date-of-establishment=Ente
 cds.subscription.date-of-establishment.error.invalid.date-of-establishment=Date of establishment must be a real date
 cds.subscription.date-of-establishment.error.in-future.date-of-establishment=Date of establishment must be in the past
 cds.subscription.date-of-establishment.cannot-find=Can''t find the certificate?
-cds.subscription.date-of-establishment.find-it=You can find the incorporated date on the <a href="https://beta.companieshouse.gov.uk/" target="_blank"> Companies House register</a>
+cds.subscription.date-of-establishment.find-it=You can find the incorporated date on the <a href="https://beta.companieshouse.gov.uk/" target="_blank" rel="noreferrer noopener"> Companies House register</a>
 
 #Sic Code
 cds.subscription.sic.page.title=What is the Standard Industrial Classification (SIC) code for your organisation?
@@ -1134,15 +1134,15 @@ cds.form.disclaimer=By sending this application you confirm that the information
 
 #disclose personal details consent
 cds.subscription.organisation-disclose-personal-details-consent.heading=Do you want to show your organisation name and address on the check an EORI number service?
-cds.subscription.organisation-disclose-personal-details-consent.declaration=<p>Anyone you share your EORI number with will be able to check it is valid using the <a href="https://www.gov.uk/check-eori-number" target="_blank">check an EORI number service (opens in new tab)</a>.</p> <p> You can choose if you want your organisation name and address to be shown with your EORI number. This can help customs agents, freight agents and businesses you are trading with identify you and process your goods.</p>
+cds.subscription.organisation-disclose-personal-details-consent.declaration=<p>Anyone you share your EORI number with will be able to check it is valid using the <a href="https://www.gov.uk/check-eori-number" target="_blank" rel="noreferrer noopener">check an EORI number service (opens in new tab)</a>.</p> <p> You can choose if you want your organisation name and address to be shown with your EORI number. This can help customs agents, freight agents and businesses you are trading with identify you and process your goods.</p>
 cds.subscription.organisation-disclose-personal-details-consent.yes=Yes, show my organisation name and address with my EORI number
 cds.subscription.organisation-disclose-personal-details-consent.no=No, only show my EORI number
 cds.subscription.organisation-disclose-personal-details-consent.partner.heading=Do you want to show your partnership name and address on the check an EORI number service?
-cds.subscription.organisation-disclose-personal-details-consent.partner.declaration=<p>Anyone you share your EORI number with will be able to check it is valid using the <a href="https://www.gov.uk/check-eori-number" target="_blank">check an EORI number service (opens in new tab)</a>.</p> <p> You can choose if you want your partnership name and address to be shown with your EORI number. This can help customs agents, freight agents and businesses you are trading with identify you and process your goods.</p>
+cds.subscription.organisation-disclose-personal-details-consent.partner.declaration=<p>Anyone you share your EORI number with will be able to check it is valid using the <a href="https://www.gov.uk/check-eori-number" target="_blank" rel="noreferrer noopener">check an EORI number service (opens in new tab)</a>.</p> <p> You can choose if you want your partnership name and address to be shown with your EORI number. This can help customs agents, freight agents and businesses you are trading with identify you and process your goods.</p>
 cds.subscription.organisation-disclose-personal-details-consent.partner.yes=Yes, show my partnership name and address with my EORI number
 cds.subscription.organisation-disclose-personal-details-consent.partner.no=No, only show my EORI number
 cds.subscription.organisation-disclose-personal-details-consent.individual.heading=Do you want to show your name and address on the check an EORI number service?
-cds.subscription.organisation-disclose-personal-details-consent.individual.declaration=<p>Anyone you share your EORI number with will be able to check it is valid using the <a href="https://www.gov.uk/check-eori-number" target="_blank">check an EORI number service (opens in new tab)</a>.</p> <p> You can choose if you want your name and address to be shown with your EORI number. This can help customs agents, freight agents and businesses you are trading with identify you and process your goods.</p>
+cds.subscription.organisation-disclose-personal-details-consent.individual.declaration=<p>Anyone you share your EORI number with will be able to check it is valid using the <a href="https://www.gov.uk/check-eori-number" target="_blank" rel="noreferrer noopener">check an EORI number service (opens in new tab)</a>.</p> <p> You can choose if you want your name and address to be shown with your EORI number. This can help customs agents, freight agents and businesses you are trading with identify you and process your goods.</p>
 cds.subscription.organisation-disclose-personal-details-consent.individual.yes=Yes, show my name and address with my EORI number
 cds.subscription.organisation-disclose-personal-details-consent.individual.no=No, only show my EORI number
 cds.subscription.organisation-disclose-personal-details-consent.error.yes-no-answer=Tell us if you want to show your name and address with your EORI number
