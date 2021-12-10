@@ -20,11 +20,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.ApplicationController
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
 import uk.gov.hmrc.customs.rosmfrontend.views.html.migration.migration_start
-import uk.gov.hmrc.customs.rosmfrontend.views.html.{
-  accessibility_statement,
-  accessibility_statement_get_access_cds,
-  start
-}
+import uk.gov.hmrc.customs.rosmfrontend.views.html.start
 import unit.controllers.CdsPage
 import util.ControllerSpec
 import util.builders.{AuthBuilder, SessionBuilder}
@@ -39,8 +35,6 @@ class HeaderSpec extends ControllerSpec {
 
   private val viewStart = app.injector.instanceOf[start]
   private val migrationStart = app.injector.instanceOf[migration_start]
-  private val accessibilityStatementView = app.injector.instanceOf[accessibility_statement]
-  private val accessibilityStatementGetAccessCdsView = app.injector.instanceOf[accessibility_statement_get_access_cds]
 
   private val controller = new ApplicationController(
     app,
@@ -49,8 +43,6 @@ class HeaderSpec extends ControllerSpec {
     mcc,
     viewStart,
     migrationStart,
-    accessibilityStatementView,
-    accessibilityStatementGetAccessCdsView,
     mockCdsFrontendCache,
     appConfig
   )
