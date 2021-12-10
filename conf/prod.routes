@@ -98,8 +98,6 @@ GET         /customs/:journey/download/text                               @uk.go
 # register-for-cds Get An Eori
 GET         /customs/register-for-cds                                              @uk.gov.hmrc.customs.rosmfrontend.controllers.ApplicationController.start
 
-GET         /customs/:journey/accessibility-statement                             @uk.gov.hmrc.customs.rosmfrontend.controllers.ApplicationController.accessibilityStatement(journey: Journey.Value)
-
 GET         /customs/register-for-cds/isle-of-man                                  @uk.gov.hmrc.customs.rosmfrontend.controllers.registration.IsleOfManController.form()
 POST        /customs/register-for-cds/isle-of-man                                  @uk.gov.hmrc.customs.rosmfrontend.controllers.registration.IsleOfManController.submit()
 

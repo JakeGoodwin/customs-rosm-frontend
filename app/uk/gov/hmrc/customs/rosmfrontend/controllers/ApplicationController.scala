@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.i18n.MessagesApi
 import play.api.mvc._
@@ -26,11 +25,9 @@ import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
 import uk.gov.hmrc.customs.rosmfrontend.views.html.migration.migration_start
-import uk.gov.hmrc.customs.rosmfrontend.views.html.{
-  accessibility_statement,
-  accessibility_statement_get_access_cds,
-  start
-}
+import uk.gov.hmrc.customs.rosmfrontend.views.html.start
+
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -41,8 +38,6 @@ class ApplicationController @Inject()(
   mcc: MessagesControllerComponents,
   viewStart: start,
   migrationStart: migration_start,
-  accessibilityStatementView: accessibility_statement,
-  accessibilityStatementGetAccessToCdsView: accessibility_statement_get_access_cds,
   cdsFrontendDataCache: SessionCache,
   appConfig: AppConfig
 )(implicit override val messagesApi: MessagesApi, ec: ExecutionContext)
@@ -54,13 +49,6 @@ class ApplicationController @Inject()(
 
   def startSubscription: Action[AnyContent] = Action { implicit request =>
     Ok(migrationStart(Journey.Migrate))
-  }
-
-  def accessibilityStatement(journey: Journey.Value): Action[AnyContent] = Action { implicit request =>
-    journey match {
-      case Journey.GetYourEORI => Ok(accessibilityStatementView())
-      case Journey.Migrate     => Ok(accessibilityStatementGetAccessToCdsView())
-    }
   }
 
   def logout(journey: Journey.Value): Action[AnyContent] = Action.async { implicit request =>
