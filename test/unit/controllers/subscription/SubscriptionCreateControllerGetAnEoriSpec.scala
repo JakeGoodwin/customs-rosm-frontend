@@ -330,7 +330,9 @@ class SubscriptionCreateControllerGetAnEoriSpec extends ControllerSpec with Befo
           page.getElementsText(RegistrationCompletePage.issuedDateXpath) shouldBe "issued by HMRC on 22 May 2016"
 
           page.getElementsText(RegistrationCompletePage.additionalInformationXpath) should include(
-            messages("cds.subscription.outcomes.success.optional-paragraph")
+            strim("""
+                    |We will send you an email when your EORI number is ready to use. This usually takes around 30 minutes, but may take up to 48 Hours. You need to wait until you receive this email before you try to subscribe to any customs services.
+                    | """)
           )
           page.getElementsText(RegistrationCompletePage.whatHappensNextXpath) shouldBe
             strim("""
