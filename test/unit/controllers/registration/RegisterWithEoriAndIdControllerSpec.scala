@@ -57,7 +57,6 @@ class RegisterWithEoriAndIdControllerSpec extends ControllerSpec with BeforeAndA
   private val mockMatchingService = mock[MatchingService]
   private val mockCdsSubscriber = mock[CdsSubscriber]
   private val mockSubscriptionStatusService = mock[SubscriptionStatusService]
-  private val mockTaxEnrolmentsService = mock[TaxEnrolmentsService]
   private val mockSubscriptionDetailsService = mock[SubscriptionDetailsService]
   private val mockSubscriptionDetails = mock[SubscriptionDetails]
   private val mockSubscriptionStatusOutcome = mock[SubscriptionStatusOutcome]
@@ -92,7 +91,6 @@ class RegisterWithEoriAndIdControllerSpec extends ControllerSpec with BeforeAndA
     subscriptionOutcomePendingView,
     subscriptionOutcomeFailView,
     registerWithEoriAndIdEoriAlreadyLinked,
-    mockTaxEnrolmentsService,
     mockNotifyRcmService
   )
 
@@ -662,10 +660,6 @@ class RegisterWithEoriAndIdControllerSpec extends ControllerSpec with BeforeAndA
         mockSubscriptionStatusService
           .getStatus(meq("SAFE"), meq("SomeSafeId"))(any())
       ).thenReturn(Future.successful(SubscriptionExists))
-      when(
-        mockTaxEnrolmentsService
-          .doesEnrolmentExist(meq(SafeId("SomeSafeId")))(any(), any())
-      ).thenReturn(Future.successful(true))
 
       regExistingEori { result =>
         {
@@ -705,10 +699,6 @@ class RegisterWithEoriAndIdControllerSpec extends ControllerSpec with BeforeAndA
         mockSubscriptionStatusService
           .getStatus(meq("SAFE"), meq("SomeSafeId"))(any())
       ).thenReturn(Future.successful(SubscriptionExists))
-      when(
-        mockTaxEnrolmentsService
-          .doesEnrolmentExist(meq(SafeId("SomeSafeId")))(any(), any())
-      ).thenReturn(Future.successful(false))
 
       regExistingEori { result =>
         {

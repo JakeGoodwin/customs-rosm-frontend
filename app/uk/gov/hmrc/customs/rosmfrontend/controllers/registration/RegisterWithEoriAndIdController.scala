@@ -29,8 +29,14 @@ import uk.gov.hmrc.customs.rosmfrontend.domain.registration.UserLocation
 import uk.gov.hmrc.customs.rosmfrontend.forms.FormUtils.dateTimeFormat
 import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
-import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
-import uk.gov.hmrc.customs.rosmfrontend.services.registration.{MatchingService, RegisterWithEoriAndIdService}
+import uk.gov.hmrc.customs.rosmfrontend.services.cache.{
+  RequestSessionData,
+  SessionCache
+}
+import uk.gov.hmrc.customs.rosmfrontend.services.registration.{
+  MatchingService,
+  RegisterWithEoriAndIdService
+}
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription._
 import uk.gov.hmrc.customs.rosmfrontend.views.html.error_template
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription._
@@ -58,7 +64,6 @@ class RegisterWithEoriAndIdController @Inject()(
   subscriptionOutcomePendingView: subscription_outcome_pending,
   subscriptionOutcomeFailView: subscription_outcome_fail,
   registerWithEoriAndIdEoriAlreadyLinked: register_with_eori_and_id_eori_already_linked,
-  taxEnrolmentsService: TaxEnrolmentsService,
   notifyRcmService: NotifyRcmService
 ) extends CdsController(mcc) {
 

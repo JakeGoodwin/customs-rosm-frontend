@@ -23,13 +23,10 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.mvc.Result
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.SignInWithDifferentDetailsController
 import uk.gov.hmrc.customs.rosmfrontend.domain._
+import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.SubscriptionDetails
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
-import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.{
-  eori_used,
-  eori_used_signout,
-  sign_in_with_different_details
-}
+import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.{eori_used, eori_used_signout, sign_in_with_different_details}
 import uk.gov.hmrc.http.HeaderCarrier
 import unit.controllers.CdsPage
 import util.ControllerSpec
@@ -47,11 +44,13 @@ class SignInWithDifferentDetailsControllerSpec
 
   private val mockCdsFrontendDataCache = mock[SessionCache]
   private val mockRegistrationDetails = mock[RegistrationDetails](RETURNS_DEEP_STUBS)
+  private val mockSubscriptionDetails = mock[SubscriptionDetails](RETURNS_DEEP_STUBS)
   private val signInWithDifferentDetailsView = app.injector.instanceOf[sign_in_with_different_details]
   private val eoriUsedSignoutView = app.injector.instanceOf[eori_used_signout]
   private val eoriUsedView = app.injector.instanceOf[eori_used]
 
   when(mockRegistrationDetails.name).thenReturn("Test Org Name")
+  when(mockSubscriptionDetails.existingEoriNumber).thenReturn(Some("GB123456789"))
 
   private val controller = new SignInWithDifferentDetailsController(
     app,
@@ -66,6 +65,7 @@ class SignInWithDifferentDetailsControllerSpec
   override def beforeEach: Unit = {
     reset(mockCdsFrontendDataCache)
     mockFunctionWithRegistrationDetails(mockRegistrationDetails)
+    mockFunctionWithSubscriptionDetails(mockSubscriptionDetails)
   }
 
   "Displaying the form in create mode" should {
@@ -79,6 +79,42 @@ class SignInWithDifferentDetailsControllerSpec
     }
   }
 
+  "Displaying the sign out page" should {
+    assertNotLoggedInAndCdsEnrolmentChecksForGetAnEori(mockAuthConnector, controller.form(Journey.Migrate))
+
+    "display correct paragraph text" in {
+      showSignOutForm() { result =>
+        val page = CdsPage(bodyOf(result))
+        page.getElementsText("//*[@id='para1']") shouldBe "To use CDS with your EORI number, you will need to sign in with the Government Gateway it is linked to."
+      }
+    }
+  }
+
+  "Displaying the Eori used page" should {
+    assertNotLoggedInAndCdsEnrolmentChecksForGetAnEori(mockAuthConnector, controller.form(Journey.Migrate))
+
+    "display correct paragraph text" in {
+      showEoriUsedForm() { result =>
+        val page = CdsPage(bodyOf(result))
+        page.getElementsText("//*[@id='para1']") shouldBe "The EORI number you entered has already been linked to a different Government Gateway for access to CDS."
+      }
+    }
+  }
+
+  private def showEoriUsedForm(userId: String = defaultUserId, journey: Journey.Value = Journey.GetYourEORI)(
+    test: Future[Result] => Any
+  ) {
+    withAuthorisedUser(userId, mockAuthConnector)
+    test(controller.eoriUsed(journey).apply(SessionBuilder.buildRequestWithSession(userId)))
+  }
+
+  private def showSignOutForm(userId: String = defaultUserId, journey: Journey.Value = Journey.GetYourEORI)(
+    test: Future[Result] => Any
+  ) {
+    withAuthorisedUser(userId, mockAuthConnector)
+    test(controller.eoriUsedSignout(journey).apply(SessionBuilder.buildRequestWithSession(userId)))
+  }
+
   private def showCreateForm(userId: String = defaultUserId, journey: Journey.Value = Journey.GetYourEORI)(
     test: Future[Result] => Any
   ) {
@@ -88,5 +124,9 @@ class SignInWithDifferentDetailsControllerSpec
 
   private def mockFunctionWithRegistrationDetails(registrationDetails: RegistrationDetails) {
     when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier])).thenReturn(registrationDetails)
+  }
+
+  private def mockFunctionWithSubscriptionDetails(subscriptionDetails: SubscriptionDetails) {
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier])).thenReturn(subscriptionDetails)
   }
 }

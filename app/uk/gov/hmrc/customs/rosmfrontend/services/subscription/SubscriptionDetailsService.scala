@@ -16,23 +16,21 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
-import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import uk.gov.hmrc.customs.rosmfrontend.connector.Save4LaterConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{BusinessShortName, SubscriptionDetails}
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.{AddressViewModel, ContactDetailsModel, VatDetails}
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{CachedData, SessionCache}
-import uk.gov.hmrc.customs.rosmfrontend.services.mapping.ContactDetailsAdaptor
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class SubscriptionDetailsService @Inject()(
   sessionCache: SessionCache,
-  contactDetailsAdaptor: ContactDetailsAdaptor,
   save4LaterConnector: Save4LaterConnector
 ) {
 
@@ -54,18 +52,10 @@ class SubscriptionDetailsService @Inject()(
   def cacheCompanyShortName(shortName: BusinessShortName)(implicit hc: HeaderCarrier): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(businessShortName = Some(shortName)))
 
-  def cacheContactDetails(contactDetailsModel: ContactDetailsModel, isInReviewMode: Boolean = false)(
-    implicit hc: HeaderCarrier
-  ): Future[Unit] =
-    contactDetails(contactDetailsModel, isInReviewMode) flatMap { contactDetails =>
-      saveSubscriptionDetails(sd => sd.copy(contactDetails = Some(contactDetails)))
-    }
-
   def cacheContactDetails(contactDetails: ContactDetailsModel)(
     implicit hc: HeaderCarrier
   ): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(contactDetails = Some(contactDetails)))
-
 
   def cacheAddressDetails(address: AddressViewModel)(implicit hc: HeaderCarrier): Future[Unit] = {
     def noneForEmptyPostcode(a: AddressViewModel) = a.copy(postcode = a.postcode.filter(_.nonEmpty))
@@ -140,15 +130,6 @@ class SubscriptionDetailsService @Inject()(
 
   def cacheConsentToDisclosePersonalDetails(yesNoAnswer: YesNo)(implicit hq: HeaderCarrier) =
     saveSubscriptionDetails(sd => sd.copy(personalDataDisclosureConsent = Some(yesNoAnswer.isYes)))
-
-  private def contactDetails(view: ContactDetailsModel, isInReviewMode: Boolean)(
-    implicit hc: HeaderCarrier
-  ): Future[ContactDetailsModel] =
-    if (!isInReviewMode && view.useAddressFromRegistrationDetails.contains(true)) {
-      sessionCache.registrationDetails map { registrationDetails =>
-        contactDetailsAdaptor.toContactDetailsModelWithRegistrationAddress(view, registrationDetails.address)
-      }
-    } else Future.successful(view)
 
   def cacheVatRegisteredEu(yesNoAnswer: YesNo)(implicit hq: HeaderCarrier): Future[Unit] =
     for {

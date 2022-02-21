@@ -25,7 +25,7 @@ import org.scalatest.mockito.MockitoSugar
 import uk.gov.hmrc.customs.rosmfrontend.connector.Save4LaterConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{BusinessShortName, SubscriptionDetails}
 import uk.gov.hmrc.customs.rosmfrontend.domain.{NameOrganisationMatchModel, _}
-import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.{AddressViewModel, ContactDetailsModel}
+import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.{AddressViewModel, ContactDetailsModel, VatDetails}
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
 import uk.gov.hmrc.customs.rosmfrontend.services.mapping.{ContactDetailsAdaptor, RegistrationDetailsCreator}
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.SubscriptionDetailsService
@@ -48,11 +48,11 @@ class SubscriptionDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
   private val mockRegistrationDetails = mock[RegistrationDetails]
   private val mockSave4LaterConnector = mock[Save4LaterConnector]
 
-  private val mockContactDetailsAdaptor = mock[ContactDetailsAdaptor]
   private val mockSubscriptionDetailsHolder = mock[SubscriptionDetails]
   private val mockpersonalDataDisclosureConsent = mock[Option[Boolean]]
 
   private val expectedDate = LocalDate.now()
+  private val shortName = BusinessShortName(Some("test-name-company"))
   private val sicCode = "someSicCode"
   private val addressDetails =
     AddressViewModel(street = "street", city = "city", postcode = Some("postcode"), countryCode = "GB")
@@ -60,7 +60,7 @@ class SubscriptionDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
   private val customsIdUTR = Utr("utrxxxxx")
 
   private val subscriptionDetailsHolderService =
-    new SubscriptionDetailsService(mockSessionCache, mockContactDetailsAdaptor, mockSave4LaterConnector)
+    new SubscriptionDetailsService(mockSessionCache, mockSave4LaterConnector)
 
   private val eoriNumericLength = 15
   private val eoriId = "GB" + Random.nextString(eoriNumericLength)
@@ -78,7 +78,6 @@ class SubscriptionDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
       registrationInfo,
       mockRegistrationDetails,
       mockSubscriptionDetailsHolder,
-      mockContactDetailsAdaptor
     )
 
     when(mockSessionCache.saveRegistrationDetails(any[RegistrationDetails])(any[HeaderCarrier]))
@@ -130,6 +129,18 @@ class SubscriptionDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
       val holder: SubscriptionDetails = requestCaptor.getValue
       holder.dateOfBirth shouldBe Some(expectedDate)
 
+    }
+  }
+
+  "Calling cacheCompanyShortName" should {
+    "save Company Short Name in frontend cache" in {
+
+      await(subscriptionDetailsHolderService.cacheCompanyShortName(shortName))
+      val requestCaptor = ArgumentCaptor.forClass(classOf[SubscriptionDetails])
+
+      verify(mockSessionCache).saveSubscriptionDetails(requestCaptor.capture())(ArgumentMatchers.eq(hc))
+      val holder: SubscriptionDetails = requestCaptor.getValue
+      holder.businessShortName shouldBe Some(shortName)
     }
   }
 
@@ -261,13 +272,6 @@ class SubscriptionDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
     "Update SubscriptionDetailsHolder with contact details when using registered address" in {
       when(mockSessionCache.registrationDetails)
         .thenReturn(RegistrationDetailsBuilder.withBusinessAddress(defaultAddress))
-
-      when(
-        mockContactDetailsAdaptor.toContactDetailsModelWithRegistrationAddress(
-          contactDetailsViewModelWhenUsingRegisteredAddress,
-          defaultAddress
-        )
-      ).thenReturn(contactDetailsViewModelWhenUsingRegisteredAddress)
 
       when(mockSessionCache.subscriptionDetails).thenReturn(SubscriptionDetails())
       when(mockSessionCache.subscriptionDetails).thenReturn(
@@ -478,6 +482,42 @@ class SubscriptionDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
       verify(mockSessionCache).saveSubscriptionDetails(requestCaptor.capture())(ArgumentMatchers.eq(hc))
       val holder = requestCaptor.getValue
       holder.personalDataDisclosureConsent shouldBe Some(true)
+    }
+  }
+
+  "Calling cachedNameIdDetails" should {
+    "return cachedNameIdDetails from frontend cache" in {
+      val nameIdDetails = NameIdOrganisationMatchModel("test-name", "test-id")
+      when(mockSessionCache.subscriptionDetails)
+        .thenReturn(Future.successful(SubscriptionDetails(nameIdOrganisationDetails = Some(nameIdDetails))))
+
+      await(subscriptionDetailsHolderService.cachedNameIdDetails) shouldBe Some(nameIdDetails)
+    }
+  }
+
+  "Calling cacheUkVatDetails" should {
+    "save VatDetails value in frontend cache" in {
+      val details = VatDetails("XXGBN", "12", LocalDate.now())
+      await(subscriptionDetailsHolderService.cacheUkVatDetails(details))
+
+      val requestCaptor = ArgumentCaptor.forClass(classOf[SubscriptionDetails])
+      verify(mockSessionCache).saveSubscriptionDetails(requestCaptor.capture())(ArgumentMatchers.eq(hc))
+
+      val holder = requestCaptor.getValue
+      holder.ukVatDetails shouldBe Some(details)
+    }
+  }
+
+  "Calling cacheVatRegisteredEu" should {
+    "save VatRegisteredEu selection value in frontend cache" in {
+      val yesNoValue = YesNo(true)
+      await(subscriptionDetailsHolderService.cacheVatRegisteredEu(yesNoValue))
+
+      val requestCaptor = ArgumentCaptor.forClass(classOf[SubscriptionDetails])
+      verify(mockSessionCache).saveSubscriptionDetails(requestCaptor.capture())(ArgumentMatchers.eq(hc))
+
+      val holder = requestCaptor.getValue
+      holder.vatRegisteredEu shouldBe Some(true)
     }
   }
 }
