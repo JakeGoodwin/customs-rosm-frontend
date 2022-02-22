@@ -43,7 +43,6 @@ class RegisterWithoutIdService @Inject()(
     address: Address,
     contactDetail: Option[ContactDetailsModel],
     loggedInUser: LoggedInUser,
-    internalId: Option[String] = None,
     orgType: Option[CdsOrganisationType] = None
   )(implicit hc: HeaderCarrier): Future[RegisterWithoutIDResponse] = {
 
@@ -68,7 +67,6 @@ class RegisterWithoutIdService @Inject()(
     address: Address,
     contactDetail: Option[ContactDetailsModel],
     loggedInUser: LoggedInUser,
-    internalId: Option[String] = None,
     orgType: Option[CdsOrganisationType] = None
   )(implicit hc: HeaderCarrier): Future[RegisterWithoutIDResponse] = {
     import individualNameAndDateOfBirth._

@@ -51,9 +51,8 @@ class SubscriptionFlowManagerSpec
 
   private val mockRequestSessionData = mock[RequestSessionData]
   private val mockCdsFrontendDataCache = mock[SessionCache]
-  private val mockSubscriptionDetailsService = mock[SubscriptionDetailsService]
   val controller =
-    new SubscriptionFlowManager(app, mockRequestSessionData, mockCdsFrontendDataCache, mockSubscriptionDetailsService)
+    new SubscriptionFlowManager(app, mockRequestSessionData, mockCdsFrontendDataCache)
   private val mockOrgRegistrationDetails = mock[RegistrationDetailsOrganisation]
   private val mockIndividualRegistrationDetails = mock[RegistrationDetailsIndividual]
   private val mockSession = mock[Session]
@@ -396,9 +395,8 @@ class SubscriptionFlowManagerNinoUtrEnabledSpec
 
   private val mockRequestSessionData = mock[RequestSessionData]
   private val mockCdsFrontendDataCache = mock[SessionCache]
-  private val mockSubscriptionDetailsService = mock[SubscriptionDetailsService]
   val controller =
-    new SubscriptionFlowManager(app, mockRequestSessionData, mockCdsFrontendDataCache, mockSubscriptionDetailsService)
+    new SubscriptionFlowManager(app, mockRequestSessionData, mockCdsFrontendDataCache)
   private val mockSession = mock[Session]
 
   private val mockHC = mock[HeaderCarrier]

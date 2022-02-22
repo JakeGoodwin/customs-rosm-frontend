@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.customs.rosmfrontend.services.cache
+package unit.services
 
-import uk.gov.hmrc.http.HeaderCarrier
+import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.customs.rosmfrontend.services.UtcClock
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import java.time.ZoneOffset
 
-@Singleton
-class ClearCacheAndRegistrationIdentificationService @Inject()(sessionCache: SessionCache) {
+class UtcClockSpec extends PlaySpec {
+  val utcClock = new UtcClock
 
-  def clear(implicit hc: HeaderCarrier): Future[Unit] =
-    for {
-      email <- sessionCache.email
-      _ <- sessionCache.remove
-      _ <- sessionCache.saveEmail(email)
-    } yield ()
+  "UTC Clock" must {
+    "return Utc Time every time it gets called" in {
+      utcClock.generateUtcTime.getZone mustBe(ZoneOffset.UTC)
+    }
+  }
 }

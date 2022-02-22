@@ -41,7 +41,6 @@ import scala.concurrent.Future
 class HaveNinoSubscriptionYesNoControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private val mockAuthConnector = mock[AuthConnector]
-  private val mockSubscriptionFlowManager = mock[SubscriptionFlowManager]
   private val mockSubscriptionDetailsService = mock[SubscriptionDetailsService]
   private val mockSubscriptionFlowInfo = mock[SubscriptionFlowInfo]
   private val mockSubscriptionPage = mock[SubscriptionPage]
@@ -58,7 +57,6 @@ class HaveNinoSubscriptionYesNoControllerSpec extends ControllerSpec with Before
   val controller = new HaveNinoSubscriptionYesNoController(
     app,
     mockAuthConnector,
-    mockSubscriptionFlowManager,
     mcc,
     matchNinoSubscriptionView,
     mockSubscriptionDetailsService
@@ -112,8 +110,6 @@ class HaveNinoSubscriptionYesNoControllerSpec extends ControllerSpec with Before
   }
 
   private def mockSubscriptionFlow(url: String) = {
-    when(mockSubscriptionFlowManager.stepInformation(any())(any[HeaderCarrier], any[Request[AnyContent]]))
-      .thenReturn(mockSubscriptionFlowInfo)
     when(mockSubscriptionFlowInfo.nextPage).thenReturn(mockSubscriptionPage)
     when(mockSubscriptionPage.url).thenReturn(url)
   }

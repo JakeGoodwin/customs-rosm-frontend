@@ -525,7 +525,7 @@ class ConfirmContactDetailsControllerSpec extends ControllerSpec with BeforeAndA
         .thenReturn(Future.successful(subscriptionDetailsHolder))
       when(
         mockRegistrationConfirmService
-          .clearRegistrationData(any[LoggedInUser])(any[HeaderCarrier])
+          .clearRegistrationData(any[HeaderCarrier])
       ).thenReturn(Future.successful(()))
       when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
         .thenReturn(Future.successful(organisationRegistrationDetails))
@@ -548,7 +548,7 @@ class ConfirmContactDetailsControllerSpec extends ControllerSpec with BeforeAndA
         .thenReturn(Future.successful(subscriptionDetailsHolder))
       when(
         mockRegistrationConfirmService
-          .clearRegistrationData(any[LoggedInUser])(any[HeaderCarrier])
+          .clearRegistrationData(any[HeaderCarrier])
       ).thenReturn(Future.failed(emulatedFailure))
       when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
         .thenReturn(Future.successful(organisationRegistrationDetails))
@@ -572,7 +572,7 @@ class ConfirmContactDetailsControllerSpec extends ControllerSpec with BeforeAndA
         .thenReturn(Future.successful(subscriptionDetailsHolder))
       when(
         mockRegistrationConfirmService
-          .clearRegistrationData(any[LoggedInUser])(any[HeaderCarrier])
+          .clearRegistrationData(any[HeaderCarrier])
       ).thenReturn(Future.successful(()))
       when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
         .thenReturn(Future.successful(organisationRegistrationDetails))
@@ -648,13 +648,6 @@ class ConfirmContactDetailsControllerSpec extends ControllerSpec with BeforeAndA
       mockCdsFrontendDataCache
         .saveSubscriptionDetails(any[SubscriptionDetails])(any[HeaderCarrier])
     ).thenReturn(Future.successful(true))
-  }
-
-  private def mockSubscriptionDetailsReviewControllerCall() {
-    val mockAction = mock[Action[AnyContent]]
-    when(mockAction.apply(any[Request[AnyContent]]))
-      .thenReturn(Future.successful(Results.Ok))
-    when(mockSubscriptionDetailsReviewController.submitDetails(any[Journey.Value])).thenReturn(mockAction)
   }
 
   private def mockNewSubscriptionFromSubscriptionStatus() =

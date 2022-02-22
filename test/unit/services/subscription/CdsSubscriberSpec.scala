@@ -119,9 +119,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
             .subscribe(
               meq(mockRegistrationDetails),
               meq(subscriptionDetails),
-              meq(mockCdsOrganisationType),
-              any[Journey.Value]
-            )(any[HeaderCarrier])
+              meq(mockCdsOrganisationType))(any[HeaderCarrier])
       }
     }
 
@@ -296,9 +294,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
           .subscribe(
             meq(mockRegistrationDetails),
             meq(subscriptionDetails),
-            any[Option[CdsOrganisationType]],
-            any[Journey.Value]
-          )(any[HeaderCarrier])
+            any[Option[CdsOrganisationType]])(any[HeaderCarrier])
         verify(mockCdsFrontendDataCache, never).remove(any[HeaderCarrier])
       }
     }
@@ -477,9 +473,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
       mockSubscriptionService.subscribe(
         any[RegistrationDetails],
         any[SubscriptionDetails],
-        any[Option[CdsOrganisationType]],
-        any[Journey.Value]
-      )(any[HeaderCarrier])
+        any[Option[CdsOrganisationType]])(any[HeaderCarrier])
     ).thenReturn(
       Future
         .successful(SubscriptionSuccessful(Eori(eori), formBundleId, processingDate, Some(emailVerificationTimestamp)))
@@ -545,9 +539,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
         .subscribe(
           any[RegistrationDetails],
           meq(subscriptionDetails),
-          any[Option[CdsOrganisationType]],
-          any[Journey.Value]
-        )(any[HeaderCarrier])
+          any[Option[CdsOrganisationType]])(any[HeaderCarrier])
     ).thenReturn(Future.successful(SubscriptionPending(formBundleId, processingDate, Some(emailVerificationTimestamp))))
     when(
       mockHandleSubscriptionService.handleSubscription(
@@ -577,9 +569,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
         .subscribe(
           any[RegistrationDetails],
           any[SubscriptionDetails],
-          any[Option[CdsOrganisationType]],
-          any[Journey.Value]
-        )(any[HeaderCarrier])
+          any[Option[CdsOrganisationType]])(any[HeaderCarrier])
     ).thenReturn(Future.successful(SubscriptionFailed("EORI already exists", processingDate)))
     when(mockRegistrationDetails.name).thenReturn(registeredName)
     when(mockRegistrationDetails.safeId).thenReturn(SafeId("safeId"))

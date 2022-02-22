@@ -62,7 +62,6 @@ class SubscriptionFlowManager @Inject()(
   override val currentApp: Application,
   requestSessionData: RequestSessionData,
   cdsFrontendDataCache: SessionCache,
-  subscriptionDetailsService: SubscriptionDetailsService
 ) extends FeatureFlags {
 
   def currentSubscriptionFlow(implicit request: Request[AnyContent]): SubscriptionFlow =

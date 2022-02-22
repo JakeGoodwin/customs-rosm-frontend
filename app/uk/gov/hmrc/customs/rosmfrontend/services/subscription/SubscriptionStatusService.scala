@@ -16,16 +16,15 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
-import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import play.api.Configuration
 import uk.gov.hmrc.customs.rosmfrontend.connector.SubscriptionStatusConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.{SubscriptionStatusOutcome, SubscriptionStatusQueryParams}
 import uk.gov.hmrc.customs.rosmfrontend.services.RequestCommonGenerator
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -34,7 +33,6 @@ class SubscriptionStatusService @Inject()(
   connector: SubscriptionStatusConnector,
   requestCommonGenerator: RequestCommonGenerator,
   cache: SessionCache,
-  config: Configuration
 ) {
 
   private val dateFormat = DateTimeFormat.forPattern("d MMM yyyy")

@@ -97,7 +97,7 @@ class CdsSubscriber @Inject()(
       customId <- if (isRow) cachedCustomsIdF else Future.successful(None)
     } yield {
       (journey, isRow, customId) match {
-        case (Journey.Migrate, true, Some(identifier)) => migrationEoriUK //Has NINO/UTR as identifier UK journey
+        case (Journey.Migrate, true, Some(_)) => migrationEoriUK //Has NINO/UTR as identifier UK journey
         case (Journey.Migrate, true, None)             => migrationEoriROW //ROW
         case (Journey.Migrate, false, _)               => migrationEoriUK //UK Journey
         case _                                         => subscribeEori //Journey Get An EORI
@@ -119,8 +119,7 @@ class CdsSubscriber @Inject()(
       subscriptionResult <- subscriptionService.subscribe(
         registrationDetails,
         subscriptionDetailsHolder,
-        mayBeCdsOrganisationType,
-        journey
+        mayBeCdsOrganisationType
       )
     } yield (subscriptionResult, Some(subscriptionDetailsHolder))
 

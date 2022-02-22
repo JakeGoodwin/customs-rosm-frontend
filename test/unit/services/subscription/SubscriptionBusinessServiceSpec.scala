@@ -26,7 +26,6 @@ import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{BusinessShortName, SubscriptionDetails}
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.{AddressViewModel, ContactDetailsModel}
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
-import uk.gov.hmrc.customs.rosmfrontend.services.mapping.{ContactDetailsAdaptor, RegistrationDetailsCreator}
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.SubscriptionBusinessService
 import uk.gov.hmrc.http.HeaderCarrier
 import util.UnitSpec
@@ -39,10 +38,8 @@ class SubscriptionBusinessServiceSpec extends UnitSpec with MockitoSugar with Be
   implicit val hc: HeaderCarrier = mock[HeaderCarrier]
 
   private val mockCdsFrontendDataCache = mock[SessionCache]
-  private val mockRegistrationDetailsCreator = mock[RegistrationDetailsCreator]
   private val registrationInfo = mock[RegistrationInfo]
   private val mockRegistrationDetails = mock[RegistrationDetails]
-  private val mockContactDetailsAdaptor = mock[ContactDetailsAdaptor]
   private val mockSubscriptionDetailsHolder = mock[SubscriptionDetails]
   private val mockpersonalDataDisclosureConsent = mock[Option[Boolean]]
   private val mockContactDetailsModel = mock[ContactDetailsModel]
@@ -54,7 +51,7 @@ class SubscriptionBusinessServiceSpec extends UnitSpec with MockitoSugar with Be
   val sicCode = Some("someSicCode")
 
   private val subscriptionBusinessService =
-    new SubscriptionBusinessService(mockCdsFrontendDataCache, mockRegistrationDetailsCreator, mockContactDetailsAdaptor)
+    new SubscriptionBusinessService(mockCdsFrontendDataCache)
   private val eoriNumericLength = 15
   private val eoriId = "GB" + Random.nextString(eoriNumericLength)
   private val eori = Eori(eoriId)
@@ -70,11 +67,9 @@ class SubscriptionBusinessServiceSpec extends UnitSpec with MockitoSugar with Be
   override def beforeEach {
     reset(
       mockCdsFrontendDataCache,
-      mockRegistrationDetailsCreator,
       registrationInfo,
       mockRegistrationDetails,
-      mockSubscriptionDetailsHolder,
-      mockContactDetailsAdaptor
+      mockSubscriptionDetailsHolder
     )
 
     when(
@@ -91,9 +86,6 @@ class SubscriptionBusinessServiceSpec extends UnitSpec with MockitoSugar with Be
 
     when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier])).thenReturn(existingHolder)
     when(mockSubscriptionDetailsHolder.personalDataDisclosureConsent).thenReturn(mockpersonalDataDisclosureConsent)
-
-    when(mockRegistrationDetailsCreator.registrationDetails(Some(eori))(registrationInfo))
-      .thenReturn(mockRegistrationDetails)
   }
 
   "Calling maybeCachedContactDetailsModel" should {

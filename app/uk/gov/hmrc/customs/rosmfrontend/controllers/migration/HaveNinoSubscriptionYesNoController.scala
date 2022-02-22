@@ -22,7 +22,6 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
 import uk.gov.hmrc.customs.rosmfrontend.controllers.migration.routes.HaveNinoSubscriptionController
 import uk.gov.hmrc.customs.rosmfrontend.controllers.routes.AddressController
-import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.SubscriptionFlowManager
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.forms.MatchingForms.yesNoCustomAnswerForm
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
@@ -37,7 +36,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class HaveNinoSubscriptionYesNoController @Inject()(
   override val currentApp: Application,
   override val authConnector: AuthConnector,
-  subscriptionFlowManager: SubscriptionFlowManager,
   mcc: MessagesControllerComponents,
   matchNinoSubscriptionView: match_nino_subscription_yes_no,
   subscriptionDetailsHolderService: SubscriptionDetailsService

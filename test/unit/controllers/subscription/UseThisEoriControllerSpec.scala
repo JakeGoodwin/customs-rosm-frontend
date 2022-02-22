@@ -26,10 +26,11 @@ import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.UseThisEoriCont
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.EoriNumberSubscriptionFlowPage
 import uk.gov.hmrc.customs.rosmfrontend.domain.{CdsOrganisationType, EnrolmentResponse, KeyValue}
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
+import uk.gov.hmrc.customs.rosmfrontend.models.exceptions.MissingExistingEori
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.RequestSessionData
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.EnrolmentStoreProxyService
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.{use_this_eori, use_this_eori_different_gg}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import unit.controllers.CdsPage
 import util.builders.AuthBuilder.withAuthorisedUser
 import util.builders.SessionBuilder
@@ -128,6 +129,14 @@ class UseThisEoriControllerSpec
       submitForm()(verifyRedirectToNextPageIn(_)("next-page-url"))
     }
 
+    "fail with MissingExistingEori Exception when EORI number cannot be found in Cache" in {
+      when(mockSubscriptionDetailsHolderService.cachedExistingEoriNumber(any[HeaderCarrier]))
+        .thenReturn(Future.successful(None))
+
+      a[MissingExistingEori] should be thrownBy {
+        submitForm()(verifyRedirectToNextPageIn(_)("next-page-url"))
+      }
+    }
   }
 
   "submitting the form all organisation types for already eori linked to different GG" should {
