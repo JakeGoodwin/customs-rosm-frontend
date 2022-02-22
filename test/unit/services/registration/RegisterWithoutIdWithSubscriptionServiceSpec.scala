@@ -101,11 +101,10 @@ class RegisterWithoutIdWithSubscriptionServiceSpec
         any[Address],
         any[Option[ContactDetailsModel]],
         any[LoggedInUser],
-        any(),
         any[Option[CdsOrganisationType]]
       )(any[HeaderCarrier])
     ).thenReturn(Future.successful(okResponse), Nil: _*)
-    when(mockRegisterWithoutIdService.registerIndividual(any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
+    when(mockRegisterWithoutIdService.registerIndividual(any(), any(), any(), any(), any())(any[HeaderCarrier]))
       .thenReturn(Future.successful(okResponse), Nil: _*)
   }
 
@@ -116,11 +115,10 @@ class RegisterWithoutIdWithSubscriptionServiceSpec
         any[Address],
         any[Option[ContactDetailsModel]],
         any[LoggedInUser],
-        any(),
         any[Option[CdsOrganisationType]]
       )(any[HeaderCarrier])
     ).thenReturn(Future.successful(notOKResponse), Nil: _*)
-    when(mockRegisterWithoutIdService.registerIndividual(any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
+    when(mockRegisterWithoutIdService.registerIndividual(any(), any(), any(), any(), any())(any[HeaderCarrier]))
       .thenReturn(Future.successful(notOKResponse), Nil: _*)
   }
 
@@ -131,11 +129,10 @@ class RegisterWithoutIdWithSubscriptionServiceSpec
         any[Address],
         any[Option[ContactDetailsModel]],
         any[LoggedInUser],
-        any(),
         any[Option[CdsOrganisationType]]
       )(any[HeaderCarrier])
     ).thenReturn(Future.failed(emulatedFailure))
-    when(mockRegisterWithoutIdService.registerIndividual(any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
+    when(mockRegisterWithoutIdService.registerIndividual(any(), any(), any(), any(), any())(any[HeaderCarrier]))
       .thenReturn(Future.failed(emulatedFailure))
   }
 
@@ -169,10 +166,10 @@ class RegisterWithoutIdWithSubscriptionServiceSpec
       await(service.rowRegisterWithoutIdWithSubscription(mockLoggedInUser, Journey.GetYourEORI)(hc, rq))
 
       verify(mockSubscriptionCreateController, times(1)).subscribe(any())
-      verify(mockRegisterWithoutIdService, never).registerOrganisation(anyString(), any(), any(), any(), any(), any())(
+      verify(mockRegisterWithoutIdService, never).registerOrganisation(anyString(), any(), any(), any(), any())(
         any()
       )
-      verify(mockRegisterWithoutIdService, never).registerIndividual(any(), any(), any(), any(), any(), any())(any())
+      verify(mockRegisterWithoutIdService, never).registerIndividual(any(), any(), any(), any(), any())(any())
     }
 
     "when UK, and Migration, call subscriptionCreate, do not call registerOrganisation or registerIndividual" in {
@@ -184,10 +181,10 @@ class RegisterWithoutIdWithSubscriptionServiceSpec
       await(service.rowRegisterWithoutIdWithSubscription(mockLoggedInUser, Journey.Migrate)(hc, rq))
 
       verify(mockSubscriptionCreateController, times(1)).subscribe(any())
-      verify(mockRegisterWithoutIdService, never).registerOrganisation(anyString(), any(), any(), any(), any(), any())(
+      verify(mockRegisterWithoutIdService, never).registerOrganisation(anyString(), any(), any(), any(), any())(
         any()
       )
-      verify(mockRegisterWithoutIdService, never).registerIndividual(any(), any(), any(), any(), any(), any())(any())
+      verify(mockRegisterWithoutIdService, never).registerIndividual(any(), any(), any(), any(), any())(any())
     }
 
     "when CorporateBody and ROW and Migration, call subscriptionCreate, do not call registerOrganisation or registerIndividual" in {
@@ -200,10 +197,10 @@ class RegisterWithoutIdWithSubscriptionServiceSpec
       await(service.rowRegisterWithoutIdWithSubscription(mockLoggedInUser, Journey.Migrate)(hc, rq))
 
       verify(mockSubscriptionCreateController, times(1)).subscribe(any())
-      verify(mockRegisterWithoutIdService, never).registerOrganisation(anyString(), any(), any(), any(), any(), any())(
+      verify(mockRegisterWithoutIdService, never).registerOrganisation(anyString(), any(), any(), any(), any())(
         any()
       )
-      verify(mockRegisterWithoutIdService, never).registerIndividual(any(), any(), any(), any(), any(), any())(any())
+      verify(mockRegisterWithoutIdService, never).registerIndividual(any(), any(), any(), any(), any())(any())
     }
 
     "when CorporateBody and ROW and GYE, call subscriptionCreate, do not call Register without id" in {
@@ -217,10 +214,10 @@ class RegisterWithoutIdWithSubscriptionServiceSpec
       await(service.rowRegisterWithoutIdWithSubscription(mockLoggedInUser, Journey.GetYourEORI)(hc, rq))
 
       verify(mockSubscriptionCreateController, times(1)).subscribe(any())
-      verify(mockRegisterWithoutIdService, never).registerOrganisation(anyString(), any(), any(), any(), any(), any())(
+      verify(mockRegisterWithoutIdService, never).registerOrganisation(anyString(), any(), any(), any(), any())(
         any()
       )
-      verify(mockRegisterWithoutIdService, never).registerIndividual(any(), any(), any(), any(), any(), any())(any())
+      verify(mockRegisterWithoutIdService, never).registerIndividual(any(), any(), any(), any(), any())(any())
     }
 
     "when NA and ROW, call subscriptionCreate, call registerIndividual, do not call registerOrganisation" in {
@@ -234,9 +231,9 @@ class RegisterWithoutIdWithSubscriptionServiceSpec
 
       await(service.rowRegisterWithoutIdWithSubscription(mockLoggedInUser, Journey.GetYourEORI)(hc, rq))
 
-      verify(mockRegisterWithoutIdService, times(1)).registerIndividual(any(), any(), any(), any(), any(), any())(any())
+      verify(mockRegisterWithoutIdService, times(1)).registerIndividual(any(), any(), any(), any(), any())(any())
       verify(mockSubscriptionCreateController, times(1)).subscribe(any())
-      verify(mockRegisterWithoutIdService, never).registerOrganisation(anyString(), any(), any(), any(), any(), any())(
+      verify(mockRegisterWithoutIdService, never).registerOrganisation(anyString(), any(), any(), any(), any())(
         any()
       )
       verify(mockSessionCache, times(2)).registrationDetails(any())
@@ -260,10 +257,9 @@ class RegisterWithoutIdWithSubscriptionServiceSpec
         any(),
         meq(Some(contactDetails)),
         any(),
-        any(),
         any()
       )(any())
-      verify(mockRegisterWithoutIdService, never).registerIndividual(any(), any(), any(), any(), any(), any())(any())
+      verify(mockRegisterWithoutIdService, never).registerIndividual(any(), any(), any(), any(), any())(any())
       verify(mockSessionCache, times(2)).registrationDetails(any())
       verify(mockSessionCache).subscriptionDetails(any())
     }

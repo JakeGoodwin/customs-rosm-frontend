@@ -38,7 +38,6 @@ class SubscriptionService @Inject()(countries: Countries, connector: Subscriptio
     registration: RegistrationDetails,
     subscription: SubscriptionDetails,
     cdsOrganisationType: Option[CdsOrganisationType],
-    journey: Journey.Value
   )(implicit hc: HeaderCarrier): Future[SubscriptionResult] =
     subscribeWithConnector(createRequest(registration, subscription, cdsOrganisationType))
 

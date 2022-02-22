@@ -16,28 +16,20 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
-import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription._
-import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.{
-  AddressViewModel,
-  ContactDetailsModel,
-  VatDetails,
-  VatEUDetailsModel
-}
+import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.{AddressViewModel, ContactDetailsModel, VatDetails, VatEUDetailsModel}
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
-import uk.gov.hmrc.customs.rosmfrontend.services.mapping.{ContactDetailsAdaptor, RegistrationDetailsCreator}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class SubscriptionBusinessService @Inject()(
-  cdsFrontendDataCache: SessionCache,
-  registrationDetailsCreator: RegistrationDetailsCreator,
-  contactDetailsAdaptor: ContactDetailsAdaptor
+  cdsFrontendDataCache: SessionCache
 ) {
 
   def getCachedCompanyShortName(implicit hc: HeaderCarrier): Future[BusinessShortName] =

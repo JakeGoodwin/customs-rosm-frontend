@@ -80,7 +80,6 @@ class RegisterWithoutIdWithSubscriptionService @Inject()(
             journey,
             regDetails,
             subDetails,
-            internalId,
             requestSessionData.userSelectedOrganisationType
           )
         case _ =>
@@ -89,7 +88,6 @@ class RegisterWithoutIdWithSubscriptionService @Inject()(
             journey,
             regDetails,
             subDetails,
-            internalId,
             requestSessionData.userSelectedOrganisationType
           )
       }
@@ -107,7 +105,6 @@ class RegisterWithoutIdWithSubscriptionService @Inject()(
     journey: Journey.Value,
     registrationDetails: RegistrationDetails,
     subscriptionDetails: SubscriptionDetails,
-    internalId: Option[String] = None,
     orgType: Option[CdsOrganisationType] = None
   )(implicit hc: HeaderCarrier, request: Request[AnyContent]) =
     subscriptionDetails.nameDobDetails.map(
@@ -118,7 +115,6 @@ class RegisterWithoutIdWithSubscriptionService @Inject()(
             registrationDetails.address,
             subscriptionDetails.contactDetails,
             loggedInUser,
-            internalId,
             orgType
           )
           .flatMap {
@@ -138,7 +134,6 @@ class RegisterWithoutIdWithSubscriptionService @Inject()(
     journey: Journey.Value,
     registrationDetails: RegistrationDetails,
     subscriptionDetails: SubscriptionDetails,
-    internalId: Option[String] = None,
     orgType: Option[CdsOrganisationType] = None
   )(implicit hc: HeaderCarrier, request: Request[AnyContent]) =
     registerWithoutIdService
@@ -147,7 +142,6 @@ class RegisterWithoutIdWithSubscriptionService @Inject()(
         registrationDetails.address,
         subscriptionDetails.contactDetails,
         loggedInUser,
-        internalId,
         orgType
       )
       .flatMap {

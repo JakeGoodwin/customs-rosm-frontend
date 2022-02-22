@@ -16,17 +16,12 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.registration
 
-import javax.inject.{Inject, Singleton}
 import play.api.mvc.{AnyContent, Request}
-import uk.gov.hmrc.customs.rosmfrontend.domain.LoggedInUser
-import uk.gov.hmrc.customs.rosmfrontend.services.cache.{
-  ClearCacheAndRegistrationIdentificationService,
-  RequestSessionData,
-  SessionCache
-}
+import uk.gov.hmrc.customs.rosmfrontend.services.cache.{ClearCacheAndRegistrationIdentificationService, RequestSessionData, SessionCache}
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{PreSubscriptionStatus, SubscriptionStatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -45,6 +40,6 @@ class RegistrationConfirmService @Inject()(
     subscriptionStatusService.getStatus("taxPayerID", registrationDetails.sapNumber.mdgTaxPayerId)
   }
 
-  def clearRegistrationData(loggedInUser: LoggedInUser)(implicit hc: HeaderCarrier): Future[Unit] =
-    clearDataService.clear(loggedInUser)
+  def clearRegistrationData(implicit hc: HeaderCarrier): Future[Unit] =
+    clearDataService.clear
 }

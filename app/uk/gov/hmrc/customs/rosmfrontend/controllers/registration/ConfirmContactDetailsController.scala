@@ -222,7 +222,7 @@ class ConfirmContactDetailsController @Inject()(
         }
       case No =>
         registrationConfirmService
-          .clearRegistrationData(loggedInUser)
+          .clearRegistrationData
           .map(
             _ =>
               Redirect(

@@ -23,7 +23,6 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
-import play.api.Configuration
 import play.api.libs.json.Json
 import play.mvc.Http.Status._
 import uk.gov.hmrc.customs.rosmfrontend.connector.SubscriptionStatusConnector
@@ -40,7 +39,6 @@ class SubscriptionStatusServiceSpec extends UnitSpec with MockitoSugar with Befo
   private val mockConnector = mock[SubscriptionStatusConnector]
   private val mockRequestCommonGenerator: RequestCommonGenerator = mock[RequestCommonGenerator]
   private val mockSessionCache = mock[SessionCache]
-  private val mockConfig = mock[Configuration]
   private val AValidTaxPayerID = "123456789"
   private val MDGZeroPaddedTaxPayerId = AValidTaxPayerID + "000000000000000000000000000000000"
   private val receiptDate = new DateTime().withDate(2016, 3, 17).withTime(9, 30, 47, 0)
@@ -48,12 +46,11 @@ class SubscriptionStatusServiceSpec extends UnitSpec with MockitoSugar with Befo
     SubscriptionStatusQueryParams(receiptDate = receiptDate, regime = "CDS", "taxPayerID", MDGZeroPaddedTaxPayerId)
 
   lazy val service =
-    new SubscriptionStatusService(mockConnector, mockRequestCommonGenerator, mockSessionCache, mockConfig)
+    new SubscriptionStatusService(mockConnector, mockRequestCommonGenerator, mockSessionCache)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   override protected def beforeEach() {
-    reset(mockConfig)
     reset(mockConnector)
     reset(mockSessionCache)
   }

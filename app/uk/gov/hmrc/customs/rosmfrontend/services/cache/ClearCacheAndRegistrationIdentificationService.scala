@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.cache
 
-import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.customs.rosmfrontend.domain.LoggedInUser
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class ClearCacheAndRegistrationIdentificationService @Inject()(sessionCache: SessionCache) {
 
-  def clear(loggedInUser: LoggedInUser)(implicit hc: HeaderCarrier): Future[Unit] =
+  def clear(implicit hc: HeaderCarrier): Future[Unit] =
     for {
       email <- sessionCache.email
       _ <- sessionCache.remove
