@@ -23,6 +23,7 @@ import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.Individual
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.RegistrationInfoRequest.{NINO, UTR}
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.SubscriptionDetails
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.AddressViewModel
+import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
 import uk.gov.hmrc.customs.rosmfrontend.services.RequestCommonGenerator
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
 import uk.gov.hmrc.customs.rosmfrontend.services.mapping.{CdsToEtmpOrganisationType, OrganisationTypeConfiguration}
@@ -190,8 +191,10 @@ class RegisterWithEoriAndIdService @Inject()(
         dataCache.saveRegisterWithEoriAndIdResponse(details)
       }
 
+    val requestToCreateBusinessPartnershipAndContractAccounts = RegisterWithEoriAndIdRequest(reqCommonGenerator.generate(), stripKFromUtr(value))
     for {
-      response <- connector.register(RegisterWithEoriAndIdRequest(reqCommonGenerator.generate(), stripKFromUtr(value)))
+      response <- connector.register(requestToCreateBusinessPartnershipAndContractAccounts)
+      _ = CdsLogger.info(s"SUBSCRIBE: ${requestToCreateBusinessPartnershipAndContractAccounts}")
       saved <- save(response, subscriptionDetails)
     } yield saved
   }
