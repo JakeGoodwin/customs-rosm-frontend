@@ -24,16 +24,13 @@ import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{affinityGroup, allEnrolments, internalId, email => ggEmail, _}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.customs.rosmfrontend.controllers.auth.{AccessController, AuthRedirectSupport, EnrolmentExtractor}
-import uk.gov.hmrc.customs.rosmfrontend.controllers.routes.EnrolmentAlreadyExistsController.enrolmentAlreadyExists
 import uk.gov.hmrc.customs.rosmfrontend.domain._
-import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class CdsController(mcc: MessagesControllerComponents)(implicit ec: ExecutionContext)
-    extends FrontendController(mcc) with I18nSupport with AuthorisedFunctions with AuthRedirectSupport
-    with EnrolmentExtractor with AccessController {
+abstract class CdsController(mcc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(mcc) with I18nSupport with AuthorisedFunctions with AuthRedirectSupport
+  with EnrolmentExtractor with AccessController {
 
   def authConnector: AuthConnector
 
@@ -76,15 +73,8 @@ abstract class CdsController(mcc: MessagesControllerComponents)(implicit ec: Exe
     userCredentialRole: Option[CredentialRole],
     groupId: Option[String]
   )(implicit request: Request[AnyContent]) = {
-    val cdsLoggedInUser =
-      LoggedInUserWithEnrolments(userAffinityGroup, userInternalId, userAllEnrolments, currentUserEmail, groupId)
-    val journey = if (request.path.contains("register-for-cds")) Journey.GetYourEORI else Journey.Migrate
-    permitUserOrRedirect(userAffinityGroup, userCredentialRole, currentUserEmail) {
-      enrolledEori(cdsLoggedInUser) match {
-        case Some(_) => Future.successful(Redirect(enrolmentAlreadyExists(journey)))
-        case None =>
-          requestProcessor fold (_(request)(userInternalId)(cdsLoggedInUser), _(request)(cdsLoggedInUser))
-      }
-    }
+    val cdsLoggedInUser = LoggedInUserWithEnrolments(userAffinityGroup, userInternalId, userAllEnrolments, currentUserEmail, groupId)
+    permitUserOrRedirect(cdsLoggedInUser, userAffinityGroup, userCredentialRole, currentUserEmail)(requestProcessor fold(_ (request)(userInternalId)(cdsLoggedInUser), _ (request)(cdsLoggedInUser)))
   }
+
 }

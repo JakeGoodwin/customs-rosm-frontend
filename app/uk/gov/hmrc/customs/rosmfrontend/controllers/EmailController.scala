@@ -100,6 +100,7 @@ class EmailController @Inject()(
           }
         }
       } else {
+        //subscription journey
         userGroupIdSubscriptionStatusCheckService.checksToProceed(GroupId(user.groupId), InternalId(user.internalId)) {
           continue(journey)
         } { groupIsEnrolled(journey) } {
