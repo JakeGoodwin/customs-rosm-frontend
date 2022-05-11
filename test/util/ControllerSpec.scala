@@ -25,7 +25,7 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc._
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Play}
-import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.{Assistant, AuthConnector, CredentialRole}
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -95,6 +95,26 @@ trait ControllerSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar
       )
     }
 
+    s"redirect to enrolment-already-exists page when a user already has an EORI enrolment on GG and is Assistant for a Get An EORI Journey $additionalLabel" in {
+      withAuthorisedUser(defaultUserId, mockAuthConnector, cdsEnrolmentId = cdsEnrolmentId, userCredentialRole = Some(Assistant))
+
+      val result = action.apply(SessionBuilder.buildRequestWithSession(defaultUserId))
+      status(result) shouldBe SEE_OTHER
+      header(LOCATION, result) shouldBe Some(
+        "/customs/subscribe-for-cds/enrolment-already-exists"
+      )
+    }
+
+    s"redirect to you-cannot-use-service page when a user doesn't have an EORI enrolment on GG and is Assistant for a Get An EORI Journey $additionalLabel" in {
+      withAuthorisedUser(defaultUserId, mockAuthConnector, cdsEnrolmentId = None, userCredentialRole = Some(Assistant))
+
+      val result = action.apply(SessionBuilder.buildRequestWithSession(defaultUserId))
+      status(result) shouldBe SEE_OTHER
+      header(LOCATION, result) shouldBe Some(
+        "/customs/subscribe-for-cds/you-cannot-use-service"
+      )
+    }
+
     s"redirect to Complete page when a user already has an EORI enrolment on GG for a Get An EORI Journey $additionalLabel" in {
       withAuthorisedUser(defaultUserId, mockAuthConnector, cdsEnrolmentId = cdsEnrolmentId)
 
@@ -116,6 +136,26 @@ trait ControllerSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar
       status(result) shouldBe SEE_OTHER
       header(LOCATION, result) shouldBe Some(
         s"/bas-gateway/sign-in?continue_url=http%3A%2F%2Flocalhost%3A9830%2Fcustoms%2Fsubscribe-for-cds%2Fsubscribe&origin=customs-rosm-frontend"
+      )
+    }
+
+    "redirect to enrolment-already-exists page when a user already has an EORI enrolment on GG and is Assistant for a Subscription Journey" in {
+      withAuthorisedUser(defaultUserId, mockAuthConnector, cdsEnrolmentId = cdsEnrolmentId, userCredentialRole = Some(Assistant))
+
+      val result = action.apply(SessionBuilder.buildRequestWithSession(defaultUserId))
+      status(result) shouldBe SEE_OTHER
+      header(LOCATION, result) shouldBe Some(
+        "/customs/subscribe-for-cds/enrolment-already-exists"
+      )
+    }
+
+    "redirect to you-cannot-use-service page when a user doesn't have an EORI enrolment on GG and is Assistant for a Subscription Journey" in {
+      withAuthorisedUser(defaultUserId, mockAuthConnector, cdsEnrolmentId = None, userCredentialRole = Some(Assistant))
+
+      val result = action.apply(SessionBuilder.buildRequestWithSession(defaultUserId))
+      status(result) shouldBe SEE_OTHER
+      header(LOCATION, result) shouldBe Some(
+        "/customs/subscribe-for-cds/you-cannot-use-service"
       )
     }
 
