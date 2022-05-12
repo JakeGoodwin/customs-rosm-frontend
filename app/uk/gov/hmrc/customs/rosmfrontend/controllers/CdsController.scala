@@ -74,7 +74,9 @@ abstract class CdsController(mcc: MessagesControllerComponents)(implicit ec: Exe
     groupId: Option[String]
   )(implicit request: Request[AnyContent]) = {
     val cdsLoggedInUser = LoggedInUserWithEnrolments(userAffinityGroup, userInternalId, userAllEnrolments, currentUserEmail, groupId)
-    permitUserOrRedirect(cdsLoggedInUser, userAffinityGroup, userCredentialRole, currentUserEmail)(requestProcessor fold(_ (request)(userInternalId)(cdsLoggedInUser), _ (request)(cdsLoggedInUser)))
+    permitUserOrRedirect(cdsLoggedInUser, userAffinityGroup, userCredentialRole, currentUserEmail)(
+      requestProcessor.fold(req => req.apply(request)(userInternalId)(cdsLoggedInUser), req => req.apply(request)(cdsLoggedInUser)) //permitted 'Action' which is executed if all checks pass
+    )
   }
 
 }
