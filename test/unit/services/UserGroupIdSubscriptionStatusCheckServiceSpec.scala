@@ -22,16 +22,19 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time.{Millis, Span}
+import play.api.http.Status.SEE_OTHER
 import play.api.libs.json.{Reads, Writes}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Request, Result}
-import play.api.test.Helpers.LOCATION
+import play.api.test.Helpers.{LOCATION, defaultAwaitTimeout, redirectLocation}
 import uk.gov.hmrc.customs.rosmfrontend.connector.Save4LaterConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.{CacheIds, GroupId, InternalId, SafeId}
 import uk.gov.hmrc.customs.rosmfrontend.services.UserGroupIdSubscriptionStatusCheckService
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription._
 import uk.gov.hmrc.http.HeaderCarrier
 import util.UnitSpec
+import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
+import uk.gov.hmrc.customs.rosmfrontend.forms.models.email.EmailStatus
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,6 +44,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
   private val mockSubscriptionStatusService = mock[SubscriptionStatusService]
   private val mockEnrolmentStoreProxyService = mock[EnrolmentStoreProxyService]
   private val mockSave4LaterConnector = mock[Save4LaterConnector]
+  private val mockAppConfig = mock[AppConfig]
   private implicit val hc: HeaderCarrier = mock[HeaderCarrier]
   private implicit val rq: Request[AnyContent] = mock[Request[AnyContent]]
   private implicit val reads: Reads[CacheIds] = mock[Reads[CacheIds]]
@@ -52,7 +56,8 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
   private val service = new UserGroupIdSubscriptionStatusCheckService(
     mockSubscriptionStatusService,
     mockEnrolmentStoreProxyService,
-    mockSave4LaterConnector
+    mockSave4LaterConnector,
+    mockAppConfig
   )
 
   private def continue: Future[Result] = Future.successful(Redirect("/continue"))
@@ -74,17 +79,19 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
     ).thenReturn(Future.successful(true))
   }
 
-  "UserGroupIdSubscriptionStatusCheckService" should {
+  "checksToProceed" should {
+
     "block the user for the groupID if enrolment exists" in {
 
       val result: Result = service
-        .checksToProceed(groupId, internalId) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
+        . checksToProceed(groupId, internalId,false) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
           otherUserWithinGroupIsInProcess
         }
         .futureValue
 
       result.header.headers(LOCATION) shouldBe "/blocked/groupIsEnrolled"
     }
+
     "block the user for the groupID is cache and subscription status is SubscriptionProcessing" in {
       when(
         mockEnrolmentStoreProxyService
@@ -98,7 +105,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
         .thenReturn(Future.successful(SubscriptionProcessing))
 
       val result: Result = service
-        .checksToProceed(groupId, internalId) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
+        . checksToProceed(groupId, internalId,false) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
           otherUserWithinGroupIsInProcess
         }
         .futureValue
@@ -119,7 +126,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
         .thenReturn(Future.successful(SubscriptionExists))
 
       val result: Result = service
-        .checksToProceed(groupId, internalId) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
+        . checksToProceed(groupId, internalId,false) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
           otherUserWithinGroupIsInProcess
         }
         .futureValue
@@ -140,7 +147,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
         .thenReturn(Future.successful(SubscriptionProcessing))
 
       val result: Result = service
-        .checksToProceed(groupId, internalId) { continue } { groupIsEnrolled } { userIsInProcess } {existingApplicationInProgress}{
+        . checksToProceed(groupId, internalId,false) { continue } { groupIsEnrolled } { userIsInProcess } {existingApplicationInProgress}{
           otherUserWithinGroupIsInProcess
         }
         .futureValue
@@ -148,7 +155,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       result.header.headers(LOCATION) shouldBe "/blocked/otherUserWithinGroupIsInProcess"
     }
 
-    "Allow the user for the groupID is cached and subscription status is SubscriptionRejected" in {
+    "allow the user for the groupID is cached and subscription status is SubscriptionRejected" in {
       when(
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
@@ -162,7 +169,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       when(mockSave4LaterConnector.delete(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(()))
 
       val result: Result = service
-        .checksToProceed(groupId, internalId) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
+        . checksToProceed(groupId, internalId,false) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
           otherUserWithinGroupIsInProcess
         }
         .futureValue
@@ -170,7 +177,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       result.header.headers(LOCATION) shouldBe "/continue"
     }
 
-    "Allow the user for the groupID is cached and subscription status is NewSubscription" in {
+    "allow the user for the groupID is cached and subscription status is NewSubscription" in {
       when(
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
@@ -184,7 +191,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       when(mockSave4LaterConnector.delete(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(()))
 
       val result: Result = service
-        .checksToProceed(groupId, internalId) { continue } { groupIsEnrolled } { userIsInProcess } {existingApplicationInProgress}{
+        . checksToProceed(groupId, internalId,false) { continue } { groupIsEnrolled } { userIsInProcess } {existingApplicationInProgress}{
           otherUserWithinGroupIsInProcess
         }
         .futureValue
@@ -192,24 +199,91 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       result.header.headers(LOCATION) shouldBe "/continue"
     }
 
-    "Allow the user if groupID is not cached" in {
+    "continue in to CDS service when groupID is not cached and redirectToECCEnabled is set to false and no email is cached" in {
       when(
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
       ).thenReturn(Future.successful(false))
+
+      when(
+        mockSave4LaterConnector
+          .get[CacheIds](any[String], any[String])(
+            any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]]
+          )
+      ).thenReturn(Future.successful(None))
+
+      when(
+        mockSave4LaterConnector
+          .get[EmailStatus](any[String], any[String])(any[HeaderCarrier], any[Reads[EmailStatus]], any[Writes[EmailStatus]])
+      ).thenReturn(Future.successful(None))
+
+      val result: Result =
+        service.checksToProceed(
+          groupId, internalId, redirectToECCEnabled = false
+        ) { continue } { groupIsEnrolled } {userIsInProcess}
+          { existingApplicationInProgress}{ otherUserWithinGroupIsInProcess }.futureValue
+
+      status(result) shouldBe SEE_OTHER
+      result.header.headers(LOCATION) shouldBe "/continue"
+    }
+
+    "continue in to CDS service when groupID is not cached and redirectToECCEnabled is set to true and email is cached" in {
+      import org.mockito.ArgumentMatchers.{eq => meq}
+
+      when(
+        mockEnrolmentStoreProxyService
+          .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
+      ).thenReturn(Future.successful(false))
+
+      when(
+        mockSave4LaterConnector
+          .get[CacheIds](
+            meq(groupId.id), meq("cachedGroupId")
+          )(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
+      ).thenReturn(Future.successful(None))
+
+      when(
+        mockSave4LaterConnector
+          .get[EmailStatus](
+            meq(internalId.id), meq("email")
+          )(any[HeaderCarrier], any[Reads[EmailStatus]], any[Writes[EmailStatus]])
+      ).thenReturn(Future.successful(Some(EmailStatus("test@email.com", true, Some(true)))))
+
+      val result: Result =
+        service.checksToProceed(groupId, internalId, redirectToECCEnabled = true)
+        { continue } { groupIsEnrolled } { userIsInProcess }
+        { existingApplicationInProgress }{ otherUserWithinGroupIsInProcess }.futureValue
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some("/continue")
+    }
+
+    "redirect to ECC when groupID is not cached and redirectToECCEnabled is set to true and no email is cached" in {
+      when(
+        mockEnrolmentStoreProxyService
+          .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
+      ).thenReturn(Future.successful(false))
+
       when(
         mockSave4LaterConnector
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(None))
 
-      val result: Result = service
-        .checksToProceed(groupId, internalId) { continue } { groupIsEnrolled } { userIsInProcess } {existingApplicationInProgress}{
-          otherUserWithinGroupIsInProcess
-        }
-        .futureValue
+      when(
+        mockSave4LaterConnector
+          .get[EmailStatus](any[String], any[String])(any[HeaderCarrier], any[Reads[EmailStatus]], any[Writes[EmailStatus]])
+      ).thenReturn(Future.successful(None))
 
-      result.header.headers(LOCATION) shouldBe "/continue"
+      when(mockAppConfig.subscribeLinkSubscribe)
+        .thenReturn("/customs-enrolment-services/cds/subscribe")
+
+      val result: Result =
+        service. checksToProceed(groupId, internalId,redirectToECCEnabled = true)
+        { continue } { groupIsEnrolled } { userIsInProcess }
+        { existingApplicationInProgress }{ otherUserWithinGroupIsInProcess }.futureValue
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some("/customs-enrolment-services/cds/subscribe")
     }
   }
-
 }

@@ -24,6 +24,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.customs.rosmfrontend.connector.Save4LaterConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.EmailController
 import uk.gov.hmrc.customs.rosmfrontend.domain.{EnrolmentResponse, EnrolmentStoreProxyResponse, InternalId, KeyValue}
@@ -50,11 +51,13 @@ class EmailControllerSpec extends ControllerSpec with AddressPageFactoring with 
   private val mockSave4LaterConnector = mock[Save4LaterConnector]
   private val mockEnrolmentStoreProxyService = mock[EnrolmentStoreProxyService]
   private val mockSubscriptionStatusService = mock[SubscriptionStatusService]
+  private val mockAppConfig = mock[AppConfig]
   private val mockUserGroupIdSubscriptionStatusCheckService =
     new UserGroupIdSubscriptionStatusCheckService(
       mockSubscriptionStatusService,
       mockEnrolmentStoreProxyService,
-      mockSave4LaterConnector
+      mockSave4LaterConnector,
+      mockAppConfig
     )
 
   private val controller = new EmailController(

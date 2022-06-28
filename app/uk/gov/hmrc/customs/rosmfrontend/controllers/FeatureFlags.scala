@@ -28,4 +28,6 @@ trait FeatureFlags {
   val matchingEnabled: Boolean = loadConfig(path = "features.matchingEnabled")
 
   val rowHaveUtrEnabled: Boolean = loadConfig("features.rowHaveUtrEnabled")
+
+  val redirectToECCEnabled: Boolean = loadConfig("features.redirectToECC")
 }

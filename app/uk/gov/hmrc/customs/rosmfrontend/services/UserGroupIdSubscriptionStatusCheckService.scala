@@ -16,10 +16,14 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services
 
+import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Request, Result}
+import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.customs.rosmfrontend.connector.Save4LaterConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.auth.EnrolmentExtractor
 import uk.gov.hmrc.customs.rosmfrontend.domain._
+import uk.gov.hmrc.customs.rosmfrontend.forms.models.email.EmailStatus
+import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.CachedData
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -31,17 +35,18 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserGroupIdSubscriptionStatusCheckService @Inject()(
     subscriptionStatusService: SubscriptionStatusService,
     enrolmentStoreProxyService: EnrolmentStoreProxyService,
-    save4LaterConnector: Save4LaterConnector
+    save4LaterConnector: Save4LaterConnector,
+    appConfig: AppConfig
 )(implicit ec: ExecutionContext)
     extends EnrolmentExtractor {
   private val idType = "SAFE"
 
-  def checksToProceed(groupId: GroupId, internalId: InternalId)(
+  def checksToProceed(groupId: GroupId, internalId: InternalId, redirectToECCEnabled: Boolean)(
       continue: => Future[Result]
   )(groupIsEnrolled: => Future[Result])(userIsInProcess: => Future[Result])(
       existingApplicationInProcess: => Future[Result])(
       otherUserWithinGroupIsInProcess: => Future[Result]
-  )(implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Result] =
+  )(implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Result] = {
     enrolmentStoreProxyService.isEnrolmentAssociatedToGroup(groupId).flatMap {
       case true => groupIsEnrolled //Block the user
       case false => {
@@ -49,6 +54,7 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
           .get[CacheIds](groupId.id, CachedData.groupIdKey)
           .flatMap {
             case Some(cacheIds) => {
+              CdsLogger.warn("CDS Cache Data Available - continue in old CDS service")
               subscriptionStatusService
                 .getStatus(idType, cacheIds.safeId.id)
                 .flatMap {
@@ -73,12 +79,19 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
                   }
                 }
             }
-            case _ => {
-              continue
-            }
+            case _ =>
+              save4LaterConnector.get[EmailStatus](internalId.id, CachedData.emailKey).flatMap {
+                case None if redirectToECCEnabled =>
+                  CdsLogger.warn("CDS Cache Data Unavailable - redirected to New ECC CDS service")
+                  Future.successful(Redirect(appConfig.subscribeLinkSubscribe))
+                case _ =>
+                  CdsLogger.warn("CDS Cache Data Available - continue in old CDS service")
+                  continue
+              }
           }
       }
     }
+  }
 
   def userOrGroupHasAnEori(
       groupId: GroupId

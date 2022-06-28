@@ -67,5 +67,4 @@ class Save4LaterService @Inject()(save4LaterConnector: Save4LaterConnector)(impl
     save4LaterConnector
       .get[EmailStatus](internalId.id, emailKey)
   }
-
 }
