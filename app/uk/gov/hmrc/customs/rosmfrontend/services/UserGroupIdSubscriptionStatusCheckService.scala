@@ -24,6 +24,7 @@ import uk.gov.hmrc.customs.rosmfrontend.controllers.auth.EnrolmentExtractor
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.email.EmailStatus
 import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
+import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.CachedData
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -41,7 +42,7 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
     extends EnrolmentExtractor {
   private val idType = "SAFE"
 
-  def checksToProceed(groupId: GroupId, internalId: InternalId, redirectToECCEnabled: Boolean)(
+  def checksToProceed(groupId: GroupId, internalId: InternalId, redirectToECCEnabled: Boolean, journey: Journey.Value)(
       continue: => Future[Result]
   )(groupIsEnrolled: => Future[Result])(userIsInProcess: => Future[Result])(
       existingApplicationInProcess: => Future[Result])(
@@ -54,7 +55,7 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
           .get[CacheIds](groupId.id, CachedData.groupIdKey)
           .flatMap {
             case Some(cacheIds) => {
-              CdsLogger.warn(s"CacheIds data exists - continue in old CDS service for user with internal id - ${internalId.id}")
+              CdsLogger.warn("CacheIds data exists - continue in old CDS service")
               subscriptionStatusService
                 .getStatus(idType, cacheIds.safeId.id)
                 .flatMap {
@@ -80,14 +81,17 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
                 }
             }
             case _ =>
+              if(journey == Journey.Migrate)
               save4LaterConnector.get[EmailStatus](internalId.id, CachedData.emailKey).flatMap {
                 case None if redirectToECCEnabled =>
-                  CdsLogger.warn(s"No cached data - redirected to New ECC CDS service for user with internal id - ${internalId.id}")
+                  CdsLogger.warn("No cached data - redirected to New ECC CDS service")
                   Future.successful(Redirect(appConfig.subscribeLinkSubscribe))
                 case _ =>
-                  CdsLogger.warn(s"EmailStatus data exists - continue in old CDS service for user with internal id - ${internalId.id}")
+                  CdsLogger.warn("EmailStatus data exists - continue in old CDS service")
                   continue
               }
+              else
+                continue
           }
       }
     }
