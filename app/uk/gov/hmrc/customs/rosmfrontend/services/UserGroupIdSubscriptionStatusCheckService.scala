@@ -54,7 +54,7 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
           .get[CacheIds](groupId.id, CachedData.groupIdKey)
           .flatMap {
             case Some(cacheIds) => {
-              CdsLogger.warn("CDS Cache Data Available - continue in old CDS service")
+              CdsLogger.warn("CacheIds data exists - continue in old CDS service")
               subscriptionStatusService
                 .getStatus(idType, cacheIds.safeId.id)
                 .flatMap {
@@ -82,10 +82,10 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
             case _ =>
               save4LaterConnector.get[EmailStatus](internalId.id, CachedData.emailKey).flatMap {
                 case None if redirectToECCEnabled =>
-                  CdsLogger.warn("CDS Cache Data Unavailable - redirected to New ECC CDS service")
+                  CdsLogger.warn("No cached data - redirected to New ECC CDS service")
                   Future.successful(Redirect(appConfig.subscribeLinkSubscribe))
                 case _ =>
-                  CdsLogger.warn("CDS Cache Data Available - continue in old CDS service")
+                  CdsLogger.warn("EmailStatus data exists - continue in old CDS service")
                   continue
               }
           }
