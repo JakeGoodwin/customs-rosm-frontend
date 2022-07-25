@@ -30,18 +30,22 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 @Singleton
-class Save4LaterConnector @Inject()(http: HttpClient, appConfig: AppConfig, audit: Auditable) {
+class Save4LaterConnector @Inject()(http: HttpClient,
+                                    appConfig: AppConfig,
+                                    audit: Auditable) {
 
   val LoggerComponentId = "Save4LaterConnector"
 
   def get[T](
-    id: String,
-    key: String
-  )(implicit hc: HeaderCarrier, reads: Reads[T], writes: Writes[T]): Future[Option[T]] = {
+      id: String,
+      key: String
+  )(implicit hc: HeaderCarrier,
+    reads: Reads[T],
+    writes: Writes[T]): Future[Option[T]] = {
     val url = s"${appConfig.handleSubscriptionBaseUrl}/save4later/$id/$key"
     CdsLogger.info(s"[$LoggerComponentId][call] GET: $url")
     http.GET[HttpResponse](url) map { response =>
-      CdsLogger.info(s"[$LoggerComponentId][call] complete for call to $url and headers ${hc.headers(explicitlyIncludedHeaders) ++ hc.extraHeaders}")
+      CdsLogger.info(s"[$LoggerComponentId][call] complete for call to $url")
 
       response.status match {
         case OK => {
@@ -57,7 +61,7 @@ class Save4LaterConnector @Inject()(http: HttpClient, appConfig: AppConfig, audi
     } recoverWith {
       case NonFatal(e) =>
         CdsLogger.error(
-          s"[$LoggerComponentId][call] request failed for call to $url and headers ${hc.headers(explicitlyIncludedHeaders) ++ hc.extraHeaders}: ${e.getMessage}",
+          s"[$LoggerComponentId][call] request failed for call to $url: ${e.getMessage}",
           e
         )
         Future.failed(e)
@@ -65,16 +69,18 @@ class Save4LaterConnector @Inject()(http: HttpClient, appConfig: AppConfig, audi
   }
 
   def put[T](
-    id: String,
-    key: String,
-    payload: JsValue
-  )(implicit hc: HeaderCarrier, reads: Reads[T], writes: Writes[T]): Future[Unit] = {
+      id: String,
+      key: String,
+      payload: JsValue
+  )(implicit hc: HeaderCarrier,
+    reads: Reads[T],
+    writes: Writes[T]): Future[Unit] = {
     val url = s"${appConfig.handleSubscriptionBaseUrl}/save4later/$id/$key"
     CdsLogger.info(s"[$LoggerComponentId][call] PUT: $url")
     auditCallRequest(url, payload)
-    val headersForLogging = hc.headers(explicitlyIncludedHeaders) ++ hc.extraHeaders
+
     http.PUT[JsValue, HttpResponse](url, payload) map { response =>
-      CdsLogger.info(s"[$LoggerComponentId][call] complete for call to $url and headers $headersForLogging")
+      CdsLogger.info(s"[$LoggerComponentId][call] complete for call to $url")
       auditCallResponse(url, response.status)
       response.status match {
         case NO_CONTENT | CREATED | OK => ()
@@ -83,7 +89,7 @@ class Save4LaterConnector @Inject()(http: HttpClient, appConfig: AppConfig, audi
     } recoverWith {
       case NonFatal(e) =>
         CdsLogger.error(
-          s"[$LoggerComponentId][call] request failed for call to $url and headers $headersForLogging: ${e.getMessage}",
+          s"[$LoggerComponentId][call] request failed for call to $url: ${e.getMessage}",
           e
         )
         Future.failed(e)
@@ -94,9 +100,9 @@ class Save4LaterConnector @Inject()(http: HttpClient, appConfig: AppConfig, audi
     val url = s"${appConfig.handleSubscriptionBaseUrl}/save4later/$id"
     CdsLogger.info(s"[$LoggerComponentId][call] DELETE: $url")
     auditCallRequest(url, JsNull)
-    val headersForLogging = hc.headers(explicitlyIncludedHeaders) ++ hc.extraHeaders
+
     http.DELETE[HttpResponse](url) map { response =>
-      CdsLogger.info(s"[$LoggerComponentId][call] complete for call to $url and headers $headersForLogging")
+      CdsLogger.info(s"[$LoggerComponentId][call] complete for call to $url")
       auditCallResponse(url, response.status)
       response.status match {
         case NO_CONTENT => ()
@@ -105,7 +111,7 @@ class Save4LaterConnector @Inject()(http: HttpClient, appConfig: AppConfig, audi
     } recoverWith {
       case NonFatal(e) =>
         CdsLogger.error(
-          s"[$LoggerComponentId][call] request failed for call to $url and headers $headersForLogging: ${e.getMessage}",
+          s"[$LoggerComponentId][call] request failed for call to $url: ${e.getMessage}",
           e
         )
         Future.failed(e)
@@ -113,8 +119,8 @@ class Save4LaterConnector @Inject()(http: HttpClient, appConfig: AppConfig, audi
   }
 
   private def auditCallRequest[T](
-    url: String,
-    request: JsValue
+      url: String,
+      request: JsValue
   )(implicit hc: HeaderCarrier, reads: HttpReads[T]): Future[Unit] =
     Future {
       audit.sendExtendedDataEvent(
@@ -126,8 +132,8 @@ class Save4LaterConnector @Inject()(http: HttpClient, appConfig: AppConfig, audi
     }
 
   private def auditCallResponse[T](
-    url: String,
-    response: T
+      url: String,
+      response: T
   )(implicit hc: HeaderCarrier, writes: Writes[T]): Future[Unit] =
     Future {
       audit.sendExtendedDataEvent(
@@ -137,5 +143,4 @@ class Save4LaterConnector @Inject()(http: HttpClient, appConfig: AppConfig, audi
         eventType = "Save4later"
       )
     }
-
 }
