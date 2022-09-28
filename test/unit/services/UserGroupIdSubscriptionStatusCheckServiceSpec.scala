@@ -200,7 +200,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       result.header.headers(LOCATION) shouldBe "/continue"
     }
 
-    "continue in to CDS service when groupID is not cached and redirectToECCEnabled is set to false and no email is cached for Migration journey" in {
+    "continue in to CDS service when groupID is not cached and redirectToECCEnabled is set to false for Migration journey" in {
       when(
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
@@ -211,11 +211,6 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
           .get[CacheIds](any[String], any[String])(
             any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]]
           )
-      ).thenReturn(Future.successful(None))
-
-      when(
-        mockSave4LaterConnector
-          .get[EmailStatus](any[String], any[String])(any[HeaderCarrier], any[Reads[EmailStatus]], any[Writes[EmailStatus]])
       ).thenReturn(Future.successful(None))
 
       val result: Result =
@@ -228,38 +223,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       result.header.headers(LOCATION) shouldBe "/continue"
     }
 
-    "continue in to CDS service when groupID is not cached and redirectToECCEnabled is set to true and email is cached for Migration journey" in {
-      import org.mockito.ArgumentMatchers.{eq => meq}
-      when(
-        mockEnrolmentStoreProxyService
-          .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
-      ).thenReturn(Future.successful(false))
-
-
-      when(
-        mockSave4LaterConnector
-          .get[CacheIds](
-            meq(groupId.id), meq("cachedGroupId")
-          )(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
-      ).thenReturn(Future.successful(None))
-
-      when(
-        mockSave4LaterConnector
-          .get[EmailStatus](
-            meq(internalId.id), meq("email")
-          )(any[HeaderCarrier], any[Reads[EmailStatus]], any[Writes[EmailStatus]])
-      ).thenReturn(Future.successful(Some(EmailStatus("test@email.com", true, Some(true)))))
-
-      val result: Result =
-        service.checksToProceed(groupId, internalId, redirectToECCEnabled = true, Journey.Migrate)
-        { continue } { groupIsEnrolled } { userIsInProcess }
-        { existingApplicationInProgress }{ otherUserWithinGroupIsInProcess }.futureValue
-
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some("/continue")
-    }
-
-    "redirect to ECC when groupID is not cached and redirectToECCEnabled is set to true and no email is cached for Migration journey only" in {
+    "redirect to ECC when groupID is not cached and redirectToECCEnabled is set to true for Migration journey only" in {
       when(
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
@@ -272,10 +236,30 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
           )
       ).thenReturn(Future.successful(None))
 
+      when(mockAppConfig.subscribeLinkSubscribe)
+        .thenReturn("/customs-enrolment-services/cds/subscribe")
+
+      val result: Result =
+        service. checksToProceed(groupId, internalId,redirectToECCEnabled = true, Journey.Migrate)
+        { continue } { groupIsEnrolled } { userIsInProcess }
+        { existingApplicationInProgress }{ otherUserWithinGroupIsInProcess }.futureValue
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some("/customs-enrolment-services/cds/subscribe")
+    }
+
+    "redirect to ECC when groupID is cached and redirectToECCEnabled is set to true for Migration journey only" in {
+      when(
+        mockEnrolmentStoreProxyService
+          .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
+      ).thenReturn(Future.successful(false))
+
       when(
         mockSave4LaterConnector
-          .get[EmailStatus](any[String], any[String])(any[HeaderCarrier], any[Reads[EmailStatus]], any[Writes[EmailStatus]])
-      ).thenReturn(Future.successful(None))
+          .get[CacheIds](any[String], any[String])(
+            any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]]
+          )
+      ).thenReturn(Future.successful(Future.successful(Some(cacheIds))))
 
       when(mockAppConfig.subscribeLinkSubscribe)
         .thenReturn("/customs-enrolment-services/cds/subscribe")
@@ -298,11 +282,6 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       when(
         mockSave4LaterConnector
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
-      ).thenReturn(Future.successful(None))
-
-      when(
-        mockSave4LaterConnector
-          .get[EmailStatus](any[String], any[String])(any[HeaderCarrier], any[Reads[EmailStatus]], any[Writes[EmailStatus]])
       ).thenReturn(Future.successful(None))
 
       when(mockAppConfig.subscribeLinkSubscribe)

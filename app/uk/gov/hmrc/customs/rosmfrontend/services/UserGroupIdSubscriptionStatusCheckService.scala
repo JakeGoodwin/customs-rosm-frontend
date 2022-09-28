@@ -34,28 +34,27 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UserGroupIdSubscriptionStatusCheckService @Inject()(
-    subscriptionStatusService: SubscriptionStatusService,
-    enrolmentStoreProxyService: EnrolmentStoreProxyService,
-    save4LaterConnector: Save4LaterConnector,
-    appConfig: AppConfig
+  subscriptionStatusService: SubscriptionStatusService,
+  enrolmentStoreProxyService: EnrolmentStoreProxyService,
+  save4LaterConnector: Save4LaterConnector,
+  appConfig: AppConfig
 )(implicit ec: ExecutionContext)
-    extends EnrolmentExtractor {
+  extends EnrolmentExtractor {
   private val idType = "SAFE"
 
   def checksToProceed(groupId: GroupId, internalId: InternalId, redirectToECCEnabled: Boolean, journey: Journey.Value)(
-      continue: => Future[Result]
+    continue: => Future[Result]
   )(groupIsEnrolled: => Future[Result])(userIsInProcess: => Future[Result])(
-      existingApplicationInProcess: => Future[Result])(
-      otherUserWithinGroupIsInProcess: => Future[Result]
+    existingApplicationInProcess: => Future[Result])(
+    otherUserWithinGroupIsInProcess: => Future[Result]
   )(implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Result] = {
     enrolmentStoreProxyService.isEnrolmentAssociatedToGroup(groupId).flatMap {
       case true => groupIsEnrolled //Block the user
-      case false => {
+      case false =>
         save4LaterConnector
           .get[CacheIds](groupId.id, CachedData.groupIdKey)
           .flatMap {
-            case Some(cacheIds) => {
-              CdsLogger.warn("CacheIds data exists - continue in old CDS service")
+            case Some(cacheIds) => redirectOnECCFlagEnabled(journey, redirectToECCEnabled) {
               subscriptionStatusService
                 .getStatus(idType, cacheIds.safeId.id)
                 .flatMap {
@@ -80,25 +79,27 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
                   }
                 }
             }
-            case _ =>
-              if(journey == Journey.Migrate)
-              save4LaterConnector.get[EmailStatus](internalId.id, CachedData.emailKey).flatMap {
-                case None if redirectToECCEnabled =>
-                  CdsLogger.warn("No cached data - redirected to New ECC CDS service")
-                  Future.successful(Redirect(appConfig.subscribeLinkSubscribe))
-                case _ =>
-                  CdsLogger.warn("EmailStatus data exists - continue in old CDS service")
-                  continue
-              }
-              else
-                continue
+            case _ => redirectOnECCFlagEnabled(journey, redirectToECCEnabled)(continue)
           }
-      }
     }
   }
 
+  private def redirectOnECCFlagEnabled(journey: Journey.Value, redirectToECCEnabled: Boolean)(action: => Future[Result]) =
+    journey match {
+      case Journey.GetYourEORI => action //continue in CDS for registration/GetYourEori journey
+      case Journey.Migrate =>
+        if (redirectToECCEnabled) {
+          CdsLogger.debug("redirectToECCEnabled flag is enabled. Redirecting to ECC")
+          Future.successful(Redirect(appConfig.subscribeLinkSubscribe))
+        }
+        else {
+          CdsLogger.info("redirectToECCEnabled flag is disabled. Continuing in CDS service")
+          action
+        }
+    }
+
   def userOrGroupHasAnEori(
-      groupId: GroupId
+    groupId: GroupId
   )(implicit request: Request[AnyContent],
     user: LoggedInUserWithEnrolments,
     hc: HeaderCarrier): Future[Option[Eori]] =
