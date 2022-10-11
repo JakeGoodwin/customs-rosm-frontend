@@ -42,9 +42,14 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
   extends EnrolmentExtractor {
   private val idType = "SAFE"
 
-  def checksToProceed(groupId: GroupId, internalId: InternalId, redirectToECCEnabled: Boolean, journey: Journey.Value)(
-    continue: => Future[Result]
-  )(groupIsEnrolled: => Future[Result])(userIsInProcess: => Future[Result])(
+  def checksToProceed(
+    groupId: GroupId,
+    internalId: InternalId,
+    redirectSubToECC: Boolean,
+    redirectRegToECC: Boolean,
+    journey: Journey.Value
+  )(continue: => Future[Result])
+  (groupIsEnrolled: => Future[Result])(userIsInProcess: => Future[Result])(
     existingApplicationInProcess: => Future[Result])(
     otherUserWithinGroupIsInProcess: => Future[Result]
   )(implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Result] = {
@@ -54,7 +59,7 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
         save4LaterConnector
           .get[CacheIds](groupId.id, CachedData.groupIdKey)
           .flatMap {
-            case Some(cacheIds) => redirectOnECCFlagEnabled(journey, redirectToECCEnabled) {
+            case Some(cacheIds) => redirectUser(journey, redirectSubToECC, redirectRegToECC) {
               subscriptionStatusService
                 .getStatus(idType, cacheIds.safeId.id)
                 .flatMap {
@@ -79,16 +84,27 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
                   }
                 }
             }
-            case _ => redirectOnECCFlagEnabled(journey, redirectToECCEnabled)(continue)
+            case _ => redirectUser(journey, redirectSubToECC, redirectRegToECC)(continue)
           }
     }
   }
 
-  private def redirectOnECCFlagEnabled(journey: Journey.Value, redirectToECCEnabled: Boolean)(action: => Future[Result]) =
+  private def redirectUser(
+    journey: Journey.Value,
+    redirectSubToECC: Boolean,
+    redirectRegToECC: Boolean,
+  )(action: => Future[Result]) =
     journey match {
-      case Journey.GetYourEORI => action //continue in CDS for registration/GetYourEori journey
+      case Journey.GetYourEORI =>
+        if(redirectRegToECC) {
+          CdsLogger.info("redirectRegToECC flag is enabled. Redirecting to ECC")
+          Future.successful(Redirect(appConfig.eccRegistrationEntryPoint))
+        } else {
+          CdsLogger.info("redirectRegToECC flag is disabled. Continuing in CDS service")
+          action
+        }
       case Journey.Migrate =>
-        if (redirectToECCEnabled) {
+        if (redirectSubToECC) {
           CdsLogger.debug("redirectToECCEnabled flag is enabled. Redirecting to ECC")
           Future.successful(Redirect(appConfig.subscribeLinkSubscribe))
         }

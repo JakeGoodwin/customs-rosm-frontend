@@ -92,7 +92,9 @@ class EmailController @Inject()(
             }
           case None => {
             userGroupIdSubscriptionStatusCheckService
-              .checksToProceed(GroupId(user.groupId), InternalId(user.internalId), redirectToECCEnabled, journey) {
+              .checksToProceed(
+                GroupId(user.groupId), InternalId(user.internalId), redirectSubToECC, redirectRegToECC, journey
+              ) {
                 continue(journey)
               } { groupIsEnrolled(journey) } {
                 userIsInProcess(journey)
@@ -101,7 +103,9 @@ class EmailController @Inject()(
         }
       } else {
         //subscription journey
-        userGroupIdSubscriptionStatusCheckService.checksToProceed(GroupId(user.groupId), InternalId(user.internalId), redirectToECCEnabled, journey) {
+        userGroupIdSubscriptionStatusCheckService.checksToProceed(
+          GroupId(user.groupId), InternalId(user.internalId), redirectSubToECC, redirectRegToECC, journey
+        ) {
           continue(journey)
         } { groupIsEnrolled(journey) } {
           userIsInProcess(journey)

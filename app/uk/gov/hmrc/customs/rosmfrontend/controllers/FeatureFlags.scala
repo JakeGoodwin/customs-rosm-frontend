@@ -29,5 +29,7 @@ trait FeatureFlags {
 
   val rowHaveUtrEnabled: Boolean = loadConfig("features.rowHaveUtrEnabled")
 
-  val redirectToECCEnabled: Boolean = loadConfig("features.redirectToECC")
+  val redirectSubToECC: Boolean = loadConfig("features.redirectToECC")
+
+  val redirectRegToECC: Boolean = loadConfig("features.redirectRegToECC")
 }
