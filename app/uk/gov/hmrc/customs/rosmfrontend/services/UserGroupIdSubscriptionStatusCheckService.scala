@@ -49,70 +49,55 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
     redirectRegToECC: Boolean,
     journey: Journey.Value
   )(continue: => Future[Result])
-  (groupIsEnrolled: => Future[Result])(userIsInProcess: => Future[Result])(
-    existingApplicationInProcess: => Future[Result])(
-    otherUserWithinGroupIsInProcess: => Future[Result]
-  )(implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Result] = {
+   (groupIsEnrolled: => Future[Result])
+   (userIsInProcess: => Future[Result])
+   (existingApplicationInProcess: => Future[Result])
+   (otherUserWithinGroupIsInProcess: => Future[Result])
+   (implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Result] = {
     enrolmentStoreProxyService.isEnrolmentAssociatedToGroup(groupId).flatMap {
       case true => groupIsEnrolled //Block the user
       case false =>
         save4LaterConnector
           .get[CacheIds](groupId.id, CachedData.groupIdKey)
           .flatMap {
-            case Some(cacheIds) => {
+            case Some(cacheIds) =>
               journey match {
                 case Journey.GetYourEORI =>
-                    subscriptionStatusService.getStatus(idType, cacheIds.safeId.id)
-                      .flatMap {
-                        case NewSubscription | SubscriptionRejected => {
-                          save4LaterConnector
-                            .delete(groupId.id)
-                            .flatMap(_ => continue) // Delete and then proceed normal
-                        }
-                        case SubscriptionProcessing => {
-                          if (cacheIds.internalId == internalId) {
-                            existingApplicationInProcess
-                          } else {
-                            otherUserWithinGroupIsInProcess
-                          }
-                        }
-                        case _ => {
-                          if (cacheIds.internalId == internalId) {
-                            userIsInProcess
-                          } else {
-                            otherUserWithinGroupIsInProcess
-                          }
-                        }
-                      }
+                    processUserWithCachedId(cacheIds, groupId, internalId)
+                      {continue}{userIsInProcess}{existingApplicationInProcess}{otherUserWithinGroupIsInProcess}
                 case Journey.Migrate =>
                   redirectUser(journey, redirectSubToECC, redirectRegToECC) {
-                    subscriptionStatusService.getStatus(idType, cacheIds.safeId.id)
-                      .flatMap {
-                        case NewSubscription | SubscriptionRejected => {
-                          save4LaterConnector
-                            .delete(groupId.id)
-                            .flatMap(_ => continue) // Delete and then proceed normal
-                        }
-                        case SubscriptionProcessing => {
-                          if (cacheIds.internalId == internalId) {
-                            existingApplicationInProcess
-                          } else {
-                            otherUserWithinGroupIsInProcess
-                          }
-                        }
-                        case _ => {
-                          if (cacheIds.internalId == internalId) {
-                            userIsInProcess
-                          } else {
-                            otherUserWithinGroupIsInProcess
-                          }
-                        }
-                      }
+                    processUserWithCachedId(cacheIds, groupId, internalId)
+                      {continue}{userIsInProcess}{existingApplicationInProcess}{otherUserWithinGroupIsInProcess}
                   }
               }
-            }
             case _ => redirectUser(journey, redirectSubToECC, redirectRegToECC)(continue)
           }
+    }
+  }
+
+  private def processUserWithCachedId(cacheIds: CacheIds, groupId: GroupId, internalId: InternalId)
+    (continue: => Future[Result])
+    (userIsInProcess: => Future[Result])
+    (existingApplicationInProcess: => Future[Result])
+    (otherUserWithinGroupIsInProcess: => Future[Result])
+    (implicit request: Request[AnyContent], hc: HeaderCarrier) = {
+  subscriptionStatusService.getStatus(idType, cacheIds.safeId.id)
+    .flatMap {
+      case NewSubscription | SubscriptionRejected =>
+        save4LaterConnector.delete(groupId.id).flatMap(_ => continue)
+      case SubscriptionProcessing =>
+        if (cacheIds.internalId == internalId) {
+          existingApplicationInProcess
+        } else {
+          otherUserWithinGroupIsInProcess
+        }
+      case _ =>
+        if (cacheIds.internalId == internalId) {
+          userIsInProcess
+        } else {
+          otherUserWithinGroupIsInProcess
+        }
     }
   }
 
