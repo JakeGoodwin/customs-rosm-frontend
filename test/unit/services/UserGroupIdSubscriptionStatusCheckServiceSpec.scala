@@ -288,7 +288,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       ).thenReturn(Future.successful(None))
 
       when(mockAppConfig.eccRegistrationEntryPoint)
-        .thenReturn("TODO!!")
+        .thenReturn("/customs-registration-services/eori-only/register/check-user")
 
       val result: Result =
         service.checksToProceed(groupId, internalId, redirectSubToECC = false, redirectRegToECC = true, Journey.GetYourEORI)
@@ -296,7 +296,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
         { otherUserWithinGroupIsInProcess }.futureValue
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some("TODO!!")
+      redirectLocation(result) shouldBe Some("/customs-registration-services/eori-only/register/check-user")
     }
 
     //TODO: Check this scenario
