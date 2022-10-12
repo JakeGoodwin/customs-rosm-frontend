@@ -59,30 +59,57 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
         save4LaterConnector
           .get[CacheIds](groupId.id, CachedData.groupIdKey)
           .flatMap {
-            case Some(cacheIds) => redirectUser(journey, redirectSubToECC, redirectRegToECC) {
-              subscriptionStatusService
-                .getStatus(idType, cacheIds.safeId.id)
-                .flatMap {
-                  case NewSubscription | SubscriptionRejected => {
-                    save4LaterConnector
-                      .delete(groupId.id)
-                      .flatMap(_ => continue) // Delete and then proceed normal
+            case Some(cacheIds) => {
+              journey match {
+                case Journey.GetYourEORI =>
+                    subscriptionStatusService.getStatus(idType, cacheIds.safeId.id)
+                      .flatMap {
+                        case NewSubscription | SubscriptionRejected => {
+                          save4LaterConnector
+                            .delete(groupId.id)
+                            .flatMap(_ => continue) // Delete and then proceed normal
+                        }
+                        case SubscriptionProcessing => {
+                          if (cacheIds.internalId == internalId) {
+                            existingApplicationInProcess
+                          } else {
+                            otherUserWithinGroupIsInProcess
+                          }
+                        }
+                        case _ => {
+                          if (cacheIds.internalId == internalId) {
+                            userIsInProcess
+                          } else {
+                            otherUserWithinGroupIsInProcess
+                          }
+                        }
+                      }
+                case Journey.Migrate =>
+                  redirectUser(journey, redirectSubToECC, redirectRegToECC) {
+                    subscriptionStatusService.getStatus(idType, cacheIds.safeId.id)
+                      .flatMap {
+                        case NewSubscription | SubscriptionRejected => {
+                          save4LaterConnector
+                            .delete(groupId.id)
+                            .flatMap(_ => continue) // Delete and then proceed normal
+                        }
+                        case SubscriptionProcessing => {
+                          if (cacheIds.internalId == internalId) {
+                            existingApplicationInProcess
+                          } else {
+                            otherUserWithinGroupIsInProcess
+                          }
+                        }
+                        case _ => {
+                          if (cacheIds.internalId == internalId) {
+                            userIsInProcess
+                          } else {
+                            otherUserWithinGroupIsInProcess
+                          }
+                        }
+                      }
                   }
-                  case SubscriptionProcessing => {
-                    if (cacheIds.internalId == internalId) {
-                      existingApplicationInProcess
-                    } else {
-                      otherUserWithinGroupIsInProcess
-                    }
-                  }
-                  case _ => {
-                    if (cacheIds.internalId == internalId) {
-                      userIsInProcess
-                    } else {
-                      otherUserWithinGroupIsInProcess
-                    }
-                  }
-                }
+              }
             }
             case _ => redirectUser(journey, redirectSubToECC, redirectRegToECC)(continue)
           }

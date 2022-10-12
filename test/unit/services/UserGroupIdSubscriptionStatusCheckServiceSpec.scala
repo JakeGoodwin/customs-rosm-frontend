@@ -299,7 +299,6 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       redirectLocation(result) shouldBe Some("/customs-registration-services/eori-only/register/check-user")
     }
 
-    //TODO: Check this scenario
     "redirect to ECC when groupID is cached and redirectToECCEnabled is set to true for Migration journey only" in {
       when(
         mockEnrolmentStoreProxyService
@@ -323,6 +322,30 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some("/customs-enrolment-services/cds/subscribe")
+    }
+
+    "continue to CDS when groupID is cached and redirectRegToECC is set to true for Reg journey" in {
+      when(
+        mockEnrolmentStoreProxyService
+          .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
+      ).thenReturn(Future.successful(false))
+
+      when(
+        mockSave4LaterConnector
+          .get[CacheIds](any[String], any[String])(
+            any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]]
+          )
+      ).thenReturn(Future.successful(Future.successful(Some(cacheIds))))
+
+      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(SubscriptionProcessing))
+
+      val result: Result = service.checksToProceed(
+        groupId, internalId, redirectSubToECC = false, redirectRegToECC = true, Journey.GetYourEORI
+      ) { continue } {groupIsEnrolled } { userIsInProcess }
+      { existingApplicationInProgress } { otherUserWithinGroupIsInProcess }.futureValue
+
+      result.header.headers(LOCATION) shouldBe "/blocked/existingApplicationInProgress"
     }
   }
 }
