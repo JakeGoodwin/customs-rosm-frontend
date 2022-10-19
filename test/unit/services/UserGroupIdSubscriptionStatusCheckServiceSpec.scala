@@ -16,6 +16,7 @@
 
 package unit.services
 
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
@@ -346,6 +347,38 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       { existingApplicationInProgress } { otherUserWithinGroupIsInProcess }.futureValue
 
       result.header.headers(LOCATION) shouldBe "/blocked/existingApplicationInProgress"
+    }
+
+    "continue to CDS when groupID is not cached and EmailStatus is cached and redirectRegToECC is set to true for Reg journey" in {
+      when(
+        mockEnrolmentStoreProxyService
+          .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
+      ).thenReturn(Future.successful(false))
+
+      when(
+        mockSave4LaterConnector
+          .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
+      ).thenReturn(Future.successful(None))
+
+      when(mockAppConfig.eccRegistrationEntryPoint)
+        .thenReturn("/customs-registration-services/eori-only/register/check-user")
+
+      when(
+        mockSave4LaterConnector
+          .get[EmailStatus](
+            ArgumentMatchers.eq(internalId.id),
+            ArgumentMatchers.eq("email")
+          )(any[HeaderCarrier], any[Reads[EmailStatus]], any[Writes[EmailStatus]])
+      ).thenReturn(Future.successful(Some(EmailStatus("test@email.com", true, Some(true)))))
+
+      val result: Result =
+        service.checksToProceed(groupId, internalId, redirectSubToECC = false, redirectRegToECC = true, Journey.GetYourEORI)
+          {continue} {groupIsEnrolled} {userIsInProcess}
+          {existingApplicationInProgress} {otherUserWithinGroupIsInProcess}
+          .futureValue
+
+      status(result) shouldBe SEE_OTHER
+      result.header.headers(LOCATION) shouldBe "/continue"
     }
   }
 }
