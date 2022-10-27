@@ -18,11 +18,7 @@ package uk.gov.hmrc.customs.rosmfrontend.domain.messaging.registration
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.customs.rosmfrontend.domain.CaseClassAuditHelper
-import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.matching.{
-  ContactResponse,
-  IndividualResponse,
-  OrganisationResponse
-}
+import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.matching.{ContactResponse, IndividualResponse, OrganisationResponse}
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.{Address, MessagingServiceParam, NonUKIdentification}
 
 case class ResponseDetail(

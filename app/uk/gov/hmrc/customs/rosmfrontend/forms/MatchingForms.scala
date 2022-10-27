@@ -20,14 +20,15 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation._
 import play.api.i18n.Messages
+import uk.gov.hmrc.customs.customs._
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.Address
 import uk.gov.hmrc.customs.rosmfrontend.domain.registration.UserLocation
-import uk.gov.hmrc.customs.rosmfrontend.domain.{Nino, Utr, _}
-import uk.gov.hmrc.customs.rosmfrontend.forms.FormUtils.{mandatoryDateTodayOrBefore, _}
+import uk.gov.hmrc.customs.rosmfrontend.domain._
+import uk.gov.hmrc.customs.rosmfrontend.forms.FormUtils._
 import uk.gov.hmrc.customs.rosmfrontend.forms.FormValidation._
 import uk.gov.hmrc.domain.{Nino => nino}
 import uk.gov.voa.play.form.ConditionalMappings._
-import uk.gov.hmrc.customs.customs._
+
 import scala.util.matching.Regex
 
 object MatchingForms {

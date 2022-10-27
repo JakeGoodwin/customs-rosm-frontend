@@ -17,8 +17,8 @@
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
 import org.joda.time.format.ISODateTimeFormat
-import uk.gov.hmrc.customs.rosmfrontend.connector.{UpdateCustomsDataStoreConnector, UpdateVerifiedEmailConnector}
 import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.VerifiedEmailRequest
+import uk.gov.hmrc.customs.rosmfrontend.connector.{UpdateCustomsDataStoreConnector, UpdateVerifiedEmailConnector}
 import uk.gov.hmrc.customs.rosmfrontend.domain.email.{DateTimeUtil, RequestDetail, UpdateVerifiedEmailRequest}
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.MessagingServiceParam
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.subscription.CustomsDataStoreRequest

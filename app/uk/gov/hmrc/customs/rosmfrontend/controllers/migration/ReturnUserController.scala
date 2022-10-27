@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.migration
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -24,6 +23,7 @@ import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.views.html.migration.return_user
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton

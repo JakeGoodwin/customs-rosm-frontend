@@ -17,15 +17,14 @@
 package uk.gov.hmrc.customs.rosmfrontend.connector
 
 import akka.util.ByteString
-import javax.inject.{Inject, Singleton}
 import play.api.http.HeaderNames.CONTENT_TYPE
 import play.api.http.MimeTypes
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
-import uk.gov.hmrc.http._
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 

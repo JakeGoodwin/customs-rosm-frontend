@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.mapping
 
-import uk.gov.hmrc.customs.rosmfrontend.domain.{RegistrationDetailsIndividual, _}
+import uk.gov.hmrc.customs.rosmfrontend.domain._
 
 object EtmpTypeOfPerson {
   val NaturalPerson = "1"

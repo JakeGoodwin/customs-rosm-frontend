@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.audit
 
-import javax.inject.{Inject, Singleton}
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.{Audit, DataEvent, ExtendedDataEvent}
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Auditable @Inject()(auditConnector: AuditConnector, appConfig: AppConfig) {

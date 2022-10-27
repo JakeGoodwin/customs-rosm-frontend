@@ -19,7 +19,7 @@ package uk.gov.hmrc.customs.rosmfrontend.connector
 import play.mvc.Http.Status._
 import uk.gov.hmrc.customs.rosmfrontend.audit.Auditable
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
-import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.{HttpErrorResponse, UnhandledException, VerifiedEmailRequest, VerifiedEmailResponse, _}
+import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers._
 import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{ForbiddenException, HttpClient, _}

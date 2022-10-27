@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -30,6 +29,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.cache.RequestSessionData
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{SubscriptionBusinessService, SubscriptionDetailsService}
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.disclose_personal_details_consent
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

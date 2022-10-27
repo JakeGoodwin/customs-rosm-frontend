@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.domain.email
 
-import java.time.Clock
-
 import com.github.nscala_time.time.Imports.DateTimeZone
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
-import play.api.libs.json.{JsResult, JsString, JsSuccess, JsValue, Reads, Writes}
+import play.api.libs.json._
+
+import java.time.Clock
 // $COVERAGE-OFF$
 object DateTimeUtil {
 

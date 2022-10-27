@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.registration
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -24,6 +23,7 @@ import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.views.html.registration.you_need_different_service_iom
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 @Singleton
 class YouNeedADifferentServiceIomController @Inject()(

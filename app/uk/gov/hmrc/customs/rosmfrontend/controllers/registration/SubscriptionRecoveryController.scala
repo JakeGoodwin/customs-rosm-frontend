@@ -18,7 +18,7 @@ package uk.gov.hmrc.customs.rosmfrontend.controllers.registration
 
 import org.joda.time.{DateTime, LocalDate}
 import play.api.Application
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.connector.SubscriptionDisplayConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
@@ -32,12 +32,7 @@ import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.RandomUUIDGenerator
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
-import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{
-  HandleSubscriptionService,
-  SubscriptionDetailsService,
-  TaxEnrolmentsService,
-  UpdateVerifiedEmailService
-}
+import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{HandleSubscriptionService, SubscriptionDetailsService, TaxEnrolmentsService, UpdateVerifiedEmailService}
 import uk.gov.hmrc.customs.rosmfrontend.views.html.error_template
 import uk.gov.hmrc.emailaddress.EmailAddress
 import uk.gov.hmrc.http.HeaderCarrier

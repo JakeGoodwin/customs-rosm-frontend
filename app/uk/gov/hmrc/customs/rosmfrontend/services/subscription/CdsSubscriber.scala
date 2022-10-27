@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
-import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.customs.rosmfrontend.domain._
@@ -27,6 +26,7 @@ import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

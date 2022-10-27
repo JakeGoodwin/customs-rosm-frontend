@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.registration
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.routes._
-import uk.gov.hmrc.customs.rosmfrontend.controllers.routes.{DetermineReviewPageController, _}
+import uk.gov.hmrc.customs.rosmfrontend.controllers.routes._
 import uk.gov.hmrc.customs.rosmfrontend.controllers.{CdsController, FeatureFlags}
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.forms.MatchingForms.thirdCountryIndividualNameDateOfBirthForm
@@ -32,6 +31,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.subscription.SubscriptionDetail
 import uk.gov.hmrc.customs.rosmfrontend.views.html.registration._
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

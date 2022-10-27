@@ -30,11 +30,7 @@ import uk.gov.hmrc.customs.rosmfrontend.forms.subscription.SubscriptionForm.eori
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.models.exceptions.MissingExistingEori
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.RequestSessionData
-import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{
-  EnrolmentStoreProxyService,
-  SubscriptionBusinessService,
-  SubscriptionDetailsService
-}
+import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{EnrolmentStoreProxyService, SubscriptionBusinessService, SubscriptionDetailsService}
 import uk.gov.hmrc.customs.rosmfrontend.views.html.migration._
 import uk.gov.hmrc.http.HeaderCarrier
 

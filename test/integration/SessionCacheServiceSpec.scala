@@ -22,18 +22,18 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json.toJson
+import play.api.mvc.{Request, Session}
+import play.libs.Json
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.ResponseCommon
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{BusinessShortName, SubscriptionDetails}
 import uk.gov.hmrc.customs.rosmfrontend.services.Save4LaterService
-import uk.gov.hmrc.customs.rosmfrontend.services.cache.{CachedData, DataUnavailableException, SessionCache, SessionTimeOutException}
+import uk.gov.hmrc.customs.rosmfrontend.services.cache.{CachedData, DataUnavailableException, SessionCache}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
-import play.api.mvc.{Request, Session}
-import play.libs.Json
+import uk.gov.hmrc.mongo.CurrentTimestampSupport
 import uk.gov.hmrc.mongo.cache.{CacheItem, DataKey}
 import uk.gov.hmrc.mongo.test.MongoSupport
-import uk.gov.hmrc.mongo.CurrentTimestampSupport
 import util.builders.RegistrationDetailsBuilder._
 
 import java.util.UUID

@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.registration
 
-import java.time.Clock
-import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.mvc.Request
 import uk.gov.hmrc.customs.rosmfrontend.connector.{EoriHttpResponse, RegistrationDisplayConnector}
@@ -28,6 +26,8 @@ import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
 import uk.gov.hmrc.customs.rosmfrontend.services.mapping.RegistrationDetailsCreator
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.Clock
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationDisplayService @Inject()(

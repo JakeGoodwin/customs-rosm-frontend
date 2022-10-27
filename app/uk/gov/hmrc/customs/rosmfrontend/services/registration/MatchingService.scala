@@ -16,11 +16,8 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.registration
 
-import akka.http.scaladsl.model.headers.CacheDirectives.public
-
-import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.customs.rosmfrontend.DateConverter._
 import uk.gov.hmrc.customs.rosmfrontend.connector.MatchingServiceConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain._
@@ -31,6 +28,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, Sess
 import uk.gov.hmrc.customs.rosmfrontend.services.mapping.RegistrationDetailsCreator
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

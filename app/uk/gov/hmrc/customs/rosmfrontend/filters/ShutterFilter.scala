@@ -17,11 +17,11 @@
 package uk.gov.hmrc.customs.rosmfrontend.filters
 
 import akka.stream.Materializer
-import javax.inject.Inject
 import play.api.mvc.Results.Redirect
 import play.api.mvc._
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class ShutterFilter @Inject()(appConfig: AppConfig)(implicit val mat: Materializer) extends Filter {

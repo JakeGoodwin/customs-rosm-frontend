@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.Messages
@@ -34,6 +33,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.subscription.SubscriptionVatEUD
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.vat_details_eu
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

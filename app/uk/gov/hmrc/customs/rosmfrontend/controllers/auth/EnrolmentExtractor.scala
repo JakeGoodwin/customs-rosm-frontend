@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.auth
 
-import uk.gov.hmrc.customs.rosmfrontend.domain.{EnrolmentResponse, Eori, LoggedInUserWithEnrolments, Nino, Utr}
+import uk.gov.hmrc.customs.rosmfrontend.domain._
 
 trait EnrolmentExtractor {
 

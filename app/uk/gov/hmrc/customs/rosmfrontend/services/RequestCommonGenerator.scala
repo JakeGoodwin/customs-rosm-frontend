@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services
 
-import java.time.Clock
-import java.util.UUID
-
-import javax.inject.{Inject, Singleton}
 import org.joda.time.{DateTime, DateTimeZone}
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.{RequestCommon, RequestParameter}
+
+import java.time.Clock
+import java.util.UUID
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class RequestCommonGenerator @Inject()(uuidGenerator: RandomUUIDGenerator, clock: UtcClock) {

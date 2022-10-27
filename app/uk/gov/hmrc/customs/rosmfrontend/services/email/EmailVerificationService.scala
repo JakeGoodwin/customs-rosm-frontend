@@ -16,18 +16,12 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.email
 
-import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.customs.rosmfrontend.connector.EmailVerificationConnector
-import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.EmailVerificationRequestHttpParser.{
-  EmailAlreadyVerified,
-  EmailVerificationRequestSent
-}
-import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.EmailVerificationStateHttpParser.{
-  EmailNotVerified,
-  EmailVerified
-}
+import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.EmailVerificationRequestHttpParser.{EmailAlreadyVerified, EmailVerificationRequestSent}
+import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.EmailVerificationStateHttpParser.{EmailNotVerified, EmailVerified}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

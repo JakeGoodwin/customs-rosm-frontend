@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import play.api.Application
 import play.api.mvc._
@@ -35,6 +34,7 @@ import uk.gov.hmrc.customs.rosmfrontend.views.html._
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.{vat_details, we_cannot_confirm_your_identity}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

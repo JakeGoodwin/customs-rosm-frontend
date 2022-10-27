@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
-import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import uk.gov.hmrc.customs.rosmfrontend.connector.TaxEnrolmentsConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.TaxEnrolmentsRequest._
 import uk.gov.hmrc.customs.rosmfrontend.domain.{Eori, KeyValue, SafeId, TaxEnrolmentsRequest}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

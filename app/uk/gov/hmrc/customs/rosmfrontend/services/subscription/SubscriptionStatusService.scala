@@ -18,7 +18,7 @@ package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import play.api.mvc.{Request, Result}
+import play.api.mvc.Request
 import uk.gov.hmrc.customs.rosmfrontend.connector.SubscriptionStatusConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.{SubscriptionStatusOutcome, SubscriptionStatusQueryParams}
 import uk.gov.hmrc.customs.rosmfrontend.services.RequestCommonGenerator

@@ -29,14 +29,8 @@ import uk.gov.hmrc.customs.rosmfrontend.domain.registration.UserLocation
 import uk.gov.hmrc.customs.rosmfrontend.forms.FormUtils.dateTimeFormat
 import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
-import uk.gov.hmrc.customs.rosmfrontend.services.cache.{
-  RequestSessionData,
-  SessionCache
-}
-import uk.gov.hmrc.customs.rosmfrontend.services.registration.{
-  MatchingService,
-  RegisterWithEoriAndIdService
-}
+import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
+import uk.gov.hmrc.customs.rosmfrontend.services.registration.{MatchingService, RegisterWithEoriAndIdService}
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription._
 import uk.gov.hmrc.customs.rosmfrontend.views.html.error_template
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription._

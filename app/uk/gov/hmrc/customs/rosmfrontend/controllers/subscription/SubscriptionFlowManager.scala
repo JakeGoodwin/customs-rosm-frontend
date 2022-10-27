@@ -16,20 +16,19 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc.{AnyContent, Request, Session}
 import uk.gov.hmrc.customs.rosmfrontend.controllers.FeatureFlags
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.registration.UserLocation
-import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{SubscriptionFlow, SubscriptionPage, _}
+import uk.gov.hmrc.customs.rosmfrontend.domain.subscription._
 import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger.logger
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
-import uk.gov.hmrc.customs.rosmfrontend.services.subscription.SubscriptionDetailsService
 import uk.gov.hmrc.customs.rosmfrontend.util.Constants.ONE
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

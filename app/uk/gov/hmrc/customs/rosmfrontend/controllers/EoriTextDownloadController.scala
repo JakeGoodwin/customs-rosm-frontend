@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -25,6 +24,7 @@ import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.eori_number_text_download
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton

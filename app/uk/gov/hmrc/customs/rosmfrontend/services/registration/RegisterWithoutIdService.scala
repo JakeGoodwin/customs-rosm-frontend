@@ -17,8 +17,6 @@
 package uk.gov.hmrc.customs.rosmfrontend.services.registration
 
 import play.api.mvc.Request
-
-import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.customs.rosmfrontend.connector.RegisterWithoutIdConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.{Address, Individual}
@@ -29,6 +27,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
 import uk.gov.hmrc.customs.rosmfrontend.services.mapping.RegistrationDetailsCreator
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

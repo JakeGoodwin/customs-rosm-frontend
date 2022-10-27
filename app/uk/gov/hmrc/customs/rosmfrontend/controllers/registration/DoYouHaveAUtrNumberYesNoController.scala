@@ -19,7 +19,7 @@ package uk.gov.hmrc.customs.rosmfrontend.controllers.registration
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.Messages
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController

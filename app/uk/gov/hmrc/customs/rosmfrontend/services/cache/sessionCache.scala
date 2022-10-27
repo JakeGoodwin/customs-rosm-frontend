@@ -16,20 +16,19 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.cache
 
-import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{JsSuccess, Json, Reads, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 import play.api.mvc.Request
-import uk.gov.hmrc.mongo.cache.{DataKey, SessionCacheRepository}
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.SubscriptionDetails
-import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
 import uk.gov.hmrc.customs.rosmfrontend.services.Save4LaterService
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.CachedData._
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.mongo.cache.{DataKey, SessionCacheRepository}
 import uk.gov.hmrc.mongo.{MongoComponent, TimestampSupport}
 import uk.gov.hmrc.play.http.logging.Mdc.preservingMdc
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NoStackTrace
 

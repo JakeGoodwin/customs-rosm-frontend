@@ -16,33 +16,22 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
 import uk.gov.hmrc.customs.rosmfrontend.controllers.routes.DetermineReviewPageController
-import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.routes.{
-  VatDetailsEuConfirmController,
-  VatDetailsEuController
-}
-import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{
-  SubscriptionPage,
-  VatEUConfirmSubscriptionFlowPage,
-  VatRegisteredEuSubscriptionFlowPage
-}
+import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.routes.{VatDetailsEuConfirmController, VatDetailsEuController}
+import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{SubscriptionPage, VatEUConfirmSubscriptionFlowPage, VatRegisteredEuSubscriptionFlowPage}
 import uk.gov.hmrc.customs.rosmfrontend.domain.{LoggedInUserWithEnrolments, YesNo}
 import uk.gov.hmrc.customs.rosmfrontend.forms.MatchingForms._
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.VatEUDetailsModel
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.RequestSessionData
-import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{
-  SubscriptionBusinessService,
-  SubscriptionDetailsService,
-  SubscriptionVatEUDetailsService
-}
+import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{SubscriptionBusinessService, SubscriptionDetailsService, SubscriptionVatEUDetailsService}
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.vat_registered_eu
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

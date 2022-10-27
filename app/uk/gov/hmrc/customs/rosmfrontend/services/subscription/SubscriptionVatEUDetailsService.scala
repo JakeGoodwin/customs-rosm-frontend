@@ -17,11 +17,10 @@
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
 import play.api.mvc.Request
-
-import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.VatEUDetailsModel
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

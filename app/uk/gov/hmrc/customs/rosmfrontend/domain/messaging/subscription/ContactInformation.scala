@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.domain.messaging.subscription
 
-import java.time.Clock
-
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json.Json
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.CommonHeader
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.ContactDetails
 import uk.gov.hmrc.customs.rosmfrontend.domain.{CaseClassAuditHelper, ContactDetail}
+
+import java.time.Clock
 
 case class ContactInformation(
   personOfContact: Option[String] = None,
