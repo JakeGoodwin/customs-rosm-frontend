@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
+import play.api.mvc.Request
 import uk.gov.hmrc.customs.rosmfrontend.connector.NotifyRcmConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.subscription.NotifyRcmRequest
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
@@ -27,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class NotifyRcmService @Inject()(sessionCache: SessionCache, notifyRcmConnector: NotifyRcmConnector) {
 
-  def notifyRcm()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def notifyRcm()(implicit hc: HeaderCarrier, request: Request[_],  ec: ExecutionContext): Future[Unit] = {
     val ff = for {
       sd <- sessionCache.subscriptionDetails
       email <- sessionCache.email

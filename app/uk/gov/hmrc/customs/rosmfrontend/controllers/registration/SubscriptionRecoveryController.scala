@@ -210,7 +210,7 @@ class SubscriptionRecoveryController @Inject()(
     subscriptionDisplayResponse: SubscriptionDisplayResponse,
     dateOfEstablishment: Option[LocalDate],
     journey: Journey.Value
-  )(redirect: => Result)(implicit headerCarrier: HeaderCarrier): Future[Result] = {
+  )(redirect: => Result)(implicit headerCarrier: HeaderCarrier, request: Request[_]): Future[Result] = {
     val formBundleId =
       subscriptionDisplayResponse.responseCommon.returnParameters
         .flatMap(_.find(_.paramName.equals("ETMPFORMBUNDLENUMBER")).map(_.paramValue))
@@ -235,12 +235,12 @@ class SubscriptionRecoveryController @Inject()(
       SafeId(safeId),
       dateOfEstablishment
     )
-    completeEnrolment(journey, subscriptionInformation)(redirect)
+    completeEnrolment(journey, subscriptionInformation)(redirect)(hc, request)
   }
 
   private def completeEnrolment(journey: Journey.Value, subscriptionInformation: SubscriptionInformation)(
     redirect: => Result
-  )(implicit hc: HeaderCarrier): Future[Result] =
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     for {
       // Update Recovered Subscription Information
       _ <- updateSubscription(subscriptionInformation)
@@ -257,7 +257,7 @@ class SubscriptionRecoveryController @Inject()(
       }
     }
 
-  private def updateSubscription(subscriptionInformation: SubscriptionInformation)(implicit hc: HeaderCarrier) =
+  private def updateSubscription(subscriptionInformation: SubscriptionInformation)(implicit hc: HeaderCarrier, request: Request[_]) =
     sessionCache.saveSubscriptionCreateOutcome(
       SubscriptionCreateOutcome(
         subscriptionInformation.processedDate,

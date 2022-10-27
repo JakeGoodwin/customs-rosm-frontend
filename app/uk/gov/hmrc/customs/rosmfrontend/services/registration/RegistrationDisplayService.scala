@@ -17,9 +17,9 @@
 package uk.gov.hmrc.customs.rosmfrontend.services.registration
 
 import java.time.Clock
-
 import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
+import play.api.mvc.Request
 import uk.gov.hmrc.customs.rosmfrontend.connector.{EoriHttpResponse, RegistrationDisplayConnector}
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.RequestParameter
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.registration._
@@ -57,7 +57,7 @@ class RegistrationDisplayService @Inject()(
 
   def cacheDetails(
     response: RegistrationDisplayResponse
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
+  )(implicit hc: HeaderCarrier, request: Request[_], ec: ExecutionContext): Future[Boolean] = {
     val registrationDetails: RegistrationDisplayResponse => RegistrationDetails = details =>
       creator.registrationDetails(details)
     sessionCache.saveRegistrationDetails(registrationDetails(response))

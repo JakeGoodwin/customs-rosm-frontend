@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
+import play.api.mvc.Request
+
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.VatEUDetailsModel
 import uk.gov.hmrc.http.HeaderCarrier
@@ -29,20 +31,20 @@ class SubscriptionVatEUDetailsService @Inject()(
   subscriptionDetailsService: SubscriptionDetailsService
 ) {
 
-  def saveOrUpdate(vatEUDetail: VatEUDetailsModel)(implicit hc: HeaderCarrier): Future[Unit] =
-    subscriptionBusinessService.retrieveSubscriptionDetailsHolder map { holder =>
+  def saveOrUpdate(vatEUDetail: VatEUDetailsModel)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+    (subscriptionBusinessService.retrieveSubscriptionDetailsHolder map { holder =>
       subscriptionDetailsService.saveSubscriptionDetails(
         _ => holder.copy(vatEUDetails = holder.vatEUDetails ++ Seq(vatEUDetail))
       )
-    }
+    }).flatten
 
-  def saveOrUpdate(vatEUDetailsParam: Seq[VatEUDetailsModel])(implicit hc: HeaderCarrier): Future[Unit] =
-    subscriptionBusinessService.retrieveSubscriptionDetailsHolder map { holder =>
+  def saveOrUpdate(vatEUDetailsParam: Seq[VatEUDetailsModel])(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+    (subscriptionBusinessService.retrieveSubscriptionDetailsHolder map { holder =>
       subscriptionDetailsService.saveSubscriptionDetails(_ => holder.copy(vatEUDetails = vatEUDetailsParam))
-    }
+    }).flatten
 
   def updateVatEuDetailsModel(oldVatEUDetail: VatEUDetailsModel, newVatEUDetail: VatEUDetailsModel)(
-    implicit hc: HeaderCarrier
+    implicit hc: HeaderCarrier, request: Request[_]
   ): Future[Seq[VatEUDetailsModel]] =
     cachedEUVatDetails map { cachedDetails =>
       val oldDetailsIndex = cachedDetails.indexOf(oldVatEUDetail)
@@ -50,12 +52,12 @@ class SubscriptionVatEUDetailsService @Inject()(
       else throw new IllegalArgumentException("Details for update do not exist in a cache")
     }
 
-  def vatEuDetails(index: Int)(implicit hc: HeaderCarrier): Future[Option[VatEUDetailsModel]] =
+  def vatEuDetails(index: Int)(implicit hc: HeaderCarrier, request: Request[_]): Future[Option[VatEUDetailsModel]] =
     cachedEUVatDetails map (_.find(_.index.equals(index)))
 
-  def cachedEUVatDetails(implicit hc: HeaderCarrier): Future[Seq[VatEUDetailsModel]] =
+  def cachedEUVatDetails(implicit hc: HeaderCarrier, request: Request[_]): Future[Seq[VatEUDetailsModel]] =
     subscriptionBusinessService.getCachedVatEuDetailsModel
 
-  def removeSingleEuVatDetails(singleVatDetail: VatEUDetailsModel)(implicit hc: HeaderCarrier): Future[Unit] =
+  def removeSingleEuVatDetails(singleVatDetail: VatEUDetailsModel)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
     cachedEUVatDetails.map(vatDetails => saveOrUpdate(vatDetails.filterNot(_ == singleVatDetail)))
 }

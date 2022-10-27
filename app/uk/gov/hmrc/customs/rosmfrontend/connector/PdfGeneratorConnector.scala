@@ -37,7 +37,7 @@ class PdfGeneratorConnector @Inject()(http: WSClient, appConfig: AppConfig) {
 
   private lazy val url = s"$baseUrl/pdf-generator-service/generate"
 
-  def generatePdf(html: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ByteString] = {
+  def generatePdf(html: String)(implicit ec: ExecutionContext): Future[ByteString] = {
     CdsLogger.debug(s"[$loggerComponentId][generatePdf] postUrl: $url")
     http
       .url(url)

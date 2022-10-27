@@ -75,7 +75,7 @@ class WhatIsYourEoriController @Inject()(
       }
     }
 
-  private def useExistingEori(eori: Eori, journey: Journey.Value)(implicit headerCarrier: HeaderCarrier) =
+  private def useExistingEori(eori: Eori, journey: Journey.Value)(implicit hc: HeaderCarrier, request: Request[_]) =
     subscriptionDetailsHolderService.cacheExistingEoriNumber(eori.id).map { _ =>
       Redirect(uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.routes.UseThisEoriController.display(journey))
     }

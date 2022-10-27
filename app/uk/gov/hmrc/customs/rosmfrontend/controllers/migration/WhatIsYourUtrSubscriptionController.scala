@@ -80,7 +80,7 @@ class WhatIsYourUtrSubscriptionController @Inject()(
     }
 
   private def cacheNameIdDetails(form: UtrMatchModel, journey: Journey.Value)(
-    implicit hc: HeaderCarrier
+    implicit hc: HeaderCarrier, request: Request[_]
   ): Future[Result] =
     for {
       optionalName <- subscriptionDetailsService.cachedNameDetails

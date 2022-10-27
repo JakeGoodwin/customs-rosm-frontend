@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.registration
 
+import play.api.mvc.Request
+
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.customs.rosmfrontend.connector.RegisterWithoutIdConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain._
@@ -44,9 +46,9 @@ class RegisterWithoutIdService @Inject()(
     contactDetail: Option[ContactDetailsModel],
     loggedInUser: LoggedInUser,
     orgType: Option[CdsOrganisationType] = None
-  )(implicit hc: HeaderCarrier): Future[RegisterWithoutIDResponse] = {
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[RegisterWithoutIDResponse] = {
 
-    val request = RegisterWithoutIDRequest(
+    val req = RegisterWithoutIDRequest(
       requestCommonGenerator.generate(),
       RegisterWithoutIdReqDetails.organisation(
         OrganisationName(orgName),
@@ -56,7 +58,7 @@ class RegisterWithoutIdService @Inject()(
     )
 
     for {
-      response <- connector.register(request)
+      response <- connector.register(req)
       registrationDetails = detailsCreator.registrationDetails(response, orgName, createSixLineAddress(address))
       _ <- save(registrationDetails, loggedInUser, orgType)
     } yield response
@@ -68,7 +70,7 @@ class RegisterWithoutIdService @Inject()(
     contactDetail: Option[ContactDetailsModel],
     loggedInUser: LoggedInUser,
     orgType: Option[CdsOrganisationType] = None
-  )(implicit hc: HeaderCarrier): Future[RegisterWithoutIDResponse] = {
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[RegisterWithoutIDResponse] = {
     import individualNameAndDateOfBirth._
     val individual =
       Individual.withLocalDate(firstName, middleName, lastName, dateOfBirth)
@@ -77,10 +79,10 @@ class RegisterWithoutIdService @Inject()(
       individual = individual,
       contactDetail = contactDetail.getOrElse(throw new IllegalStateException("No contact details in cache"))
     )
-    val request =
+    val req =
       RegisterWithoutIDRequest(requestCommonGenerator.generate(), reqDetails)
     for {
-      response <- connector.register(request)
+      response <- connector.register(req)
       registrationDetails = detailsCreator.registrationDetails(
         response,
         individualNameAndDateOfBirth,
@@ -96,7 +98,7 @@ class RegisterWithoutIdService @Inject()(
     registrationDetails: RegistrationDetails,
     loggedInUser: LoggedInUser,
     orgType: Option[CdsOrganisationType] = None
-  )(implicit hc: HeaderCarrier) =
+  )(implicit hc: HeaderCarrier, request: Request[_]) =
     if (registrationDetails.safeId.id.nonEmpty) {
       sessionCache.saveRegistrationDetailsWithoutId(
         registrationDetails: RegistrationDetails,

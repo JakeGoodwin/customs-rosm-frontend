@@ -210,7 +210,7 @@ class VatDetailsEuController @Inject()(
       )
     )
 
-  private def isEuVatDetailsSeqOnLimit(implicit hc: HeaderCarrier): Future[Boolean] =
+  private def isEuVatDetailsSeqOnLimit(implicit hc: HeaderCarrier, request: Request[_]): Future[Boolean] =
     vatEUDetailsService.cachedEUVatDetails map (_.size == EuVatDetailsLimit)
 
   private def goToConfirmVat(journey: Journey.Value, isInReviewMode: Boolean) =

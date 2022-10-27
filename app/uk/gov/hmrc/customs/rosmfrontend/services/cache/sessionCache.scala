@@ -17,18 +17,18 @@
 package uk.gov.hmrc.customs.rosmfrontend.services.cache
 
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{JsSuccess, Json}
-import play.modules.reactivemongo.ReactiveMongoComponent
-import uk.gov.hmrc.cache._
-import uk.gov.hmrc.cache.model.{Cache, Id}
-import uk.gov.hmrc.cache.repository.CacheMongoRepository
+import play.api.libs.json.{JsSuccess, Json, Reads, Writes}
+import play.api.mvc.Request
+import uk.gov.hmrc.mongo.cache.{DataKey, SessionCacheRepository}
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.SubscriptionDetails
 import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
 import uk.gov.hmrc.customs.rosmfrontend.services.Save4LaterService
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.CachedData._
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.mongo.{MongoComponent, TimestampSupport}
+import uk.gov.hmrc.play.http.logging.Mdc.preservingMdc
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NoStackTrace
@@ -42,44 +42,7 @@ sealed case class CachedData(
   registerWithEoriAndIdResponse: Option[RegisterWithEoriAndIdResponse] = None,
   email: Option[String] = None,
   eori: Option[String] = None,
-  hasNino: Option[Boolean] = None
-) {
-
-  def registrationDetails(sessionId: Id): RegistrationDetails =
-    regDetails.getOrElse(throwException(regDetailsKey, sessionId))
-
-  def registerWithEoriAndIdResponse(sessionId: Id): RegisterWithEoriAndIdResponse =
-    registerWithEoriAndIdResponse.getOrElse(throwException(registerWithEoriAndIdResponseKey, sessionId))
-
-  def subscriptionStatusOutcome(sessionId: Id): SubscriptionStatusOutcome =
-    subscriptionStatusOutcome.getOrElse(throwException(subscriptionStatusOutcomeKey, sessionId))
-
-  def subscriptionCreateOutcome(sessionId: Id): SubscriptionCreateOutcome =
-    subscriptionCreateOutcome.getOrElse(throwException(subscriptionCreateOutcomeKey, sessionId))
-
-  def registrationInfo(sessionId: Id): RegistrationInfo =
-    regInfo.getOrElse(throwException(regInfoKey, sessionId))
-
-  def subscriptionDetails(sessionId: Id): SubscriptionDetails =
-    subDetails.getOrElse(initialEmptySubscriptionDetails)
-
-  def email(sessionId: Id): String =
-    email.getOrElse(throwException(emailKey, sessionId))
-
-  def safeId(sessionId: Id) = {
-    lazy val mayBeMigration: Option[SafeId] = registerWithEoriAndIdResponse
-      .flatMap(_.responseDetail.flatMap(_.responseData.map(_.SAFEID)))
-      .map(SafeId(_))
-    lazy val mayBeRegistration: Option[SafeId] =
-      regDetails.flatMap(s => if (s.safeId.id.nonEmpty) Some(s.safeId) else None)
-    mayBeRegistration orElse mayBeMigration getOrElse (throwException(safeIdKey, sessionId))
-  }
-  // $COVERAGE-OFF$
-  private def throwException(name: String, sessionId: Id) =
-    throw new IllegalStateException(s"$name is not cached in data for the sessionId: ${sessionId.id}")
-  // $COVERAGE-ON$
-  private val initialEmptySubscriptionDetails = SubscriptionDetails()
-}
+  hasNino: Option[Boolean] = None)
 
 object CachedData {
   val regDetailsKey = "regDetails"
@@ -97,27 +60,48 @@ object CachedData {
 }
 
 @Singleton
-class SessionCache @Inject()(appConfig: AppConfig, mongo: ReactiveMongoComponent, save4LaterService: Save4LaterService)(
-  implicit ec: ExecutionContext
-) extends CacheMongoRepository("session-cache", appConfig.ttl.toSeconds)(mongo.mongoConnector.db, ec) {
+class SessionCache @Inject() (
+   appConfig: AppConfig,
+   mongo: MongoComponent,
+   save4LaterService: Save4LaterService,
+   timestampSupport: TimestampSupport
+)(implicit ec: ExecutionContext)
+    extends SessionCacheRepository(
+      mongo,
+      "session-cache",
+      ttl = appConfig.ttl,
+      timestampSupport = timestampSupport,
+      sessionIdKey = SessionKeys.sessionId
+      )(ec){
 
-  private def sessionId(implicit hc: HeaderCarrier): Id =
-    hc.sessionId match {
+  private def sessionId(implicit request: Request[_]): String =
+    request.session.get("sessionId") match {
       case None =>
         // $COVERAGE-OFF$
         throw new IllegalStateException("Session id is not available")
       // $COVERAGE-ON$
-      case Some(sessionId) => model.Id(sessionId.value)
+      case Some(sessionId) =>  sessionId
     }
 
-  def saveRegistrationDetails(rd: RegistrationDetails)(implicit hc: HeaderCarrier): Future[Boolean] =
-    createOrUpdate(sessionId, regDetailsKey, Json.toJson(rd)) map (_ => true)
+  def putData[A: Writes](key: String, data: A)(implicit request: Request[_]): Future[A] =
+    preservingMdc {
+      putSession[A](DataKey(key), data).map(_ => data)
+    }
+
+  def getData[A: Reads](key: String)(implicit request: Request[_]): Future[Option[A]] =
+    preservingMdc {
+      getFromSession[A](DataKey(key))
+    }
+
+
+  def saveRegistrationDetails(rd: RegistrationDetails)(implicit request: Request[_]): Future[Boolean] =
+    putData(regDetailsKey, Json.toJson(rd)) map (_ => true)
 
   def saveRegistrationDetails(
     rd: RegistrationDetails,
     internalId: InternalId,
     orgType: Option[CdsOrganisationType] = None
-  )(implicit hc: HeaderCarrier): Future[Boolean] =
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Boolean] =
     for {
       _ <- save4LaterService.saveOrgType(internalId, orgType)
       createdOrUpdated <- saveRegistrationDetails(rd)
@@ -127,7 +111,7 @@ class SessionCache @Inject()(appConfig: AppConfig, mongo: ReactiveMongoComponent
     rd: RegistrationDetails,
     internalId: InternalId,
     orgType: Option[CdsOrganisationType] = None
-  )(implicit hc: HeaderCarrier): Future[Boolean] =
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Boolean] =
     for {
       _ <- save4LaterService.saveSafeId(internalId, rd.safeId)
       _ <- save4LaterService.saveOrgType(internalId, orgType)
@@ -136,94 +120,82 @@ class SessionCache @Inject()(appConfig: AppConfig, mongo: ReactiveMongoComponent
 
   def saveRegisterWithEoriAndIdResponse(
     rd: RegisterWithEoriAndIdResponse
-  )(implicit hc: HeaderCarrier): Future[Boolean] =
-    createOrUpdate(sessionId, registerWithEoriAndIdResponseKey, Json.toJson(rd)) map (_ => true)
+  )(implicit request: Request[_]): Future[Boolean] =
+    putData(registerWithEoriAndIdResponseKey, Json.toJson(rd)) map (_ => true)
 
-  def saveSubscriptionCreateOutcome(subscribeOutcome: SubscriptionCreateOutcome)(implicit hc: HeaderCarrier): Future[Boolean] =
-    createOrUpdate(sessionId, subscriptionCreateOutcomeKey, Json.toJson(subscribeOutcome)) map (_ => true)
+  def saveSubscriptionCreateOutcome(subscribeOutcome: SubscriptionCreateOutcome)(implicit request: Request[_]): Future[Boolean] =
+    putData(subscriptionCreateOutcomeKey, Json.toJson(subscribeOutcome)) map (_ => true)
 
-  def saveSubscriptionStatusOutcome(subscriptionStatusOutcome: SubscriptionStatusOutcome)(implicit hc: HeaderCarrier): Future[Boolean] =
-    createOrUpdate(sessionId, subscriptionStatusOutcomeKey, Json.toJson(subscriptionStatusOutcome)) map (_ => true)
+  def saveSubscriptionStatusOutcome(subscriptionStatusOutcome: SubscriptionStatusOutcome)(implicit request: Request[_]): Future[Boolean] =
+    putData(subscriptionStatusOutcomeKey, Json.toJson(subscriptionStatusOutcome)) map (_ => true)
 
-  def saveRegistrationInfo(rd: RegistrationInfo)(implicit hc: HeaderCarrier): Future[Boolean] =
-    createOrUpdate(sessionId, regInfoKey, Json.toJson(rd)) map (_ => true)
+  def saveRegistrationInfo(rd: RegistrationInfo)(implicit request: Request[_]): Future[Boolean] =
+    putData(regInfoKey, Json.toJson(rd)) map (_ => true)
 
-  def saveSubscriptionDetails(rdh: SubscriptionDetails)(implicit hc: HeaderCarrier): Future[Boolean] =
-    createOrUpdate(sessionId, subDetailsKey, Json.toJson(rdh)) map (_ => true)
+  def saveSubscriptionDetails(rdh: SubscriptionDetails)(implicit request: Request[_]): Future[Boolean] =
+    putData(subDetailsKey, Json.toJson(rdh)) map (_ => true)
 
-  def saveEmail(email: String)(implicit hc: HeaderCarrier): Future[Boolean] =
-    createOrUpdate(sessionId, emailKey, Json.toJson(email)) map (_ => true)
+  def saveEmail(email: String)(implicit request: Request[_]): Future[Boolean] =
+    putData(emailKey, Json.toJson(email)) map (_ => true)
 
-  def saveHasNino(hasNino: Boolean)(implicit hc: HeaderCarrier): Future[Boolean] =
-    createOrUpdate(sessionId, hasNinoKey, Json.toJson(hasNino)) map (_ => true)
+  def saveHasNino(hasNino: Boolean)(implicit request: Request[_]): Future[Boolean] =
+    putData(hasNinoKey, Json.toJson(hasNino)) map (_ => true)
 
-  def saveEori(eori: Eori)(implicit hc: HeaderCarrier): Future[Boolean] =
-    createOrUpdate(sessionId, eoriKey, Json.toJson(eori.id)) map (_ => true)
+  def saveEori(eori: Eori)(implicit request: Request[_]): Future[Boolean] =
+    putData(eoriKey, Json.toJson(eori.id)) map (_ => true)
 
-  private def getCached[T](sessionId: Id, t: (CachedData, Id) => T)(implicit hc: HeaderCarrier): Future[T] =
-    findById(sessionId.id).map {
-      case Some(Cache(_, Some(data), _, _)) =>
-        Json.fromJson[CachedData](data) match {
-          case d: JsSuccess[CachedData] => t(d.value, sessionId)
-          case _ => {
-            // $COVERAGE-OFF$
-            CdsLogger.warn(s"No Session data is cached for the sessionId : ${sessionId.id}")
-            throw SessionTimeOutException(s"No Session data is cached for the sessionId : ${sessionId.id}")
-            // $COVERAGE-ON$
-          }
-        }
-      case _ => {
-        // $COVERAGE-OFF$
-        CdsLogger.warn(s"No match session id for signed in user with session: ${sessionId.id}")
-        throw SessionTimeOutException(s"No match session id for signed in user with session : ${sessionId.id}")
-        // $COVERAGE-ON$
+  def subscriptionDetails(implicit request: Request[_]): Future[SubscriptionDetails] =
+    getData[SubscriptionDetails](subDetailsKey).map(_.getOrElse(throwException(subDetailsKey)))
+
+  def eori(implicit request: Request[_]): Future[Option[String]] =
+    getData[String](eoriKey)
+
+  def email(implicit request: Request[_]): Future[String] =
+    getData[String](emailKey).map(_.getOrElse(throwException(emailKey)))
+
+  def hasNino(implicit request: Request[_]): Future[Option[Boolean]] =
+    getData[Boolean](hasNinoKey) // .map(_.getOrElse(throwException(hasNinoKey)))
+
+  def mayBeEmail(implicit request: Request[_]): Future[Option[String]] =
+    getData[String](emailKey)
+
+  def safeId(implicit request: Request[_]): Future[SafeId] =
+    getData[SafeId](safeIdKey).map(_.getOrElse(throwException(safeIdKey)))
+
+  def name(implicit request: Request[_]): Future[Option[String]] =
+    getData[RegistrationDetails](regDetailsKey).map(_.map(_.name))
+
+  def registrationDetails(implicit request: Request[_]): Future[RegistrationDetails] =
+    getData[RegistrationDetails](regDetailsKey).map(_.getOrElse(throwException(regDetailsKey)))
+
+  def registerWithEoriAndIdResponse(implicit request: Request[_]): Future[RegisterWithEoriAndIdResponse] =
+    getData[RegisterWithEoriAndIdResponse](registerWithEoriAndIdResponseKey)
+      .map(_.getOrElse(throwException(registerWithEoriAndIdResponseKey)))
+
+  def subscriptionStatusOutcome(implicit request: Request[_]): Future[SubscriptionStatusOutcome] =
+    getData[SubscriptionStatusOutcome](subscriptionStatusOutcomeKey)
+      .map(_.getOrElse(throwException(subscriptionStatusOutcomeKey)))
+
+  def subscriptionCreateOutcome(implicit request: Request[_]): Future[SubscriptionCreateOutcome] =
+    getData[SubscriptionCreateOutcome](subscriptionCreateOutcomeKey)
+      .map(_.getOrElse(throwException(subscriptionCreateOutcomeKey)))
+
+  def mayBeSubscriptionCreateOutcome(implicit request: Request[_]): Future[Option[SubscriptionCreateOutcome]] =
+    getData[SubscriptionCreateOutcome](subscriptionCreateOutcomeKey)
+
+  def registrationInfo(implicit request: Request[_]): Future[RegistrationInfo] =
+    getData[RegistrationInfo](regInfoKey).map(_.getOrElse(throwException(regInfoKey)))
+
+  def remove(implicit request: Request[_]): Future[Boolean] =
+    preservingMdc {
+      cacheRepo.deleteEntity(request).map(_ => true).recoverWith {
+        case _ => Future.successful(false)
       }
     }
 
-  def subscriptionDetails(implicit hc: HeaderCarrier): Future[SubscriptionDetails] =
-    getCached[SubscriptionDetails](sessionId, (cachedData, id) => cachedData.subscriptionDetails(id))
-
-  def eori(implicit hc: HeaderCarrier): Future[Option[String]] =
-    getCached[Option[String]](sessionId, (cachedData, id) => cachedData.eori)
-
-  def email(implicit hc: HeaderCarrier): Future[String] =
-    getCached[String](sessionId, (cachedData, id) => cachedData.email(id))
-
-  def hasNino(implicit hc: HeaderCarrier): Future[Option[Boolean]] =
-    getCached[Option[Boolean]](sessionId, (cachedData, _) => cachedData.hasNino)
-
-  def mayBeEmail(implicit hc: HeaderCarrier): Future[Option[String]] =
-    getCached[Option[String]](sessionId, (cachedData, _) => cachedData.email)
-
-  def safeId(implicit hc: HeaderCarrier): Future[SafeId] =
-    getCached[SafeId](sessionId, (cachedData, id) => cachedData.safeId(id))
-
-  def name(implicit hc: HeaderCarrier): Future[Option[String]] =
-    getCached[Option[String]](sessionId, (cachedData, _) => cachedData.regDetails.map(_.name))
-
-  def registrationDetails(implicit hc: HeaderCarrier): Future[RegistrationDetails] =
-    getCached[RegistrationDetails](sessionId, (cachedData, id) => cachedData.registrationDetails(id))
-
-  def registerWithEoriAndIdResponse(implicit hc: HeaderCarrier): Future[RegisterWithEoriAndIdResponse] =
-    getCached[RegisterWithEoriAndIdResponse](
-      sessionId,
-      (cachedData, id) => cachedData.registerWithEoriAndIdResponse(id)
-    )
-
-  def subscriptionStatusOutcome(implicit hc: HeaderCarrier): Future[SubscriptionStatusOutcome] =
-    getCached[SubscriptionStatusOutcome](sessionId, (cachedData, id) => cachedData.subscriptionStatusOutcome(id))
-
-  def subscriptionCreateOutcome(implicit hc: HeaderCarrier): Future[SubscriptionCreateOutcome] =
-    getCached[SubscriptionCreateOutcome](sessionId, (cachedData, id) => cachedData.subscriptionCreateOutcome(id))
-
-  def mayBeSubscriptionCreateOutcome(implicit hc: HeaderCarrier): Future[Option[SubscriptionCreateOutcome]] =
-    getCached[Option[SubscriptionCreateOutcome]](sessionId, (cachedData, _) => cachedData.subscriptionCreateOutcome)
-
-  def registrationInfo(implicit hc: HeaderCarrier): Future[RegistrationInfo] =
-    getCached[RegistrationInfo](sessionId, (cachedData, id) => cachedData.registrationInfo(id))
-
-  def remove(implicit hc: HeaderCarrier): Future[Boolean] =
-    removeById(sessionId.id) map (x => x.writeErrors.isEmpty && x.writeConcernError.isEmpty)
+  private def throwException(name: String)(implicit request: Request[_]) =
+    throw DataUnavailableException(s"$name is not cached in data for the sessionId: $sessionId")
 }
 
 case class SessionTimeOutException(errorMessage: String) extends NoStackTrace
+case class DataUnavailableException(message: String)     extends RuntimeException(message)

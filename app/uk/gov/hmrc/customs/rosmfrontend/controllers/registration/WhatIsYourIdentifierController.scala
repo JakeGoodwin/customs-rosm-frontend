@@ -190,7 +190,7 @@ class WhatIsYourIdentifierController @Inject()(
   }
 
   private def retrieveNameDobFromCache()(
-      implicit hc: HeaderCarrier): Future[Individual] =
+      implicit hc: HeaderCarrier, request: Request[_]): Future[Individual] =
     for {
       mayBeNameDobDetails <- sessionCache.subscriptionDetails.map(
         _.nameDobDetails)

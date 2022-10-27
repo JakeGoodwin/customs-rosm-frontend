@@ -119,26 +119,28 @@ val compileDependencies = Seq(
   "uk.gov.hmrc" %% "http-caching-client" % "9.5.0-play-28",
   "uk.gov.hmrc" %% "play-conditional-form-mapping" % "1.9.0-play-28",
   "uk.gov.hmrc" %% "domain" % "6.0.0-play-28",
-  "uk.gov.hmrc" %% "mongo-caching" % "7.0.0-play-28",
+  "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28" % "0.71.0",
   "uk.gov.hmrc" %% "emailaddress" % "3.5.0",
   "uk.gov.hmrc" %% "logback-json-logger" % "5.1.0",
   "com.typesafe.play" %% "play-json-joda" % "2.8.1",
+  "com.github.nscala-time" %% "nscala-time" % "2.32.0",
+  "uk.gov.hmrc.mongo"   %% "hmrc-mongo-test-play-28" % "0.71.0"   % "test, it",
   "uk.gov.hmrc" %% "play-ui" % "9.6.0-play-28"
 )
 
 val testDependencies = Seq(
-  "com.typesafe.play" %% "play-test" % PlayVersion.current % "test,it",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % "test,it",
+  "org.scalatest"          %% "scalatest"           % "3.2.12"            % "test,it",
+  "com.typesafe.play"      %% "play-test"           % PlayVersion.current % "test,it",
+  "org.scalatestplus.play" %% "scalatestplus-play"  % "5.1.0"             % "test,it",
+  "org.mockito"             % "mockito-core"        % "4.7.0"             % "test,it",
+  "org.scalatestplus"      %% "mockito-4-6"         % "3.2.13.0"          % "test, it",
   "com.github.tomakehurst" % "wiremock-standalone" % "2.27.2" % "test, it"
     exclude ("org.apache.httpcomponents", "httpclient") exclude ("org.apache.httpcomponents", "httpcore"),
   "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0" % "test,it",
-  "org.scalacheck" %% "scalacheck" % "1.14.0" % "test,it",
   "org.jsoup" % "jsoup" % "1.11.3" % "test,it",
   "us.codecraft" % "xsoup" % "0.3.1" % "test,it",
-  "org.mockito" % "mockito-core" % "3.11.1" % "test,it",
   "uk.gov.hmrc" %% "webdriver-factory" % "0.22.0",
   "uk.gov.hmrc" %% "play-language" % "5.1.0-play-28",
-  "uk.gov.hmrc" %% "reactivemongo-test" % "5.0.0-play-28" % "test, it",
   "org.pegdown" % "pegdown" % "1.6.0" % "test,it"
 )
 

@@ -21,7 +21,6 @@ import play.mvc.Http.Status._
 import uk.gov.hmrc.customs.rosmfrontend.audit.Auditable
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
-import uk.gov.hmrc.http.HeaderNames.explicitlyIncludedHeaders
 import uk.gov.hmrc.http.{BadRequestException, HttpClient, _}
 
 import javax.inject.{Inject, Singleton}

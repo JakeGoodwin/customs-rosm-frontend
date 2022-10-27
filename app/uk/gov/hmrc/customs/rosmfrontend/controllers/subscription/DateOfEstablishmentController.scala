@@ -89,7 +89,7 @@ class DateOfEstablishmentController @Inject()(
         )
     }
 
-  private def fetchDate(implicit hc: HeaderCarrier): Future[LocalDate] =
+  private def fetchDate(implicit hc: HeaderCarrier, request: Request[_]): Future[LocalDate] =
     subscriptionBusinessService.getCachedDateEstablished
 
   def submit(isInReviewMode: Boolean, journey: Journey.Value): Action[AnyContent] =
@@ -125,7 +125,7 @@ class DateOfEstablishmentController @Inject()(
       )
     }
 
-  private def saveDateEstablished(date: LocalDate)(implicit hc: HeaderCarrier) =
+  private def saveDateEstablished(date: LocalDate)(implicit hc: HeaderCarrier, request: Request[_]) =
     subscriptionDetailsHolderService.cacheDateEstablished(date)
 
   private def getSubscriptionPage(journey: Journey.Value, location: Boolean) =

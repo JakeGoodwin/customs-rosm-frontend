@@ -125,7 +125,7 @@ class UserLocationController @Inject()(
 
     }
 
-  private def subscriptionStatusBasedOnSafeId(internalId: InternalId)(implicit hc: HeaderCarrier) =
+  private def subscriptionStatusBasedOnSafeId(internalId: InternalId)(implicit hc: HeaderCarrier, request: Request[_]) =
     for {
       mayBeSafeId <- save4LaterService.fetchSafeId(internalId)
       preSubscriptionStatus <- mayBeSafeId match {
