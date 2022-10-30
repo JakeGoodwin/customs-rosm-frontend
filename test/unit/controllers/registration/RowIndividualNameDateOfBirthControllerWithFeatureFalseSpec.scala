@@ -69,8 +69,7 @@ class RowIndividualNameDateOfBirthControllerWithFeatureFalseSpec
       mcc,
       rowIndividualNameDob,
       mockRequestSessionData,
-      mockAppConfig,
-      mockFeatureFlags
+      mockAppConfig
     )
 
     def beforeEach(): Unit = {

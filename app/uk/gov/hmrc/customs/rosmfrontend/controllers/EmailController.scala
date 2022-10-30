@@ -43,10 +43,9 @@ class EmailController @Inject()(
   sessionCache: SessionCache,
   mcc: MessagesControllerComponents,
   save4LaterService: Save4LaterService,
-  userGroupIdSubscriptionStatusCheckService: UserGroupIdSubscriptionStatusCheckService,
-  featureFlags: FeatureFlags
+  userGroupIdSubscriptionStatusCheckService: UserGroupIdSubscriptionStatusCheckService
 )(implicit ec: ExecutionContext)
-    extends CdsController(mcc)  {
+    extends CdsController(mcc) with FeatureFlags {
 
   private def groupIsEnrolled(
     journey: Journey.Value
@@ -93,7 +92,7 @@ class EmailController @Inject()(
             }
           case None => {
             userGroupIdSubscriptionStatusCheckService
-              .checksToProceed(GroupId(user.groupId), InternalId(user.internalId), featureFlags.redirectToECCEnabled, journey) {
+              .checksToProceed(GroupId(user.groupId), InternalId(user.internalId), redirectToECCEnabled, journey) {
                 continue(journey)
               } { groupIsEnrolled(journey) } {
                 userIsInProcess(journey)
@@ -103,7 +102,7 @@ class EmailController @Inject()(
       } else {
         //subscription journey
         userGroupIdSubscriptionStatusCheckService
-          .checksToProceed(GroupId(user.groupId), InternalId(user.internalId), featureFlags.redirectToECCEnabled, journey) {
+          .checksToProceed(GroupId(user.groupId), InternalId(user.internalId), redirectToECCEnabled, journey) {
           continue(journey)
         } { groupIsEnrolled(journey) } {
           userIsInProcess(journey)

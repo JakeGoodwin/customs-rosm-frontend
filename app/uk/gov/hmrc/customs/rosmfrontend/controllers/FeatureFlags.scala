@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers
 
-import play.api.{Application, Configuration}
+import play.api.Application
 
-import javax.inject.Inject
+trait FeatureFlags {
 
-class FeatureFlags @Inject() (config: Configuration) {
+  def currentApp: Application
 
-  def loadConfig(path: String): Boolean = config.get[Boolean](path)
+  def loadConfig(path: String): Boolean =
+    currentApp.configuration.get[Boolean](path)
 
   val matchingEnabled: Boolean = loadConfig(path = "features.matchingEnabled")
 

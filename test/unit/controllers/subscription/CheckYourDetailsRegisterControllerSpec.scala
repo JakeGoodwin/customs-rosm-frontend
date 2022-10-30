@@ -30,7 +30,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc._
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.customs.rosmfrontend.controllers.FeatureFlags
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.CheckYourDetailsRegisterController
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.routes._
 import uk.gov.hmrc.customs.rosmfrontend.domain.CdsOrganisationType.{Partnership, _}
@@ -61,7 +60,6 @@ class CheckYourDetailsRegisterControllerSpec
   private val mockRegisterWithoutIdWithSubscription = mock[RegisterWithoutIdWithSubscriptionService]
   private val mockSubscriptionFlow = mock[SubscriptionFlow]
   private val mockRequestSession = mock[RequestSessionData]
-  private val mockFeatureFlags = mock[FeatureFlags]
   private val checkYourDetailsRegisterView = app.injector.instanceOf[check_your_details_register]
 
   val controller = new CheckYourDetailsRegisterController(
@@ -71,8 +69,7 @@ class CheckYourDetailsRegisterControllerSpec
     mockRequestSession,
     mcc,
     checkYourDetailsRegisterView,
-    mockRegisterWithoutIdWithSubscription,
-    mockFeatureFlags
+    mockRegisterWithoutIdWithSubscription
   )
 
   private val organisationRegistrationDetailsWithEmptySafeId = organisationRegistrationDetails.copy(safeId = SafeId(""))
@@ -795,6 +792,10 @@ class CheckYourDetailsRegisterControllerSpec
     isIndividualSubscriptionFlow: Boolean = false,
     rowHaveUtrEnabled: Boolean = true
   )(test: Future[Result] => Any) {
+    implicit val app: Application = new GuiceApplicationBuilder()
+      .configure(Map("features.rowHaveUtrEnabled" -> rowHaveUtrEnabled))
+      .build()
+
     val controller = new CheckYourDetailsRegisterController(
       app,
       mockAuthConnector,
@@ -802,8 +803,7 @@ class CheckYourDetailsRegisterControllerSpec
       mockRequestSession,
       mcc,
       checkYourDetailsRegisterView,
-      mockRegisterWithoutIdWithSubscription,
-      mockFeatureFlags
+      mockRegisterWithoutIdWithSubscription
     )
 
     withAuthorisedUser(userId, mockAuthConnector)

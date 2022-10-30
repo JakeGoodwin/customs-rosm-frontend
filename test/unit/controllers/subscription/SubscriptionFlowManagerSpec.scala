@@ -48,10 +48,9 @@ class SubscriptionFlowManagerSpec
 
   private val mockRequestSessionData = mock[RequestSessionData]
   private val mockCdsFrontendDataCache = mock[SessionCache]
-  private val featureFlags = new FeatureFlags(app.configuration)
 
   val controller =
-    new SubscriptionFlowManager(mockRequestSessionData, mockCdsFrontendDataCache, featureFlags)
+    new SubscriptionFlowManager(app, mockRequestSessionData, mockCdsFrontendDataCache)
   private val mockOrgRegistrationDetails = mock[RegistrationDetailsOrganisation]
   private val mockIndividualRegistrationDetails = mock[RegistrationDetailsIndividual]
   private val mockSession = mock[Session]
@@ -394,9 +393,9 @@ class SubscriptionFlowManagerNinoUtrEnabledSpec
 
   private val mockRequestSessionData = mock[RequestSessionData]
   private val mockCdsFrontendDataCache = mock[SessionCache]
-  private val mockFeatureFlags = mock[FeatureFlags]
+
   val controller =
-    new SubscriptionFlowManager(mockRequestSessionData, mockCdsFrontendDataCache, mockFeatureFlags)
+    new SubscriptionFlowManager(app, mockRequestSessionData, mockCdsFrontendDataCache)
   private val mockSession = mock[Session]
 
   private val mockHC = mock[HeaderCarrier]
@@ -443,7 +442,7 @@ class SubscriptionFlowManagerNinoUtrEnabledSpec
       verify(mockRequestSessionData).storeUserSubscriptionFlow(
         MigrationEoriRowIndividualsSubscriptionUtrNinoEnabledFlow,
         RegistrationConfirmPage.url
-      )(any())
+      )(mockRequest)
     }
 
     "start Corporate Subscription Flow when cached registration details are for an Organisation" in {
@@ -458,7 +457,7 @@ class SubscriptionFlowManagerNinoUtrEnabledSpec
       verify(mockRequestSessionData).storeUserSubscriptionFlow(
         MigrationEoriRowOrganisationSubscriptionUtrNinoEnabledFlow,
         RegistrationConfirmPage.url
-      )(any())
+      )(mockRequest)
     }
   }
 }

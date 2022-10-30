@@ -64,8 +64,7 @@ class WhatIsYourOrgNameControllerSpec extends ControllerSpec with BeforeAndAfter
     mockRequestSessionData,
     mcc,
     whatIsYourOrgNameView,
-    mockSubscriptionDetailsService,
-    mockFeatureFlags
+    mockSubscriptionDetailsService
   )
 
   private val organisationTypeOrganisations =

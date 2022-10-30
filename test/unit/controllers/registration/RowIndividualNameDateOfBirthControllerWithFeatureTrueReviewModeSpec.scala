@@ -69,8 +69,7 @@ class RowIndividualNameDateOfBirthControllerWithFeatureTrueReviewModeSpec
       mcc,
       rowIndividualNameDob,
       mockRequestSessionData,
-      appConfig,
-      mockFeatureFlags
+      appConfig
     )
 
     protected def show(с: RowIndividualNameDateOfBirthController): Action[AnyContent] =

@@ -62,6 +62,8 @@ class VatRegisteredEuControllerSpec extends ControllerSpec {
   private val emptyVatEuDetails: Seq[VatEUDetailsModel] = Seq.empty
   private val someVatEuDetails: Seq[VatEUDetailsModel] = Seq(VatEUDetailsModel("1234", "FR"))
 
+  implicit val req: Request[_] = mock[Request[_]]
+
   private val controller = new VatRegisteredEuController(
     app,
     mockAuthConnector,
@@ -181,8 +183,8 @@ class VatRegisteredEuControllerSpec extends ControllerSpec {
   private def reviewForm(journey: Journey.Value = Journey.GetYourEORI)(test: Future[Result] => Any) {
     withAuthorisedUser(defaultUserId, mockAuthConnector)
     mockIsIndividual()
-    when(mockSessionCache.subscriptionDetails(any[Request[_]])).thenReturn(any)
-    when(mockSubscriptionBusinessService.getCachedVatRegisteredEu(any[Request[_]])).thenReturn(true)
+    when(mockSessionCache.subscriptionDetails).thenReturn(any)
+    when(mockSubscriptionBusinessService.getCachedVatRegisteredEu).thenReturn(true)
     test(controller.reviewForm(journey).apply(SessionBuilder.buildRequestWithSession(defaultUserId)))
   }
 

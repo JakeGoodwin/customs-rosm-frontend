@@ -56,8 +56,7 @@ class WhatIsYourOrgNameControllerRowSpec extends ControllerSpec with BeforeAndAf
     mockRequestSessionData,
     mcc,
     whatIsYourOrgNameView,
-    mockSubscriptionDetailsService,
-    mockFeatureFlags
+    mockSubscriptionDetailsService
   )
 
   override def beforeEach: Unit =

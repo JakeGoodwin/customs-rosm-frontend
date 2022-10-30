@@ -82,7 +82,7 @@ class SubscriptionStatusServiceSpec extends UnitSpec with MockitoSugar with Befo
     }
 
     "store processing date in cache" in {
-      when(mockConnector.status(request)(any[HeaderCarrier])).thenReturn(
+      when(mockConnector.status(meq(request))(any[HeaderCarrier])).thenReturn(
         Future.successful(
           responseHolderWithStatusAndProcessingDateWithoutEori("01", "2018-05-22T09:30:00Z").subscriptionStatusResponse
         )

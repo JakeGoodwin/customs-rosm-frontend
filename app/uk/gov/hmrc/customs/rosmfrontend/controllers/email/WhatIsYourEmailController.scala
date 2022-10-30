@@ -41,7 +41,7 @@ class WhatIsYourEmailController @Inject()(
   save4LaterService: Save4LaterService,
   appConfig: AppConfig
 )(implicit ec: ExecutionContext)
-    extends CdsController(mcc) {
+    extends CdsController(mcc) with FeatureFlags {
 
   private def populateView(
     email: Option[String],

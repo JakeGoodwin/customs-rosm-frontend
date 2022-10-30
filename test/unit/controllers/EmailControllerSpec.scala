@@ -68,8 +68,7 @@ class EmailControllerSpec extends ControllerSpec with AddressPageFactoring with 
     mockSessionCache,
     mcc,
     mockSave4LaterService,
-    mockUserGroupIdSubscriptionStatusCheckService,
-    mockFeatureFlags
+    mockUserGroupIdSubscriptionStatusCheckService
   )
   val enrolments = EnrolmentStoreProxyResponse(
     List(

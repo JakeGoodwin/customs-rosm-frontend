@@ -29,7 +29,7 @@ import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.ResponseCommon
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{BusinessShortName, SubscriptionDetails}
 import uk.gov.hmrc.customs.rosmfrontend.services.Save4LaterService
-import uk.gov.hmrc.customs.rosmfrontend.services.cache.{CachedData, DataUnavailableException, SessionCache}
+import uk.gov.hmrc.customs.rosmfrontend.services.cache.{CachedData, DataUnavailableException, SessionCache, SessionTimeOutException}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
 import uk.gov.hmrc.mongo.CurrentTimestampSupport
 import uk.gov.hmrc.mongo.cache.{CacheItem, DataKey}
@@ -82,6 +82,11 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
 
     "provide default when subscription details holder not in cache" in {
       when(request.session).thenReturn(Session(Map(("sessionId", "sessionId-" + UUID.randomUUID()))))
+
+      val e1 = intercept[SessionTimeOutException] {
+        await(sessionCache.subscriptionDetails(request))
+      }
+      e1.errorMessage mustBe "No match session id for signed in user with session : does-not-exist"
 
       await(sessionCache.putSession(DataKey("regDetails"), data = Json.toJson(individualRegistrationDetails)))
 

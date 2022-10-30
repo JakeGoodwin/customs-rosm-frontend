@@ -58,10 +58,10 @@ case class SubscriptionFlowConfig(
 
 @Singleton
 class SubscriptionFlowManager @Inject()(
+  override val currentApp: Application,
   requestSessionData: RequestSessionData,
   cdsFrontendDataCache: SessionCache,
-  featureFlags: FeatureFlags
-)  {
+) extends FeatureFlags {
 
   def currentSubscriptionFlow(implicit request: Request[AnyContent]): SubscriptionFlow =
     requestSessionData.userSubscriptionFlow
@@ -119,7 +119,7 @@ class SubscriptionFlowManager @Inject()(
   )(implicit request: Request[AnyContent], headerCarrier: HeaderCarrier): SubscriptionFlow = {
     val userLocation = requestSessionData.selectedUserLocation
 
-    val subscribePrefix = (userLocation, journey, registrationDetails.customsId, featureFlags.rowHaveUtrEnabled) match {
+    val subscribePrefix = (userLocation, journey, registrationDetails.customsId, rowHaveUtrEnabled) match {
       case (
           Some(UserLocation.Islands) | Some(UserLocation.ThirdCountry),
           Journey.Migrate,
@@ -139,7 +139,7 @@ class SubscriptionFlowManager @Inject()(
     }
 
     val selectedFlow: SubscriptionFlow =
-      (registrationDetails, maybeOrgType, featureFlags.rowHaveUtrEnabled, registrationDetails.customsId, journey) match {
+      (registrationDetails, maybeOrgType, rowHaveUtrEnabled, registrationDetails.customsId, journey) match {
         case (_: RegistrationDetailsOrganisation, Some(CdsOrganisationType.Partnership), _, _, _) =>
           SubscriptionFlow(subscribePrefix + PartnershipSubscriptionFlow.name)
         case (_: RegistrationDetailsOrganisation, _, true, None, Journey.Migrate) =>

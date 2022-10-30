@@ -48,7 +48,7 @@ class MatchingIdControllerSpec extends ControllerSpec with BeforeAndAfterEach {
   private val payeNinoId: String = "AB123456C"
 
   private val controller =
-    new MatchingIdController(app, mockAuthConnector, mockMatchingService, mockRequestSessionData, mcc, mockFeatureFlags)
+    new MatchingIdController(app, mockAuthConnector, mockMatchingService, mockRequestSessionData, mcc)
 
   override def beforeEach: Unit =
     reset(mockMatchingService)
@@ -61,7 +61,7 @@ class MatchingIdControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       withAuthorisedUser(userId, mockAuthConnector)
 
       val controller =
-        new MatchingIdController(app, mockAuthConnector, mockMatchingService, mockRequestSessionData, mcc, mockFeatureFlags)
+        new MatchingIdController(app, mockAuthConnector, mockMatchingService, mockRequestSessionData, mcc)
       val result: Result = await(controller.matchWithIdOnly().apply(SessionBuilder.buildRequestWithSession(userId)))
 
       status(result) shouldBe SEE_OTHER
@@ -92,7 +92,7 @@ class MatchingIdControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       .thenReturn(Future.successful(false))
 
       val controller =
-        new MatchingIdController(app, mockAuthConnector, mockMatchingService, mockRequestSessionData, mcc, mockFeatureFlags)
+        new MatchingIdController(app, mockAuthConnector, mockMatchingService, mockRequestSessionData, mcc)
       val result = await(controller.matchWithIdOnly().apply(SessionBuilder.buildRequestWithSession(userId)))
 
       status(result) shouldBe SEE_OTHER
@@ -185,7 +185,7 @@ class MatchingIdControllerSpec extends ControllerSpec with BeforeAndAfterEach {
         .thenReturn(Future.successful(false))
 
       val controller =
-        new MatchingIdController(app, mockAuthConnector, mockMatchingService, mockRequestSessionData, mcc, mockFeatureFlags)
+        new MatchingIdController(app, mockAuthConnector, mockMatchingService, mockRequestSessionData, mcc)
       val result =
         await(controller.matchWithIdOnlyForExistingReg().apply(SessionBuilder.buildRequestWithSession(userId)))
 

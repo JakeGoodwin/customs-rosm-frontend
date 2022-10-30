@@ -55,7 +55,7 @@ class UserLocationController @Inject()(
   subscriptionStatusOutcomeRejected: subscription_status_outcome_rejected,
   errorTemplate: error_template
 )(implicit ec: ExecutionContext)
-    extends CdsController(mcc) {
+    extends CdsController(mcc) with FeatureFlags {
 
   private def isAffinityOrganisation(affinityGroup: Option[AffinityGroup]): Boolean =
     affinityGroup.contains(AffinityGroup.Organisation)

@@ -38,9 +38,8 @@ class MatchingIdController @Inject()(
   override val authConnector: AuthConnector,
   matchingService: MatchingService,
   requestSessionData: RequestSessionData,
-  mcc: MessagesControllerComponents,
-  featureFlags: FeatureFlags
-) extends CdsController(mcc) with EnrolmentExtractor {
+  mcc: MessagesControllerComponents
+) extends CdsController(mcc) with EnrolmentExtractor with FeatureFlags {
 
   def matchWithIdOnly(): Action[AnyContent] = ggAuthorisedUserWithEnrolmentsAction {
     implicit request => loggedInUser: LoggedInUserWithEnrolments =>
@@ -59,7 +58,7 @@ class MatchingIdController @Inject()(
   private def matchLoggedInUserAndRedirect(loggedInUser: LoggedInUserWithEnrolments)(
     redirectOrganisationTypePage: => Result
   )(redirectToConfirmationPage: => Result)(implicit hc: HeaderCarrier, request: Request[AnyContent]) =
-    if (featureFlags.matchingEnabled) {
+    if (matchingEnabled) {
       lazy val ctUtr = enrolledCtUtr(loggedInUser)
       lazy val saUtr = enrolledSaUtr(loggedInUser)
       lazy val nino = enrolledNino(loggedInUser)

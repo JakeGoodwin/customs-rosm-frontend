@@ -37,10 +37,9 @@ class CheckYourDetailsRegisterController @Inject()(
   requestSessionData: RequestSessionData,
   mcc: MessagesControllerComponents,
   checkYourDetailsRegisterView: check_your_details_register,
-  registerWithoutIdWithSubscription: RegisterWithoutIdWithSubscriptionService,
-  featureFlags: FeatureFlags
+  registerWithoutIdWithSubscription: RegisterWithoutIdWithSubscriptionService
 )(implicit ec: ExecutionContext)
-    extends CdsController(mcc) {
+    extends CdsController(mcc) with FeatureFlags {
 
   def reviewDetails(journey: Journey.Value): Action[AnyContent] = ggAuthorisedUserWithEnrolmentsAction {
     implicit request => _: LoggedInUserWithEnrolments =>
@@ -61,7 +60,7 @@ class CheckYourDetailsRegisterController @Inject()(
             consent,
             journey,
             isUserIdentifiedByRegService,
-            featureFlags.rowHaveUtrEnabled
+            rowHaveUtrEnabled
           )
         )
       }
