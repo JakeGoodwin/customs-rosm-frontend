@@ -22,7 +22,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.Application
+import play.api.{Application, Configuration}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContent, Request, Session}
 import uk.gov.hmrc.customs.rosmfrontend.controllers.FeatureFlags
@@ -48,9 +48,10 @@ class SubscriptionFlowManagerSpec
 
   private val mockRequestSessionData = mock[RequestSessionData]
   private val mockCdsFrontendDataCache = mock[SessionCache]
-  private val mockFeatureFlags =mock[FeatureFlags]
+  private val featureFlags = new FeatureFlags(app.configuration)
+
   val controller =
-    new SubscriptionFlowManager(mockRequestSessionData, mockCdsFrontendDataCache, mockFeatureFlags)
+    new SubscriptionFlowManager(mockRequestSessionData, mockCdsFrontendDataCache, featureFlags)
   private val mockOrgRegistrationDetails = mock[RegistrationDetailsOrganisation]
   private val mockIndividualRegistrationDetails = mock[RegistrationDetailsIndividual]
   private val mockSession = mock[Session]
@@ -442,7 +443,7 @@ class SubscriptionFlowManagerNinoUtrEnabledSpec
       verify(mockRequestSessionData).storeUserSubscriptionFlow(
         MigrationEoriRowIndividualsSubscriptionUtrNinoEnabledFlow,
         RegistrationConfirmPage.url
-      )(mockRequest)
+      )(any())
     }
 
     "start Corporate Subscription Flow when cached registration details are for an Organisation" in {
@@ -457,7 +458,7 @@ class SubscriptionFlowManagerNinoUtrEnabledSpec
       verify(mockRequestSessionData).storeUserSubscriptionFlow(
         MigrationEoriRowOrganisationSubscriptionUtrNinoEnabledFlow,
         RegistrationConfirmPage.url
-      )(mockRequest)
+      )(any())
     }
   }
 }

@@ -58,7 +58,7 @@ class RowIndividualNameDateOfBirthControllerWithFeatureTrueSpec
     val mockRequestSessionData: RequestSessionData = mock[RequestSessionData]
     val mockSubscriptionDetailsService = mock[SubscriptionDetailsService]
     val mockAppConfig = mock[AppConfig]
-    val mockFeatureFlags = mock[FeatureFlags]
+    val featureFlags = new FeatureFlags(app.configuration)
 
     private val rowIndividualNameDob = app.injector.instanceOf[row_individual_name_dob]
     override val controller = new RowIndividualNameDateOfBirthController(
@@ -70,7 +70,7 @@ class RowIndividualNameDateOfBirthControllerWithFeatureTrueSpec
       rowIndividualNameDob,
       mockRequestSessionData,
       mockAppConfig,
-      mockFeatureFlags
+      featureFlags
     )
 
     def beforeEach = {
