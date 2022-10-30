@@ -64,7 +64,7 @@ class VatRegisteredUkSubscriptionControllerSpec extends ControllerSpec with Befo
       mockSubscriptionFlow,
       mockRequestSession
     )
-    when(mockSubscriptionDetailsService.cacheVatRegisteredUk(any[YesNo])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsService.cacheVatRegisteredUk(any[YesNo])(any[HeaderCarrier], any[Request[_]]))
       .thenReturn(Future.successful({}))
   }
 
@@ -156,7 +156,7 @@ class VatRegisteredUkSubscriptionControllerSpec extends ControllerSpec with Befo
   private def reviewForm(journey: Journey.Value = Journey.GetYourEORI)(test: Future[Result] => Any) {
     withAuthorisedUser(defaultUserId, mockAuthConnector)
     mockIsIndividual()
-    when(mockSubscriptionBusinessService.getCachedVatRegisteredUk(any[HeaderCarrier])).thenReturn(true)
+    when(mockSubscriptionBusinessService.getCachedVatRegisteredUk(any[Request[_]])).thenReturn(true)
     test(controller.reviewForm(journey).apply(SessionBuilder.buildRequestWithSession(defaultUserId)))
   }
 

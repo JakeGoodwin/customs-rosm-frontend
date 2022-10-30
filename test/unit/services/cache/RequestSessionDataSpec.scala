@@ -18,7 +18,7 @@ package unit.services.cache
 
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{AnyContent, Request, Session}
 import uk.gov.hmrc.customs.rosmfrontend.domain.CdsOrganisationType
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.OrganisationSubscriptionFlow

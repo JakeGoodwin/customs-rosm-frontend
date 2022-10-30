@@ -16,13 +16,17 @@
 
 package integration
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.Ignore
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.customs.rosmfrontend.services.countries.Countries
 
-class AllTheCountriesSpec extends WordSpec with Matchers with GuiceOneAppPerSuite {
+@Ignore
+class AllTheCountriesSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   val countries = new Countries(app)
+
 
   "Countries" should {
     "be filtered according to the enum values that backend accepts " in {

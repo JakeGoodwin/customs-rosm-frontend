@@ -24,20 +24,20 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContent, Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.customs.rosmfrontend.controllers.FeatureFlags
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.WhatIsYourOrgNameController
 import uk.gov.hmrc.customs.rosmfrontend.domain.registration.UserLocation
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.RequestSessionData
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.SubscriptionDetailsService
 import uk.gov.hmrc.customs.rosmfrontend.views.html.registration.what_is_your_org_name
-import uk.gov.hmrc.http.HeaderCarrier
 import util.ControllerSpec
 import util.builders.AuthBuilder.withAuthorisedUser
 import util.builders.SessionBuilder
 import util.builders.matching.OrganisationNameFormBuilder._
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class WhatIsYourOrgNameControllerRowSpec extends ControllerSpec with BeforeAndAfterEach {
 
@@ -49,14 +49,15 @@ class WhatIsYourOrgNameControllerRowSpec extends ControllerSpec with BeforeAndAf
   private val mockRequestSessionData = mock[RequestSessionData]
   private val mockSubscriptionDetailsService = mock[SubscriptionDetailsService]
   private val whatIsYourOrgNameView = app.injector.instanceOf[what_is_your_org_name]
-
+  private val mockFeatureFlags = mock[FeatureFlags]
   private val controller = new WhatIsYourOrgNameController(
     app,
     mockAuthConnector,
     mockRequestSessionData,
     mcc,
     whatIsYourOrgNameView,
-    mockSubscriptionDetailsService
+    mockSubscriptionDetailsService,
+    mockFeatureFlags
   )
 
   override def beforeEach: Unit =
@@ -71,7 +72,7 @@ class WhatIsYourOrgNameControllerRowSpec extends ControllerSpec with BeforeAndAf
     )
     "redirect to the 'Do you have a UTR? page when isInReviewMode is false" in {
 
-      when(mockSubscriptionDetailsService.cacheNameDetails(any())(any[HeaderCarrier]()))
+      when(mockSubscriptionDetailsService.cacheNameDetails(any())(any[Request[_]]()))
         .thenReturn(Future.successful(()))
       when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]]))
         .thenReturn(Some(UserLocation.ThirdCountry))
@@ -93,7 +94,7 @@ class WhatIsYourOrgNameControllerRowSpec extends ControllerSpec with BeforeAndAf
     )
     "redirect to the Determine Review page when isInReviewMode is true" in {
 
-      when(mockSubscriptionDetailsService.cacheNameDetails(any())(any[HeaderCarrier]()))
+      when(mockSubscriptionDetailsService.cacheNameDetails(any())(any[Request[_]]()))
         .thenReturn(Future.successful(()))
       when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]]))
         .thenReturn(Some(UserLocation.ThirdCountry))

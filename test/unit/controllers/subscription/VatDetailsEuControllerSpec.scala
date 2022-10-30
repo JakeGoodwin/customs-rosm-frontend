@@ -21,8 +21,8 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.prop.Checkers
-import play.api.mvc.Result
+import org.scalatestplus.scalacheck.Checkers
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.{SubscriptionFlowManager, VatDetailsEuController}
@@ -83,7 +83,7 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
 
   "VatDetailEuController show createForm" should {
     "return ok and display correct form when accessing with vatDetails under limit in the cache" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(vatEuDetails))
       createForm() { result =>
         status(result) shouldBe OK
@@ -93,7 +93,7 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
     }
 
     "return 303 and display correct form when accessing with vatDetails under limit in the cache in create mode" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(vatEuDetailsOnLimit))
       createForm() { result =>
         status(result) shouldBe SEE_OTHER
@@ -102,7 +102,7 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
     }
 
     "return 303 and display correct form when accessing with vatDetails under limit in the cache in review mode" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(vatEuDetailsOnLimit))
       reviewForm() { result =>
         status(result) shouldBe SEE_OTHER
@@ -113,7 +113,7 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
 
   "Submitting VatDetailEuController" should {
     "fail validation when vat number already exists in cache" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(vatEuDetailsOnLimit))
 
       submit(validVatIdMap + ("vatNumber" -> "12345")) { result =>
@@ -125,9 +125,9 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
     }
 
     "redirect to confirm vat page when form is valid in create mode" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(vatEuDetails))
-      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[VatEUDetailsModel])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[VatEUDetailsModel])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(()))
       submit(validVatIdMap + ("vatNumber" -> "AAAA1234")) { result =>
         status(result) shouldBe SEE_OTHER
@@ -136,9 +136,9 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
     }
 
     "redirect to confirm vat page when form is valid in review mode" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(vatEuDetails))
-      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[VatEUDetailsModel])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[VatEUDetailsModel])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(()))
       submit(validVatIdMap + ("vatNumber" -> "AAAA1234"), isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER
@@ -149,9 +149,9 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
 
   "Submitting update on VatDetailEuController" should {
     "fail validation when updated value of vat number already exists in cache" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(vatEuDetailsOnLimit))
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(Some(VatEUDetailsModel("DE", "22222"))))
 
       submitUpdate(validVatIdMap + ("vatNumber" -> "12345"), index = 12345) { result =>
@@ -163,15 +163,15 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
     }
 
     "pass validation when updated value of vat number already exists in cache but is the same as the value it is replacing" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(vatEuDetailsOnLimit))
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(Some(VatEUDetailsModel("FR", "12345"))))
       when(
         mockSubscriptionVatEUDetailsService
-          .updateVatEuDetailsModel(any[VatEUDetailsModel], any[VatEUDetailsModel])(any[HeaderCarrier])
+          .updateVatEuDetailsModel(any[VatEUDetailsModel], any[VatEUDetailsModel])(any[HeaderCarrier], any[Request[_]])
       ).thenReturn(Future.successful(Seq(VatEUDetailsModel("12345", "FR"))))
-      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[Seq[VatEUDetailsModel]])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[Seq[VatEUDetailsModel]])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(()))
 
       submitUpdate(validVatIdMap + ("vatNumber" -> "12345"), index = 12345) { result =>
@@ -181,9 +181,9 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
     }
 
     "fail validation when passed vat details with given index were not found" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(vatEuDetailsOnLimit))
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(None))
 
       intercept[IllegalStateException] {
@@ -194,16 +194,16 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
     }
 
     "update details and redirect to eu vat confirm page in create mode" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(vatEuDetails))
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(Some(VatEUDetailsModel("DK", "54321"))))
 
       when(
         mockSubscriptionVatEUDetailsService
-          .updateVatEuDetailsModel(any[VatEUDetailsModel], any[VatEUDetailsModel])(any[HeaderCarrier])
+          .updateVatEuDetailsModel(any[VatEUDetailsModel], any[VatEUDetailsModel])(any[HeaderCarrier], any[Request[_]])
       ).thenReturn(Future.successful(vatEuDetailsOnLimit))
-      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[Seq[VatEUDetailsModel]])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[Seq[VatEUDetailsModel]])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(()))
 
       submitUpdate(validVatIdMap + ("vatNumber" -> "AAAA1234"), index = 12345) { result =>
@@ -217,22 +217,22 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
       verify(mockSubscriptionVatEUDetailsService).updateVatEuDetailsModel(
         requestCaptor1.capture(),
         requestCaptor2.capture()
-      )(ArgumentMatchers.any[HeaderCarrier])
+      )(ArgumentMatchers.any[HeaderCarrier], any[Request[_]])
       requestCaptor1.getValue should equal(VatEUDetailsModel("DK", "54321"))
       requestCaptor2.getValue should equal(VatEUDetailsModel("FR", "AAAA1234"))
     }
 
     "update details and redirect to eu vat confirm page in review mode" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(vatEuDetails))
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(Some(VatEUDetailsModel("DK", "54321"))))
 
       when(
         mockSubscriptionVatEUDetailsService
-          .updateVatEuDetailsModel(any[VatEUDetailsModel], any[VatEUDetailsModel])(any[HeaderCarrier])
+          .updateVatEuDetailsModel(any[VatEUDetailsModel], any[VatEUDetailsModel])(any[HeaderCarrier], any[Request[_]])
       ).thenReturn(Future.successful(vatEuDetailsOnLimit))
-      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[Seq[VatEUDetailsModel]])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[Seq[VatEUDetailsModel]])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(()))
 
       submitUpdate(validVatIdMap + ("vatNumber" -> "AAAA1234"), index = 12345, isInReviewMode = true) { result =>
@@ -246,7 +246,7 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
       verify(mockSubscriptionVatEUDetailsService).updateVatEuDetailsModel(
         requestCaptor1.capture(),
         requestCaptor2.capture()
-      )(ArgumentMatchers.any[HeaderCarrier])
+      )(ArgumentMatchers.any[HeaderCarrier], any[Request[_]])
       requestCaptor1.getValue should equal(VatEUDetailsModel("DK", "54321"))
       requestCaptor2.getValue should equal(VatEUDetailsModel("FR", "AAAA1234"))
     }
@@ -254,7 +254,7 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
 
   "Updating Form through VatDetailEuController" should {
     "redirect to confirm vat page when vat detals of given index was not found" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(None))
       updateForm(index = 12345) { result =>
         status(result) shouldBe SEE_OTHER
@@ -263,7 +263,7 @@ class VatDetailsEuControllerSpec extends ControllerSpec with Checkers with Befor
     }
 
     "display vat details page when details for given index were not found" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(Some(VatEUDetailsModel("54321", "DK"))))
       updateForm(index = 12345) { result =>
         status(result) shouldBe OK

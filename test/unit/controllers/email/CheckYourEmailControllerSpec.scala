@@ -21,7 +21,7 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import play.api.libs.json.Json
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.email.CheckYourEmailController
@@ -39,6 +39,7 @@ import util.builders.AuthBuilder.withAuthorisedUser
 import util.builders.SessionBuilder
 import util.builders.YesNoFormBuilder.ValidRequest
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.routes.MatchingIdController
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -120,7 +121,7 @@ class CheckYourEmailControllerSpec extends ControllerSpec with BeforeAndAfterEac
         mockSave4LaterService
           .saveEmail(any[InternalId], any[EmailStatus])(any[HeaderCarrier])
       ).thenReturn(Future.successful(unit))
-      when(mockSessionCache.saveEmail(any[String])(any[HeaderCarrier]))
+      when(mockSessionCache.saveEmail(any[String])(any[Request[_]]))
         .thenReturn(Future.successful(true))
 
       when(mockEmailVerificationService.createEmailVerificationRequest(any[String], any[String])(any[HeaderCarrier]))
@@ -176,7 +177,7 @@ class CheckYourEmailControllerSpec extends ControllerSpec with BeforeAndAfterEac
       mockSave4LaterService
         .saveEmail(any[InternalId], any[EmailStatus])(any[HeaderCarrier])
     ).thenReturn(Future.successful(unit))
-    when(mockSessionCache.saveEmail(any[String])(any[HeaderCarrier]))
+    when(mockSessionCache.saveEmail(any[String])(any[Request[_]]))
       .thenReturn(Future.successful(true))
 
     emailConfirmed(journey = Journey.Migrate) { result =>
@@ -193,7 +194,7 @@ class CheckYourEmailControllerSpec extends ControllerSpec with BeforeAndAfterEac
       mockSave4LaterService
         .saveEmail(any[InternalId], any[EmailStatus])(any[HeaderCarrier])
     ).thenReturn(Future.successful(unit))
-    when(mockSessionCache.saveEmail(any[String])(any[HeaderCarrier]))
+    when(mockSessionCache.saveEmail(any[String])(any[Request[_]]))
       .thenReturn(Future.successful(true))
 
     emailConfirmed(journey = Journey.Migrate) { result =>
@@ -209,7 +210,7 @@ class CheckYourEmailControllerSpec extends ControllerSpec with BeforeAndAfterEac
       mockSave4LaterService
         .saveEmail(any[InternalId], any[EmailStatus])(any[HeaderCarrier])
     ).thenReturn(Future.successful(unit))
-    when(mockSessionCache.saveEmail(any[String])(any[HeaderCarrier]))
+    when(mockSessionCache.saveEmail(any[String])(any[Request[_]]))
       .thenReturn(Future.successful(true))
 
     emailConfirmed(journey = Journey.GetYourEORI) { result =>

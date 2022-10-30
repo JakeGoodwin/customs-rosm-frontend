@@ -45,20 +45,20 @@ class SubscriptionDetailsService @Inject()(
 
   def saveSubscriptionDetails(
     insertNewDetails: SubscriptionDetails => SubscriptionDetails
-  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] = sessionCache.subscriptionDetails flatMap { subDetails =>
+  )(implicit request: Request[_]): Future[Unit] = sessionCache.subscriptionDetails flatMap { subDetails =>
     sessionCache.saveSubscriptionDetails(insertNewDetails(subDetails)).map(_ => ())
 
   }
 
-  def cacheCompanyShortName(shortName: BusinessShortName)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheCompanyShortName(shortName: BusinessShortName)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(businessShortName = Some(shortName)))
 
   def cacheContactDetails(contactDetails: ContactDetailsModel)(
-    implicit hc: HeaderCarrier, request: Request[_]
+    implicit request: Request[_]
   ): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(contactDetails = Some(contactDetails)))
 
-  def cacheAddressDetails(address: AddressViewModel)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] = {
+  def cacheAddressDetails(address: AddressViewModel)(implicit request: Request[_]): Future[Unit] = {
     def noneForEmptyPostcode(a: AddressViewModel) = a.copy(postcode = a.postcode.filter(_.nonEmpty))
     saveSubscriptionDetails(sd => sd.copy(addressDetails = Some(noneForEmptyPostcode(address))))
   }
@@ -68,59 +68,59 @@ class SubscriptionDetailsService @Inject()(
 
   def cacheNameIdDetails(
     nameIdOrganisationMatchModel: NameIdOrganisationMatchModel
-  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  )(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(nameIdOrganisationDetails = Some(nameIdOrganisationMatchModel)))
 
-  def cacheNameIdAndCustomsId(name: String, id: String)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheNameIdAndCustomsId(name: String, id: String)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(
       sd => sd.copy(nameIdOrganisationDetails = Some(NameIdOrganisationMatchModel(name, id)), customsId = Some(Utr(id)))
     )
 
-  def cachedNameIdDetails(implicit hc: HeaderCarrier, request: Request[_]): Future[Option[NameIdOrganisationMatchModel]] =
+  def cachedNameIdDetails(implicit request: Request[_]): Future[Option[NameIdOrganisationMatchModel]] =
     sessionCache.subscriptionDetails map (_.nameIdOrganisationDetails)
 
   def cacheNameDetails(
     nameOrganisationMatchModel: NameOrganisationMatchModel
-  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  )(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(nameOrganisationDetails = Some(nameOrganisationMatchModel)))
 
-  def cachedNameDetails(implicit hc: HeaderCarrier, request: Request[_]): Future[Option[NameOrganisationMatchModel]] =
+  def cachedNameDetails(implicit request: Request[_]): Future[Option[NameOrganisationMatchModel]] =
     sessionCache.subscriptionDetails map (_.nameOrganisationDetails)
 
-  def cacheDateOfBirth(date: LocalDate)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheDateOfBirth(date: LocalDate)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(dateOfBirth = Some(date)))
 
-  def cacheSicCode(sicCode: String)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheSicCode(sicCode: String)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(sicCode = Some(sicCode)))
 
-  def cacheEoriNumber(eoriNumber: String)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheEoriNumber(eoriNumber: String)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(eoriNumber = Some(eoriNumber)))
 
-  def cacheDateEstablished(date: LocalDate)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheDateEstablished(date: LocalDate)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(dateEstablished = Some(date)))
 
-  def cachePersonalDataDisclosureConsent(consent: Boolean)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cachePersonalDataDisclosureConsent(consent: Boolean)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(personalDataDisclosureConsent = Some(consent)))
 
-  def cacheNameDobDetails(nameDob: NameDobMatchModel)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheNameDobDetails(nameDob: NameDobMatchModel)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(nameDobDetails = Some(nameDob)))
 
-  def cachedNameDobDetails(implicit hc: HeaderCarrier, request: Request[_]): Future[Option[NameDobMatchModel]] =
+  def cachedNameDobDetails(implicit equest: Request[_]): Future[Option[NameDobMatchModel]] =
     sessionCache.subscriptionDetails.map(_.nameDobDetails)
 
-  def cacheIdDetails(idMatchModel: IdMatchModel)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheIdDetails(idMatchModel: IdMatchModel)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(idDetails = Some(idMatchModel)))
 
-  def cacheCustomsId(subscriptionCustomsId: CustomsId)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheCustomsId(subscriptionCustomsId: CustomsId)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(customsId = Some(subscriptionCustomsId)))
 
-  def clearCachedCustomsId(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def clearCachedCustomsId(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(customsId = None))
 
-  def cacheUkVatDetails(ukVatDetails: VatDetails)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheUkVatDetails(ukVatDetails: VatDetails)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(ukVatDetails = Some(ukVatDetails)))
 
-  def clearCachedUkVatDetails(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def clearCachedUkVatDetails(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(ukVatDetails = None))
 
   def cacheVatRegisteredUk(yesNoAnswer: YesNo)(implicit hq: HeaderCarrier, request: Request[_]) =
@@ -139,16 +139,16 @@ class SubscriptionDetailsService @Inject()(
       _ <- sessionCache.saveSubscriptionDetails(updatedHolder)
     } yield ()
 
-  def cachedCustomsId(implicit hc: HeaderCarrier, request: Request[_]): Future[Option[CustomsId]] =
+  def cachedCustomsId(implicit request: Request[_]): Future[Option[CustomsId]] =
     sessionCache.subscriptionDetails map (_.customsId)
 
-  def cacheExistingEoriNumber(eori: String)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheExistingEoriNumber(eori: String)(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(existingEoriNumber = Some(eori)))
 
-  def cachedExistingEoriNumber(implicit hc: HeaderCarrier, request: Request[_]): Future[Option[String]] =
+  def cachedExistingEoriNumber(implicit request: Request[_]): Future[Option[String]] =
     sessionCache.subscriptionDetails map (_.existingEoriNumber)
 
-  def updateSubscriptionDetails(implicit hc: HeaderCarrier, request: Request[_]) =
+  def updateSubscriptionDetails(implicit request: Request[_]) =
     sessionCache.subscriptionDetails flatMap { subDetails =>
       sessionCache.saveRegistrationDetails(RegistrationDetailsOrganisation())
       sessionCache.saveRegistrationDetails(RegistrationDetailsIndividual())

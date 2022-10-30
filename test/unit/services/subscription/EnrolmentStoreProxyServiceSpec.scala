@@ -19,17 +19,10 @@ package unit.services.subscription
 import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import uk.gov.hmrc.customs.rosmfrontend.connector.EnrolmentStoreProxyConnector
-import uk.gov.hmrc.customs.rosmfrontend.domain.{
-  EnrolmentResponse,
-  EnrolmentStoreProxyResponse,
-  Eori,
-  GroupId,
-  GroupIds,
-  KeyValue
-}
+import uk.gov.hmrc.customs.rosmfrontend.domain.{EnrolmentResponse, EnrolmentStoreProxyResponse, Eori, GroupId, GroupIds, KeyValue}
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.EnrolmentStoreProxyService
 import uk.gov.hmrc.http.HeaderCarrier
 import util.UnitSpec

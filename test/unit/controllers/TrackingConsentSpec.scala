@@ -16,17 +16,14 @@
 
 package unit.controllers
 
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.migration.WhatIsYourIdentifierController
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.SubscriptionFlowManager
-import uk.gov.hmrc.customs.rosmfrontend.domain.CustomsId
-import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{AddressDetailsSubscriptionFlowPage, SubscriptionFlowInfo, WhatIsYourIdentifierControllerFlowPage}
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{SubscriptionBusinessService, SubscriptionDetailsService}
@@ -56,10 +53,10 @@ class TrackingConsentSpec extends ControllerSpec with GuiceOneAppPerSuite with M
 
   "Tracking consent" should {
     "include the javascript file in the header" in {
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(true))
       )
-      when(mockSubscriptionBusinessService.getCachedCustomsId(any[HeaderCarrier]))
+      when(mockSubscriptionBusinessService.getCachedCustomsId(any[Request[_]]))
         .thenReturn(Future.successful(None))
       showForm(Map.empty) { result =>
         val page = CdsPage(bodyOf(result))

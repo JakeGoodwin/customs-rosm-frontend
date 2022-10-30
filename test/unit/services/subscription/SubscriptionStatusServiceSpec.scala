@@ -20,10 +20,11 @@ import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
+import play.api.mvc.Request
 import play.mvc.Http.Status._
 import uk.gov.hmrc.customs.rosmfrontend.connector.SubscriptionStatusConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.{SubscriptionStatusOutcome, SubscriptionStatusQueryParams, SubscriptionStatusResponseHolder, TaxPayerId}
@@ -49,6 +50,7 @@ class SubscriptionStatusServiceSpec extends UnitSpec with MockitoSugar with Befo
     new SubscriptionStatusService(mockConnector, mockRequestCommonGenerator, mockSessionCache)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val req: Request[_] = mock[Request[_]]
 
   override protected def beforeEach() {
     reset(mockConnector)
@@ -80,7 +82,7 @@ class SubscriptionStatusServiceSpec extends UnitSpec with MockitoSugar with Befo
     }
 
     "store processing date in cache" in {
-      when(mockConnector.status(meq(request))(any[HeaderCarrier])).thenReturn(
+      when(mockConnector.status(request)(any[HeaderCarrier])).thenReturn(
         Future.successful(
           responseHolderWithStatusAndProcessingDateWithoutEori("01", "2018-05-22T09:30:00Z").subscriptionStatusResponse
         )

@@ -21,7 +21,7 @@ import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.connector.PdfGeneratorConnector
@@ -127,14 +127,14 @@ class SubscriptionCreateControllerRegisterExistingSpec extends ControllerSpec wi
       invokeRegExistingEndPageWithAuthenticatedUser() {
         when(mockRequestSessionData.selectedUserLocation(any())).thenReturn(Some(UserLocation.Uk))
 
-        when(mockSessionCache.registerWithEoriAndIdResponse(any[HeaderCarrier]))
+        when(mockSessionCache.registerWithEoriAndIdResponse(any[Request[_]]))
           .thenReturn(Future.successful(stubRegisterWithEoriAndIdResponse()))
-        when(mockSessionCache.remove(any[HeaderCarrier])).thenReturn(Future.successful(true))
-        when(mockSessionCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[HeaderCarrier]))
+        when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
+        when(mockSessionCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[Request[_]]))
           .thenReturn(Future.successful(true))
 
         val mockSubscribeOutcome = mock[SubscriptionCreateOutcome]
-        when(mockSessionCache.subscriptionCreateOutcome(any[HeaderCarrier])).thenReturn(Future.successful(mockSubscribeOutcome))
+        when(mockSessionCache.subscriptionCreateOutcome(any[Request[_]])).thenReturn(Future.successful(mockSubscribeOutcome))
         when(mockSubscribeOutcome.processedDate).thenReturn("22 May 2016")
         when(mockSubscribeOutcome.eori).thenReturn(Some("ZZZ1ZZZZ23ZZZZZZZ"))
         when(mockSubscribeOutcome.fullName).thenReturn("Name")
@@ -142,7 +142,7 @@ class SubscriptionCreateControllerRegisterExistingSpec extends ControllerSpec wi
         result =>
           status(result) shouldBe OK
           val page = CdsPage(bodyOf(result))
-          verify(mockSessionCache).remove(any[HeaderCarrier])
+          verify(mockSessionCache).remove(any[Request[_]])
           page.title should startWith("Application received")
           page.getElementsText(RegistrationCompletePage.pageHeadingXpath) shouldBe "Application received for Name"
           page.getElementsText(RegistrationCompletePage.activeFromXpath) shouldBe "on 22 May 2016"

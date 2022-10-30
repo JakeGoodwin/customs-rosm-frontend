@@ -17,14 +17,13 @@
 package unit.controllers.subscription
 
 import java.util.UUID
-
 import common.pages.subscription.DisclosePersonalDetailsConsentPage
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{AnyContent, Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.DisclosePersonalDetailsConsentController
@@ -98,7 +97,7 @@ class DisclosePersonalDetailsConsentControllerSpec
 
   override def beforeEach() {
     reset(mockSubscriptionDetailsHolderService, mockSubscriptionFlowManager)
-    when(mockSubscriptionDetailsHolderService.cacheConsentToDisclosePersonalDetails(any[YesNo])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheConsentToDisclosePersonalDetails(any[YesNo])(any[HeaderCarrier], any[Request[_]]))
       .thenReturn(Future.successful({}))
     setupMockSubscriptionFlowManager(EoriConsentSubscriptionFlowPage)
   }
@@ -258,7 +257,7 @@ class DisclosePersonalDetailsConsentControllerSpec
   )(test: (Future[Result]) => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockSubscriptionBusinessService.getCachedPersonalDataDisclosureConsent(any[HeaderCarrier]))
+    when(mockSubscriptionBusinessService.getCachedPersonalDataDisclosureConsent(any[Request[_]]))
       .thenReturn(previouslyAnswered)
 
     when(mockSubscriptionFlowManager.currentSubscriptionFlow(any[Request[AnyContent]])).thenReturn(subscriptionFlow)

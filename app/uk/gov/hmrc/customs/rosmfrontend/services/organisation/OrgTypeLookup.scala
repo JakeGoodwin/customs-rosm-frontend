@@ -28,7 +28,7 @@ import scala.concurrent.Future
 @Singleton
 class OrgTypeLookup @Inject()(requestSessionData: RequestSessionData, sessionCache: SessionCache) {
 
-  def etmpOrgType(implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Option[EtmpOrganisationType]] =
+  def etmpOrgType(implicit request: Request[AnyContent]): Future[Option[EtmpOrganisationType]] =
     requestSessionData.userSelectedOrganisationType match {
       case Some(cdsOrgType) => Future.successful(Some(EtmpOrganisationType(cdsOrgType)))
       case None =>

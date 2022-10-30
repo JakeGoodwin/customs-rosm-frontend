@@ -18,7 +18,7 @@ package common.support.testdata
 
 import common.support.testdata.subscription.SubscriptionDataGenerators
 import org.scalacheck.{Gen, Prop}
-import org.scalatest.prop.Checkers
+import org.scalatestplus.scalacheck.Checkers
 
 trait GenTestRunner extends SubscriptionDataGenerators {
 

@@ -18,21 +18,18 @@ package unit.controllers.subscription
 
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContent, Request, Session}
+import uk.gov.hmrc.customs.rosmfrontend.controllers.FeatureFlags
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.SubscriptionFlowManager
 import uk.gov.hmrc.customs.rosmfrontend.domain.registration.UserLocation
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{IndividualSubscriptionFlow, _}
-import uk.gov.hmrc.customs.rosmfrontend.domain.{
-  CdsOrganisationType,
-  RegistrationDetailsIndividual,
-  RegistrationDetailsOrganisation
-}
+import uk.gov.hmrc.customs.rosmfrontend.domain.{CdsOrganisationType, RegistrationDetailsIndividual, RegistrationDetailsOrganisation}
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.SubscriptionDetailsService
@@ -51,8 +48,9 @@ class SubscriptionFlowManagerSpec
 
   private val mockRequestSessionData = mock[RequestSessionData]
   private val mockCdsFrontendDataCache = mock[SessionCache]
+  private val mockFeatureFlags =mock[FeatureFlags]
   val controller =
-    new SubscriptionFlowManager(app, mockRequestSessionData, mockCdsFrontendDataCache)
+    new SubscriptionFlowManager(mockRequestSessionData, mockCdsFrontendDataCache, mockFeatureFlags)
   private val mockOrgRegistrationDetails = mock[RegistrationDetailsOrganisation]
   private val mockIndividualRegistrationDetails = mock[RegistrationDetailsIndividual]
   private val mockSession = mock[Session]
@@ -68,7 +66,7 @@ class SubscriptionFlowManagerSpec
     reset(mockRequestSessionData, mockSession, mockCdsFrontendDataCache)
     when(mockRequestSessionData.storeUserSubscriptionFlow(any[SubscriptionFlow], any[String])(any[Request[AnyContent]]))
       .thenReturn(mockSession)
-    when(mockCdsFrontendDataCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[Request[_]]))
       .thenReturn(Future.successful(true))
   }
 
@@ -310,7 +308,7 @@ class SubscriptionFlowManagerSpec
     "start Individual Subscription Flow for individual" in {
       when(mockRequestSessionData.userSelectedOrganisationType(mockRequest)).thenReturn(None)
 
-      when(mockCdsFrontendDataCache.registrationDetails(mockHC))
+      when(mockCdsFrontendDataCache.registrationDetails(mockRequest))
         .thenReturn(Future.successful(mockIndividualRegistrationDetails))
       val (subscriptionPage, session) = await(
         controller.startSubscriptionFlow(Some(ConfirmIndividualTypePage), Journey.GetYourEORI)(mockHC, mockRequest)
@@ -326,7 +324,7 @@ class SubscriptionFlowManagerSpec
     "start Corporate Subscription Flow when cached registration details are for an Organisation" in {
       when(mockRequestSessionData.userSelectedOrganisationType(mockRequest)).thenReturn(None)
 
-      when(mockCdsFrontendDataCache.registrationDetails(mockHC))
+      when(mockCdsFrontendDataCache.registrationDetails(mockRequest))
         .thenReturn(Future.successful(mockOrgRegistrationDetails))
       val (subscriptionPage, session) =
         await(controller.startSubscriptionFlow(Journey.GetYourEORI)(mockHC, mockRequest))
@@ -342,7 +340,7 @@ class SubscriptionFlowManagerSpec
       when(mockRequestSessionData.userSelectedOrganisationType(mockRequest))
         .thenReturn(Some(CdsOrganisationType.SoleTrader))
 
-      when(mockCdsFrontendDataCache.registrationDetails(mockHC))
+      when(mockCdsFrontendDataCache.registrationDetails(mockRequest))
         .thenReturn(Future.successful(mockIndividualRegistrationDetails))
       val (subscriptionPage, session) =
         await(controller.startSubscriptionFlow(Journey.GetYourEORI)(mockHC, mockRequest))
@@ -356,7 +354,7 @@ class SubscriptionFlowManagerSpec
 
     "start Corporate Subscription Flow when cached registration details are for an Organisation Reg-existing (a.k.a migration)" in {
       when(mockRequestSessionData.userSelectedOrganisationType(mockRequest)).thenReturn(None)
-      when(mockCdsFrontendDataCache.registrationDetails(mockHC))
+      when(mockCdsFrontendDataCache.registrationDetails(mockRequest))
         .thenReturn(Future.successful(mockOrgRegistrationDetails))
       val (subscriptionPage, session) = await(controller.startSubscriptionFlow(Journey.Migrate)(mockHC, mockRequest))
 
@@ -371,7 +369,7 @@ class SubscriptionFlowManagerSpec
       when(mockRequestSessionData.userSelectedOrganisationType(mockRequest)).thenReturn(None)
       when(mockRequestSessionData.selectedUserLocation(mockRequest)).thenReturn(Some("islands"))
 
-      when(mockCdsFrontendDataCache.registrationDetails(mockHC))
+      when(mockCdsFrontendDataCache.registrationDetails(mockRequest))
         .thenReturn(Future.successful(mockOrgRegistrationDetails))
       val (subscriptionPage, session) = await(controller.startSubscriptionFlow(Journey.Migrate)(mockHC, mockRequest))
 
@@ -395,8 +393,9 @@ class SubscriptionFlowManagerNinoUtrEnabledSpec
 
   private val mockRequestSessionData = mock[RequestSessionData]
   private val mockCdsFrontendDataCache = mock[SessionCache]
+  private val mockFeatureFlags = mock[FeatureFlags]
   val controller =
-    new SubscriptionFlowManager(app, mockRequestSessionData, mockCdsFrontendDataCache)
+    new SubscriptionFlowManager(mockRequestSessionData, mockCdsFrontendDataCache, mockFeatureFlags)
   private val mockSession = mock[Session]
 
   private val mockHC = mock[HeaderCarrier]
@@ -408,7 +407,7 @@ class SubscriptionFlowManagerNinoUtrEnabledSpec
     reset(mockRequestSessionData, mockSession, mockCdsFrontendDataCache)
     when(mockRequestSessionData.storeUserSubscriptionFlow(any[SubscriptionFlow], any[String])(any[Request[AnyContent]]))
       .thenReturn(mockSession)
-    when(mockCdsFrontendDataCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[Request[_]]))
       .thenReturn(Future.successful(true))
   }
 
@@ -418,7 +417,7 @@ class SubscriptionFlowManagerNinoUtrEnabledSpec
       when(mockRequestSessionData.userSelectedOrganisationType(mockRequest))
         .thenReturn(Some(CdsOrganisationType.SoleTrader))
       when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]])).thenReturn(Some(UserLocation.ThirdCountry))
-      when(mockCdsFrontendDataCache.registrationDetails(mockHC))
+      when(mockCdsFrontendDataCache.registrationDetails(mockRequest))
         .thenReturn(Future.successful(RegistrationDetailsIndividual()))
 
       val (subscriptionPage, session) = await(controller.startSubscriptionFlow(Journey.Migrate)(mockHC, mockRequest))
@@ -434,7 +433,7 @@ class SubscriptionFlowManagerNinoUtrEnabledSpec
       when(mockRequestSessionData.userSelectedOrganisationType(mockRequest))
         .thenReturn(Some(CdsOrganisationType.Individual))
       when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]])).thenReturn(Some(UserLocation.ThirdCountry))
-      when(mockCdsFrontendDataCache.registrationDetails(mockHC))
+      when(mockCdsFrontendDataCache.registrationDetails(mockRequest))
         .thenReturn(Future.successful(RegistrationDetailsIndividual()))
 
       val (subscriptionPage, session) = await(controller.startSubscriptionFlow(Journey.Migrate)(mockHC, mockRequest))
@@ -449,7 +448,7 @@ class SubscriptionFlowManagerNinoUtrEnabledSpec
     "start Corporate Subscription Flow when cached registration details are for an Organisation" in {
       when(mockRequestSessionData.userSelectedOrganisationType(mockRequest)).thenReturn(None)
       when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]])).thenReturn(Some(UserLocation.ThirdCountry))
-      when(mockCdsFrontendDataCache.registrationDetails(mockHC))
+      when(mockCdsFrontendDataCache.registrationDetails(mockRequest))
         .thenReturn(Future.successful(RegistrationDetailsOrganisation()))
 
       val (subscriptionPage, session) = await(controller.startSubscriptionFlow(Journey.Migrate)(mockHC, mockRequest))

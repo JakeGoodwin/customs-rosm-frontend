@@ -48,7 +48,7 @@ class CheckYourEmailController @Inject()(
   verifyYourEmail: verify_your_email,
   emailVerificationService: EmailVerificationService
 )(implicit ec: ExecutionContext)
-    extends CdsController(mcc) with FeatureFlags {
+    extends CdsController(mcc) {
 
   private def populateView(email: Option[String], isInReviewMode: Boolean, journey: Journey.Value)(
     implicit hc: HeaderCarrier,

@@ -135,14 +135,14 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
 
     "store, fetch and update Registration details with OrgType correctly" in {
       val sessionId: SessionId = setupSession
-      when(save4LaterService.saveOrgType(any(), any())(any[Request[_]]))
+      when(save4LaterService.saveOrgType(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
       await(
         sessionCache.saveRegistrationDetails(
           organisationRegistrationDetails,
           InternalId("InternalId"),
           Some(CdsOrganisationType.Company)
-        )(request)
+        )(hc, request)
       )
       val cache = await(sessionCache.cacheRepo.findById(request))
       val expectedJson = toJson(CachedData(regDetails = Some(organisationRegistrationDetails)))
@@ -154,16 +154,16 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
 
     "store, fetch and update Registration details with OrgType AND SafeId for ROW correctly" in {
       val sessionId: SessionId = setupSession
-      when(save4LaterService.saveOrgType(any(), any())(any[Request[_]]))
+      when(save4LaterService.saveOrgType(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
-      when(save4LaterService.saveSafeId(any(), any())(any[Request[_]]))
+      when(save4LaterService.saveSafeId(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
       await(
         sessionCache.saveRegistrationDetailsWithoutId(
           organisationRegistrationDetails,
           InternalId("InternalId"),
           Some(CdsOrganisationType.Company)
-        )(request)
+        )(hc, request)
       )
       val cache = await(sessionCache.cacheRepo.findById(request))
       val expectedJson = toJson(CachedData(regDetails = Some(organisationRegistrationDetails)))

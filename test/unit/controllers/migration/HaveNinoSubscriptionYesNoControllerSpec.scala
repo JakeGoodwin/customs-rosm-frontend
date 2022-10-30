@@ -87,13 +87,13 @@ class HaveNinoSubscriptionYesNoControllerSpec extends ControllerSpec with Before
       verifyNoInteractions(mockSubscriptionDetailsService)
     }
     "cache None for CustomsId and redirect to Address Page of the flow" in {
-      when(mockSubscriptionDetailsService.clearCachedCustomsId(any[HeaderCarrier])).thenReturn(Future.successful(()))
+      when(mockSubscriptionDetailsService.clearCachedCustomsId(any[Request[_]])).thenReturn(Future.successful(()))
       mockSubscriptionFlow(nextPageFlowUrl)
       submit(Journey.Migrate, ValidNinoNoRequest) { result =>
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "/customs/subscribe-for-cds/address"
       }
-      verify(mockSubscriptionDetailsService).clearCachedCustomsId(any[HeaderCarrier])
+      verify(mockSubscriptionDetailsService).clearCachedCustomsId(any[Request[_]])
     }
   }
 

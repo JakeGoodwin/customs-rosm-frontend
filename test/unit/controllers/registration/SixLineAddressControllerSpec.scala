@@ -21,9 +21,10 @@ import common.pages.subscription.AddressPage
 import org.joda.time.LocalDate
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, mock => _}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc._
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -51,7 +52,7 @@ import util.builders.matching._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SixLineAddressControllerSpec extends ControllerSpec with BeforeAndAfter with BeforeAndAfterEach {
+class SixLineAddressControllerSpec extends ControllerSpec with MockitoSugar with BeforeAndAfterEach {
 
   private val mockAuthConnector = mock[AuthConnector]
   private val mockRegistrationDetailsCreator = mock[RegistrationDetailsCreator]
@@ -124,9 +125,9 @@ class SixLineAddressControllerSpec extends ControllerSpec with BeforeAndAfter wi
         .startSubscriptionFlow(any[Journey.Value])(any[HeaderCarrier], any[Request[AnyContent]])
     ).thenReturn(Future.successful(mockFlowStart))
     when(mockRegistrationDetailsCreator.registrationAddress(any())).thenReturn(testAddress)
-    when(mockSessionCache.saveRegistrationDetails(any[RegistrationDetails]())(any[HeaderCarrier]()))
+    when(mockSessionCache.saveRegistrationDetails(any[RegistrationDetails]())(any[Request[_]]))
       .thenReturn(Future.successful(true))
-    when(mockRegistrationDetailsService.cacheAddress(any())(any[HeaderCarrier]())).thenReturn(Future.successful(true))
+    when(mockRegistrationDetailsService.cacheAddress(any())(any[HeaderCarrier], any[Request[_]])).thenReturn(Future.successful(true))
     when(mockCountries.getCountryParameters(any())).thenReturn(aFewCountries -> AllCountriesExceptIomInCountryPicker)
   }
 
@@ -135,12 +136,12 @@ class SixLineAddressControllerSpec extends ControllerSpec with BeforeAndAfter wi
 
     organisationType match {
       case "third-country-organisation" => {
-        when(mockSessionCache.registrationDetails(any[HeaderCarrier]))
+        when(mockSessionCache.registrationDetails(any[Request[_]]))
           .thenReturn(Future.successful(mockRegistrationDetailsOrganisation))
         when(mockRegistrationDetailsOrganisation.address).thenReturn(testAddress)
       }
       case _ => {
-        when(mockSessionCache.registrationDetails(any[HeaderCarrier]))
+        when(mockSessionCache.registrationDetails(any[Request[_]]))
           .thenReturn(Future.successful(mockRegistrationDetailsIndividual))
         when(mockRegistrationDetailsIndividual.name).thenReturn("Test individual name")
       }
@@ -385,8 +386,8 @@ class SixLineAddressControllerSpec extends ControllerSpec with BeforeAndAfter wi
     withAuthorisedUser(userId, mockAuthConnector)
     when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]]))
       .thenReturn(Some(CdsOrganisationType.ThirdCountryIndividual))
-    when(mockSessionCache.registrationDetails(any[HeaderCarrier])).thenReturn(individualRegistrationDetails)
-    when(mockSubscriptionDetailsService.cachedCustomsId(any[HeaderCarrier])).thenReturn(None)
+    when(mockSessionCache.registrationDetails(any[Request[_]])).thenReturn(individualRegistrationDetails)
+    when(mockSubscriptionDetailsService.cachedCustomsId(any[Request[_]])).thenReturn(None)
 
     test(
       controller.submit(false, CdsOrganisationType.ThirdCountryIndividualId, Journey.GetYourEORI)(

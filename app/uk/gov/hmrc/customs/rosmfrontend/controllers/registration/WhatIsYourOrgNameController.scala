@@ -41,9 +41,10 @@ class WhatIsYourOrgNameController @Inject()(
   requestSessionData: RequestSessionData,
   mcc: MessagesControllerComponents,
   whatIsYourOrgNameView: what_is_your_org_name,
-  subscriptionDetailsService: SubscriptionDetailsService
+  subscriptionDetailsService: SubscriptionDetailsService,
+  featureFlags: FeatureFlags
 )(implicit ec: ExecutionContext)
-    extends CdsController(mcc) with FeatureFlags {
+    extends CdsController(mcc) {
 
   private def populateView(
     name: Option[String],
@@ -84,7 +85,7 @@ class WhatIsYourOrgNameController @Inject()(
         Redirect(DetermineReviewPageController.determineRoute(journey))
       } else {
         if (UserLocation.isRow(requestSessionData)) {
-          if (rowHaveUtrEnabled) {
+          if (featureFlags.rowHaveUtrEnabled) {
             Redirect(DoYouHaveAUtrNumberYesNoController.form(organisationType, journey))
           } else {
             Redirect(SixLineAddressController.showForm(false, organisationType, journey))

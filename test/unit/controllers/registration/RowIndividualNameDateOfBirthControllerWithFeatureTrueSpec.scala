@@ -22,13 +22,14 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalacheck.Prop
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.prop.Checkers
+import org.scalatestplus.scalacheck.Checkers
 import play.api.Application
 import play.api.data.Form
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc._
 import play.api.test.Helpers._
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
+import uk.gov.hmrc.customs.rosmfrontend.controllers.FeatureFlags
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.RowIndividualNameDateOfBirthController
 import uk.gov.hmrc.customs.rosmfrontend.domain.{IndividualNameAndDateOfBirth, NameDobMatchModel}
 import uk.gov.hmrc.customs.rosmfrontend.forms.MatchingForms
@@ -57,6 +58,7 @@ class RowIndividualNameDateOfBirthControllerWithFeatureTrueSpec
     val mockRequestSessionData: RequestSessionData = mock[RequestSessionData]
     val mockSubscriptionDetailsService = mock[SubscriptionDetailsService]
     val mockAppConfig = mock[AppConfig]
+    val mockFeatureFlags = mock[FeatureFlags]
 
     private val rowIndividualNameDob = app.injector.instanceOf[row_individual_name_dob]
     override val controller = new RowIndividualNameDateOfBirthController(
@@ -67,7 +69,8 @@ class RowIndividualNameDateOfBirthControllerWithFeatureTrueSpec
       mcc,
       rowIndividualNameDob,
       mockRequestSessionData,
-      mockAppConfig
+      mockAppConfig,
+      mockFeatureFlags
     )
 
     def beforeEach = {
@@ -75,12 +78,12 @@ class RowIndividualNameDateOfBirthControllerWithFeatureTrueSpec
     }
 
     def saveRegistrationDetailsMockSuccess() {
-      when(mockSubscriptionDetailsService.cacheNameDobDetails(any[NameDobMatchModel])(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cacheNameDobDetails(any[NameDobMatchModel])(any[Request[_]]))
         .thenReturn(Future.successful(()))
     }
 
     def registerIndividualMockFailure(exception: Throwable) {
-      when(mockSubscriptionDetailsService.cacheNameDobDetails(any[NameDobMatchModel])(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cacheNameDobDetails(any[NameDobMatchModel])(any[Request[_]]))
         .thenReturn(Future.failed(exception))
     }
 

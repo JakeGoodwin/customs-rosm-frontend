@@ -58,9 +58,9 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
 
   override def beforeEach: Unit = {
-    when(mockSubscriptionDetailsHolderService.cacheCustomsId(any[CustomsId])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheCustomsId(any[CustomsId])(any[Request[_]]))
       .thenReturn(Future.successful(()))
-    when(mockSubscriptionBusinessService.getCachedCustomsId(any[HeaderCarrier]))
+    when(mockSubscriptionBusinessService.getCachedCustomsId(any[Request[_]]))
       .thenReturn(Future.successful(None))
     when(
       mockSubscriptionFlowManager.stepInformation(ArgumentMatchers.eq(WhatIsYourIdentifierControllerFlowPage))(
@@ -69,7 +69,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
       )
     ).thenReturn(SubscriptionFlowInfo(4, 5, AddressDetailsSubscriptionFlowPage))
 
-    when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+    when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
       Future.successful(Some(true))
     )
 
@@ -107,7 +107,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
     }
 
     "display the form for UTR" in {
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(false))
       )
 
@@ -120,7 +120,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
     }
 
     "display the form for UTR in review mode" in {
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(false))
       )
 
@@ -157,7 +157,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     "redirect to 'Address Details' Self Assessment Unique Taxpayer is UTR is submitted" in {
       val utrForm = Map("id" -> utr)
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(false))
       )
       submitForm(utrForm, true) { result =>
@@ -187,7 +187,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     "redirect to 'Address Details' Self Assessment Unique Taxpayer is UTR is submitted" in {
       val utrForm = Map("id" -> utr)
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(false))
       )
       submitForm(utrForm) { result =>
@@ -199,7 +199,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     "redirect to 'What is your Self Assessment Unique Taxpayer Reference' page when  Utr is invalid" in {
       val utrForm = Map("id" -> "InvalidUtr")
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(false))
       )
 
@@ -214,7 +214,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     "redirect to 'What is your National insurance number' page when nino is invalid" in {
       val ninoForm = Map("id" -> "")
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(true))
       )
 
@@ -229,7 +229,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     "redirect to 'What is your National insurance number' page when when nino is invalid number " in {
       val ninoForm = Map("id" -> "InvalidNino")
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(true))
       )
 
@@ -243,7 +243,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     "redirect to 'What is your Self Assessment Unique Taxpayer Reference' page when utr is lest then 10 number" in {
       val utrForm = Map("id" -> "1111111")
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(false))
       )
 

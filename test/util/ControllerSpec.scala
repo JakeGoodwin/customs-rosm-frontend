@@ -18,19 +18,18 @@ package util
 
 import akka.stream.Materializer
 import common.pages.WebPage
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.Lang._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc._
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Play}
-import uk.gov.hmrc.auth.core.{Assistant, AuthConnector, CredentialRole}
+import uk.gov.hmrc.auth.core.{Assistant, AuthConnector}
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import unit.UnitTestApp
 import unit.controllers.CdsPage
 import util.builders.AuthBuilder.withAuthorisedUser
 import util.builders.{AuthBuilder, SessionBuilder}
@@ -39,7 +38,7 @@ import java.util.UUID
 import scala.concurrent.Future
 import scala.util.Random
 
-trait ControllerSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar with I18nSupport with UnitTestApp {
+trait ControllerSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar with I18nSupport {
 
   implicit val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
 
@@ -261,7 +260,7 @@ trait ControllerSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar
 
   private val cdsEnrolmentId: Option[String] = Some("GB1234567890ABCDE")
 
-  def strim(s: String): String = s.stripMargin.trim.lines mkString " "
+  def strim(s: String): String = s.stripMargin.trim.lines().toArray().mkString(" ")
 
   def oversizedString(maxLength: Int): String = Random.alphanumeric.take(maxLength + 1).mkString
 

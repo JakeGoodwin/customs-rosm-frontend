@@ -43,9 +43,10 @@ class RowIndividualNameDateOfBirthController @Inject()(
   mcc: MessagesControllerComponents,
   rowIndividualNameDob: row_individual_name_dob,
   requestSessionData: RequestSessionData,
-  appConfig: AppConfig
+  appConfig: AppConfig,
+  featureFlags: FeatureFlags
 )(implicit ec: ExecutionContext)
-    extends CdsController(mcc) with FeatureFlags {
+    extends CdsController(mcc) {
 
   def form(organisationType: String, journey: Journey.Value): Action[AnyContent] =
     ggAuthorisedUserWithEnrolmentsAction { implicit request => _: LoggedInUser =>
@@ -99,7 +100,7 @@ class RowIndividualNameDateOfBirthController @Inject()(
       NameDobMatchModel(formData.firstName, formData.middleName, formData.lastName, formData.dateOfBirth)
 
     subscriptionDetailsService.cacheNameDobDetails(nameDobMatchModel) map { _ =>
-      (isInReviewMode, rowHaveUtrEnabled) match {
+      (isInReviewMode, featureFlags.rowHaveUtrEnabled) match {
         case (true, _)      => Redirect(DetermineReviewPageController.determineRoute(journey))
         case (false, true)  => Redirect(DoYouHaveAUtrNumberYesNoController.form(organisationType, journey))
         case (false, false) => Redirect(SixLineAddressController.showForm(false, organisationType, journey))

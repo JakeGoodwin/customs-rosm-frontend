@@ -91,7 +91,7 @@ class DateOfEstablishmentControllerSpec
   override protected def beforeEach(): Unit = {
     reset(mockSubscriptionFlowManager, mockSubscriptionBusinessService, mockSubscriptionDetailsHolderService)
     setupMockSubscriptionFlowManager(DateOfEstablishmentSubscriptionFlowPage)
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(CorporateBody))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(CorporateBody))
   }
 
   val formModes = Table(
@@ -157,7 +157,7 @@ class DateOfEstablishmentControllerSpec
     }
 
     "use partnership in title and heading for Partnership Org Type" in {
-      when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(Partnership))
+      when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(Partnership))
       showCreateForm(cachedDate = Some(DateOfEstablishment)) { result =>
         val page = CdsPage(bodyOf(result))
         page.title should startWith("When was the partnership established?")
@@ -166,7 +166,7 @@ class DateOfEstablishmentControllerSpec
     }
 
     "use partnership in title and heading for Limited Liability Partnership Org Type" in {
-      when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(LLP))
+      when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(LLP))
       showCreateForm(cachedDate = Some(DateOfEstablishment)) { result =>
         val page = CdsPage(bodyOf(result))
         page.title should startWith("When was the partnership established?")
@@ -175,7 +175,7 @@ class DateOfEstablishmentControllerSpec
     }
 
     "use business in Date of Establishment title and heading for non-partnership Org Type" in {
-      when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier]))
+      when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]]))
         .thenReturn(Some(UnincorporatedBody))
       showCreateForm(cachedDate = Some(DateOfEstablishment)) { result =>
         val page = CdsPage(bodyOf(result))
@@ -185,7 +185,7 @@ class DateOfEstablishmentControllerSpec
     }
 
     "use business in Date of Establishment text and organisation in title and heading for Company Org Type" in {
-      when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(CorporateBody))
+      when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(CorporateBody))
       showCreateForm(cachedDate = Some(DateOfEstablishment)) { result =>
         val page = CdsPage(bodyOf(result))
         page.getElementText(SubscriptionDateOfEstablishmentPage.dateOfEstablishmentLabelXPath) should startWith(
@@ -282,7 +282,7 @@ class DateOfEstablishmentControllerSpec
         submitFormInCreateMode(ValidRequest) { result =>
           await(result)
           verify(mockSubscriptionDetailsHolderService).cacheDateEstablished(meq(DateOfEstablishment))(
-            any[HeaderCarrier]
+            any[Request[_]]
           )
         }
       }
@@ -328,7 +328,7 @@ class DateOfEstablishmentControllerSpec
     journey: Journey.Value = Journey.GetYourEORI
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
-    when(mockSubscriptionBusinessService.maybeCachedDateEstablished(any[HeaderCarrier]))
+    when(mockSubscriptionBusinessService.maybeCachedDateEstablished(any[Request[_]]))
       .thenReturn(Future.successful(cachedDate))
 
     val result = controller.createForm(journey).apply(SessionBuilder.buildRequestWithSession(userId))
@@ -340,7 +340,7 @@ class DateOfEstablishmentControllerSpec
   ) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockSubscriptionBusinessService.getCachedDateEstablished(any[HeaderCarrier])).thenReturn(DateOfEstablishment)
+    when(mockSubscriptionBusinessService.getCachedDateEstablished(any[Request[_]])).thenReturn(DateOfEstablishment)
 
     val result = controller.reviewForm(journey).apply(SessionBuilder.buildRequestWithSession(userId))
     test(result)
@@ -360,7 +360,7 @@ class DateOfEstablishmentControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockSubscriptionDetailsHolderService.cacheDateEstablished(any[LocalDate])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheDateEstablished(any[LocalDate])(any[Request[_]]))
       .thenReturn(Future.successful(()))
     val result = controller
       .submit(isInReviewMode, journey)

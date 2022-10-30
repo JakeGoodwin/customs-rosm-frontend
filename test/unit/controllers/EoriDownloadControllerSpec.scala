@@ -21,6 +21,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.http.Status.OK
+import play.api.mvc.Request
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.connector.PdfGeneratorConnector
@@ -30,7 +31,6 @@ import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
 import uk.gov.hmrc.customs.rosmfrontend.views.html.error_template
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.eori_number_download
-import uk.gov.hmrc.http.HeaderCarrier
 import util.ControllerSpec
 import util.builders.AuthBuilder._
 import util.builders.SessionBuilder
@@ -66,7 +66,7 @@ class EoriDownloadControllerSpec extends ControllerSpec {
 
     "download EORI PDF for an authenticated user" in {
       val mockSubscribeOutcome = mock[SubscriptionCreateOutcome]
-      when(mockCdsFrontendDataCache.subscriptionCreateOutcome(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.subscriptionCreateOutcome(any[Request[_]]))
         .thenReturn(Future.successful(mockSubscribeOutcome))
       when(mockSubscribeOutcome.processedDate).thenReturn("01 May 2016")
       when(mockSubscribeOutcome.eori).thenReturn(Some("EN123456789012345"))
@@ -76,7 +76,6 @@ class EoriDownloadControllerSpec extends ControllerSpec {
       val html = eoriNumberDownloadView(Journey.GetYourEORI, "EN123456789012345", "John Doe", "01 May 2016").toString()
       when(
         mockPdfGenerator.generatePdf(ArgumentMatchers.eq(html))(
-          ArgumentMatchers.any[HeaderCarrier],
           ArgumentMatchers.any[ExecutionContext]
         )
       ).thenReturn(Future(pdf))
@@ -93,7 +92,7 @@ class EoriDownloadControllerSpec extends ControllerSpec {
 
     "display the service unavailable page if the eori is missing from SubscriptionCreateOutcome" in {
       val mockSubscribeOutcome = mock[SubscriptionCreateOutcome]
-      when(mockCdsFrontendDataCache.subscriptionCreateOutcome(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.subscriptionCreateOutcome(any[Request[_]]))
         .thenReturn(Future.successful(mockSubscribeOutcome))
       when(mockSubscribeOutcome.processedDate).thenReturn("01 May 2016")
       when(mockSubscribeOutcome.eori).thenReturn(None)

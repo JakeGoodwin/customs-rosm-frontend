@@ -20,14 +20,11 @@ import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.Request
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.SubscriptionDetails
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.VatEUDetailsModel
-import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{
-  SubscriptionBusinessService,
-  SubscriptionDetailsService,
-  SubscriptionVatEUDetailsService
-}
+import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{SubscriptionBusinessService, SubscriptionDetailsService, SubscriptionVatEUDetailsService}
 import uk.gov.hmrc.http.HeaderCarrier
 import util.UnitSpec
 
@@ -39,6 +36,7 @@ class SubscriptionVatEUDetailsServiceSpec extends UnitSpec with MockitoSugar wit
   private val mockSubscriptionDetailsService = mock[SubscriptionDetailsService]
 
   implicit val hc: HeaderCarrier = mock[HeaderCarrier]
+  implicit val request: Request[_] = mock[Request[_]]
 
   private val mockSubscriptionDetails = mock[SubscriptionDetails]
   private val mockVatEuDetails = mock[VatEUDetailsModel]
@@ -55,7 +53,7 @@ class SubscriptionVatEUDetailsServiceSpec extends UnitSpec with MockitoSugar wit
 
   override protected def beforeEach() {
     reset(mockSubscriptionBusinessService, mockSubscriptionDetails, mockSubscriptionDetailsService)
-    when(mockSubscriptionBusinessService.retrieveSubscriptionDetailsHolder(meq(hc)))
+    when(mockSubscriptionBusinessService.retrieveSubscriptionDetailsHolder(meq(request)))
       .thenReturn(previouslyCachedSubscriptionDetailsHolder)
   }
 
@@ -64,94 +62,94 @@ class SubscriptionVatEUDetailsServiceSpec extends UnitSpec with MockitoSugar wit
 
       when(
         mockSubscriptionDetailsService
-          .saveSubscriptionDetails(any[SubscriptionDetails => SubscriptionDetails]())(meq(hc))
+          .saveSubscriptionDetails(any[SubscriptionDetails => SubscriptionDetails]())(meq(request))
       ).thenReturn(Future.successful[Unit](()))
 
       await(service.saveOrUpdate(mockVatEuDetails)) should be(())
 
-      verify(mockSubscriptionBusinessService).retrieveSubscriptionDetailsHolder(meq(hc))
+      verify(mockSubscriptionBusinessService).retrieveSubscriptionDetailsHolder(meq(request))
       verify(mockSubscriptionDetailsService).saveSubscriptionDetails(any[SubscriptionDetails => SubscriptionDetails]())(
-        meq(hc)
+        meq(request)
       )
     }
 
     "update EU Details in previously cached SubscriptionDetailsHolder" in {
       when(
         mockSubscriptionDetailsService
-          .saveSubscriptionDetails(any[SubscriptionDetails => SubscriptionDetails]())(meq(hc))
+          .saveSubscriptionDetails(any[SubscriptionDetails => SubscriptionDetails]())(meq(request))
       ).thenReturn(Future.successful[Unit](()))
 
       await(service.saveOrUpdate(mockVatEuDetails)) should be(())
 
-      verify(mockSubscriptionBusinessService).retrieveSubscriptionDetailsHolder(meq(hc))
+      verify(mockSubscriptionBusinessService).retrieveSubscriptionDetailsHolder(meq(request))
       verify(mockSubscriptionDetailsService).saveSubscriptionDetails(any[SubscriptionDetails => SubscriptionDetails]())(
-        meq(hc)
+        meq(request)
       )
     }
 
     "fail when cache fails accessing current SubscriptionDetailsHolder" in {
-      when(mockSubscriptionBusinessService.retrieveSubscriptionDetailsHolder(meq(hc)))
+      when(mockSubscriptionBusinessService.retrieveSubscriptionDetailsHolder(meq(request)))
         .thenReturn(Future.failed(emulatedFailure))
 
       intercept[RuntimeException] {
         await(service.saveOrUpdate(mockVatEuDetails))
       } shouldBe emulatedFailure
 
-      verify(mockSubscriptionBusinessService).retrieveSubscriptionDetailsHolder(meq(hc))
+      verify(mockSubscriptionBusinessService).retrieveSubscriptionDetailsHolder(meq(request))
       verifyNoMoreInteractions(mockSubscriptionBusinessService)
     }
 
     "update EU Details in previously cached SubscriptionDetailsHolder using sequence" in {
       when(
         mockSubscriptionDetailsService
-          .saveSubscriptionDetails(any[SubscriptionDetails => SubscriptionDetails]())(meq(hc))
+          .saveSubscriptionDetails(any[SubscriptionDetails => SubscriptionDetails]())(meq(request))
       ).thenReturn(Future.successful[Unit](()))
 
       await(service.saveOrUpdate(Seq(mockVatEuDetails))) should be(())
 
-      verify(mockSubscriptionBusinessService).retrieveSubscriptionDetailsHolder(meq(hc))
+      verify(mockSubscriptionBusinessService).retrieveSubscriptionDetailsHolder(meq(request))
       verify(mockSubscriptionDetailsService).saveSubscriptionDetails(any[SubscriptionDetails => SubscriptionDetails]())(
-        meq(hc)
+        meq(request)
       )
     }
 
     "fail when cache fails accessing current SubscriptionDetailsHolder using sequence" in {
-      when(mockSubscriptionBusinessService.retrieveSubscriptionDetailsHolder(meq(hc)))
+      when(mockSubscriptionBusinessService.retrieveSubscriptionDetailsHolder(meq(request)))
         .thenReturn(Future.failed(emulatedFailure))
 
       intercept[RuntimeException] {
         await(service.saveOrUpdate(Seq(mockVatEuDetails)))
       } shouldBe emulatedFailure
 
-      verify(mockSubscriptionBusinessService).retrieveSubscriptionDetailsHolder(meq(hc))
+      verify(mockSubscriptionBusinessService).retrieveSubscriptionDetailsHolder(meq(request))
       verifyNoMoreInteractions(mockSubscriptionBusinessService)
     }
   }
 
   "VAT EU Details retrieve from cache" should {
     "give Nil when cached SubscriptionDetailsHolder does not hold VAT EU Details" in {
-      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(hc))).thenReturn(Future.successful(Seq()))
+      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(request))).thenReturn(Future.successful(Seq()))
       await(service.cachedEUVatDetails) shouldBe Nil
-      verify(mockSubscriptionBusinessService).getCachedVatEuDetailsModel(meq(hc))
+      verify(mockSubscriptionBusinessService).getCachedVatEuDetailsModel(meq(request))
     }
 
     "give Some previously cached VAT Identifications" in {
-      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(hc)))
+      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(request)))
         .thenReturn(Future.successful(Seq(mockVatEuDetails)))
       await(service.cachedEUVatDetails) shouldBe List(mockVatEuDetails)
 
-      verify(mockSubscriptionBusinessService).getCachedVatEuDetailsModel(meq(hc))
+      verify(mockSubscriptionBusinessService).getCachedVatEuDetailsModel(meq(request))
     }
 
     "fail when cache fails accessing current SubscriptionDetailsHolder" in {
-      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(hc)))
+      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(request)))
         .thenReturn(Future.failed(emulatedFailure))
 
       intercept[RuntimeException] {
         await(service.cachedEUVatDetails)
       } shouldBe emulatedFailure
 
-      verify(mockSubscriptionBusinessService).getCachedVatEuDetailsModel(meq(hc))
+      verify(mockSubscriptionBusinessService).getCachedVatEuDetailsModel(meq(request))
       verifyNoMoreInteractions(mockSubscriptionBusinessService)
     }
   }
@@ -160,7 +158,7 @@ class SubscriptionVatEUDetailsServiceSpec extends UnitSpec with MockitoSugar wit
     "return subscription details's vat eu details updated" in {
       val vatEuUpdate = VatEUDetailsModel("54321", "ES")
 
-      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(hc)))
+      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(request)))
         .thenReturn(Future.successful(VatEuDetailsForUpdate))
       await(service.updateVatEuDetailsModel(VatEuDetailsForUpdate.head, vatEuUpdate)) shouldBe Seq(
         VatEUDetailsModel("54321", "ES"),
@@ -172,27 +170,27 @@ class SubscriptionVatEUDetailsServiceSpec extends UnitSpec with MockitoSugar wit
       val vatEuUpdate = VatEUDetailsModel("54321", "ES")
       val nonExistingVatReference = VatEUDetailsModel("12345", "PL")
 
-      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(hc)))
+      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(request)))
         .thenReturn(Future.successful(VatEuDetailsForUpdate))
 
       intercept[IllegalArgumentException] {
         await(service.updateVatEuDetailsModel(nonExistingVatReference, vatEuUpdate))
       } getMessage () shouldBe "Details for update do not exist in a cache"
 
-      verify(mockSubscriptionBusinessService).getCachedVatEuDetailsModel(meq(hc))
+      verify(mockSubscriptionBusinessService).getCachedVatEuDetailsModel(meq(request))
       verifyNoMoreInteractions(mockSubscriptionBusinessService)
     }
   }
 
   "Querying for specific vatEuDetails" should {
     "return vatEuDetails when index was found" in {
-      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(hc)))
+      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(request)))
         .thenReturn(Future.successful(VatEuDetailsForUpdate))
       await(service.vatEuDetails(VatEuDetailsForUpdate.head.index)) shouldBe Some(VatEUDetailsModel("12345", "FR"))
     }
 
     "return None when index not found" in {
-      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(hc)))
+      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(request)))
         .thenReturn(Future.successful(VatEuDetailsForUpdate))
       await(service.vatEuDetails(VatEuDetailsForUpdate.size)) shouldBe None
     }
@@ -200,10 +198,10 @@ class SubscriptionVatEUDetailsServiceSpec extends UnitSpec with MockitoSugar wit
 
   "Asking for cached Eu Vat Details" should {
     "should call subscription business service " in {
-      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(hc)))
+      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(request)))
         .thenReturn(Future.successful(Seq(mockVatEuDetails)))
       await(service.vatEuDetails(VatEuDetailsForUpdate.size))
-      verify(mockSubscriptionBusinessService).getCachedVatEuDetailsModel(meq(hc))
+      verify(mockSubscriptionBusinessService).getCachedVatEuDetailsModel(meq(request))
     }
   }
 
@@ -211,18 +209,18 @@ class SubscriptionVatEUDetailsServiceSpec extends UnitSpec with MockitoSugar wit
     "call SubscriptionDetailsService to save filtered vatEuDetails when value to be removed was found" in {
       def sub = (subDet: SubscriptionDetails) => subDet.copy(vatEUDetails = Seq(VatEUDetailsModel("54321", "DE")))
 
-      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(hc)))
+      when(mockSubscriptionBusinessService.getCachedVatEuDetailsModel(meq(request)))
         .thenReturn(Future.successful(VatEuDetailsForUpdate))
       when(
         mockSubscriptionDetailsService
-          .saveSubscriptionDetails(any[SubscriptionDetails => SubscriptionDetails]())(meq(hc))
+          .saveSubscriptionDetails(any[SubscriptionDetails => SubscriptionDetails]())(meq(request))
       ).thenReturn(Future.successful(()))
 
       await(service.removeSingleEuVatDetails(VatEUDetailsModel("12345", "FR")))
 
       val requestCaptor = ArgumentCaptor.forClass(classOf[SubscriptionDetails => SubscriptionDetails])
 
-      verify(mockSubscriptionDetailsService).saveSubscriptionDetails(requestCaptor.capture())(ArgumentMatchers.eq(hc))
+      verify(mockSubscriptionDetailsService).saveSubscriptionDetails(requestCaptor.capture())(ArgumentMatchers.eq(request))
       val f = requestCaptor.getValue.asInstanceOf[SubscriptionDetails => SubscriptionDetails]
 
       f(exampleSubscriptionDetails) should equal(sub(exampleSubscriptionDetails))

@@ -21,9 +21,10 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, verify, when}
 import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.Request
 import uk.gov.hmrc.customs.rosmfrontend.domain.CdsOrganisationType._
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.Address
@@ -36,6 +37,7 @@ import scala.concurrent.Future
 
 class RegistrationDetailsServiceSpec extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
   implicit val hc = mock[HeaderCarrier]
+  implicit val req = mock[Request[_]]
 
   private def startingDate = LocalDate.now
 
@@ -104,7 +106,7 @@ class RegistrationDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
 
   override def beforeEach {
     reset(mockSessionCache)
-    when(mockSessionCache.saveRegistrationDetails(any[RegistrationDetails])(any[HeaderCarrier]))
+    when(mockSessionCache.saveRegistrationDetails(any[RegistrationDetails])(any[Request[_]]))
       .thenReturn(Future.successful(true))
   }
 
@@ -115,8 +117,8 @@ class RegistrationDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
       await(registrationDetailsService.cacheOrgName(updatedOrgName))
       val requestCaptor = ArgumentCaptor.forClass(classOf[RegistrationDetails])
 
-      verify(mockSessionCache).registrationDetails(ArgumentMatchers.eq(hc))
-      verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(hc))
+      verify(mockSessionCache).registrationDetails(ArgumentMatchers.eq(req))
+      verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(req))
 
       val holder: RegistrationDetails = requestCaptor.getValue
       holder.name shouldBe updatedOrgName
@@ -130,8 +132,8 @@ class RegistrationDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
       await(registrationDetailsService.cacheAddress(updatedAddress))
       val requestCaptor = ArgumentCaptor.forClass(classOf[RegistrationDetailsOrganisation])
 
-      verify(mockSessionCache).registrationDetails(ArgumentMatchers.eq(hc))
-      verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(hc))
+      verify(mockSessionCache).registrationDetails(ArgumentMatchers.eq(req))
+      verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(req))
 
       val holder: RegistrationDetailsOrganisation = requestCaptor.getValue
       holder.address shouldBe updatedAddress
@@ -146,8 +148,8 @@ class RegistrationDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
       await(registrationDetailsService.cacheAddress(updatedAddress))
       val requestCaptor = ArgumentCaptor.forClass(classOf[RegistrationDetailsIndividual])
 
-      verify(mockSessionCache).registrationDetails(ArgumentMatchers.eq(hc))
-      verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(hc))
+      verify(mockSessionCache).registrationDetails(ArgumentMatchers.eq(req))
+      verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(req))
 
       val holder: RegistrationDetailsIndividual = requestCaptor.getValue
       holder.address shouldBe updatedAddress
@@ -162,8 +164,8 @@ class RegistrationDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
       await(registrationDetailsService.cacheNameDateOfBirth(updatedRegDetailsIndividual))
       val requestCaptor = ArgumentCaptor.forClass(classOf[RegistrationDetailsIndividual])
 
-      verify(mockSessionCache).registrationDetails(ArgumentMatchers.eq(hc))
-      verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(hc))
+      verify(mockSessionCache).registrationDetails(ArgumentMatchers.eq(req))
+      verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(req))
 
       val holder: RegistrationDetailsIndividual = requestCaptor.getValue
       holder.address shouldBe startingBlankAddress
@@ -182,7 +184,7 @@ class RegistrationDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
 
         val requestCaptor = ArgumentCaptor.forClass(classOf[RegistrationDetails])
 
-        verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(hc))
+        verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(req))
         val holder: RegistrationDetails = requestCaptor.getValue
 
         holder shouldBe emptyRegDetailsIndividual
@@ -196,7 +198,7 @@ class RegistrationDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
 
         val requestCaptor = ArgumentCaptor.forClass(classOf[RegistrationDetails])
 
-        verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(hc))
+        verify(mockSessionCache).saveRegistrationDetails(requestCaptor.capture())(ArgumentMatchers.eq(req))
         val holder: RegistrationDetails = requestCaptor.getValue
 
         holder shouldBe emptyRegDetailsOrganisation

@@ -21,7 +21,7 @@ import common.pages.matching.DoYouHaveNinoPage._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.migration.ConfirmYourIdentityController
@@ -46,10 +46,10 @@ class ConfirmYourIndentityControllerSpec extends ControllerSpec with BeforeAndAf
   private val confirmYourIdentityController = new ConfirmYourIdentityController(app, mockAuthConnector, mcc, confirm_your_identity, mockSessionCache)
 
   "ConfirmYourIdentityController" should {
-    when(mockSessionCache.saveHasNino(any[Boolean])(any[HeaderCarrier])).thenReturn(
+    when(mockSessionCache.saveHasNino(any[Boolean])(any[Request[_]])).thenReturn(
       Future.successful(true)
     )
-    when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+    when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
       Future.successful(Some(true))
     )
       "while Viewing the form " should {

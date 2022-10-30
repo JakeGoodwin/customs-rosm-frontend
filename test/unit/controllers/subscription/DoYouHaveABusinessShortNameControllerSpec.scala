@@ -83,7 +83,7 @@ class DoYouHaveABusinessShortNameControllerSpec
       mockOrgTypeLookup,
       mockSubscriptionDetailsHolderService
     )
-    when(mockSubscriptionBusinessService.companyShortName(any[HeaderCarrier])).thenReturn(None)
+    when(mockSubscriptionBusinessService.companyShortName(any[Request[_]])).thenReturn(None)
     registerSaveDetailsMockSuccess()
     setupMockSubscriptionFlowManager(BusinessShortNameSubscriptionFlowYesNoPage)
   }
@@ -228,7 +228,7 @@ class DoYouHaveABusinessShortNameControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
 
     test(
       controller.submit(isInReviewMode = false, Journey.GetYourEORI)(
@@ -244,7 +244,7 @@ class DoYouHaveABusinessShortNameControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
 
     test(
       controller.submit(isInReviewMode = true, Journey.GetYourEORI)(
@@ -254,12 +254,12 @@ class DoYouHaveABusinessShortNameControllerSpec
   }
 
   private def registerSaveDetailsMockSuccess() {
-    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[Request[_]]))
       .thenReturn(Future.successful(()))
   }
 
   private def registerSaveDetailsMockFailure(exception: Throwable) {
-    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[Request[_]]))
       .thenReturn(Future.failed(exception))
   }
 
@@ -270,7 +270,7 @@ class DoYouHaveABusinessShortNameControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
 
     test(controller.createForm(journey).apply(SessionBuilder.buildRequestWithSession(userId)))
   }

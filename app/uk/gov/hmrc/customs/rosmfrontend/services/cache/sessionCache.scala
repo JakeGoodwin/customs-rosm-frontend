@@ -100,7 +100,7 @@ class SessionCache @Inject() (
     rd: RegistrationDetails,
     internalId: InternalId,
     orgType: Option[CdsOrganisationType] = None
-  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Boolean] =
+  )(implicit headerCarrier: HeaderCarrier, request: Request[_]): Future[Boolean] =
     for {
       _ <- save4LaterService.saveOrgType(internalId, orgType)
       createdOrUpdated <- saveRegistrationDetails(rd)
@@ -110,7 +110,7 @@ class SessionCache @Inject() (
     rd: RegistrationDetails,
     internalId: InternalId,
     orgType: Option[CdsOrganisationType] = None
-  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Boolean] =
+  )(implicit  headerCarrier: HeaderCarrier, request: Request[_]): Future[Boolean] =
     for {
       _ <- save4LaterService.saveSafeId(internalId, rd.safeId)
       _ <- save4LaterService.saveOrgType(internalId, orgType)

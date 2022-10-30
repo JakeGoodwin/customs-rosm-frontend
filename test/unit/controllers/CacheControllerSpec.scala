@@ -50,7 +50,7 @@ class CacheControllerSpec extends ControllerSpec {
 
     "clear cache for subscription holder for subscription journey" in {
       withAuthorisedUser(userId, mockAuthConnector)
-      when(mockSessionCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[HeaderCarrier]))
+      when(mockSessionCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[Request[_]]))
         .thenReturn(Future.successful(true))
       val result: Result =
         await(controller.clearCache(Journey.Migrate).apply(SessionBuilder.buildRequestWithSession(userId)))
@@ -61,7 +61,7 @@ class CacheControllerSpec extends ControllerSpec {
 
     "clear cache for subscription holder for get an eori journey" in {
       withAuthorisedUser(userId, mockAuthConnector)
-      when(mockSessionCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[HeaderCarrier]))
+      when(mockSessionCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[Request[_]]))
         .thenReturn(Future.successful(true))
       val result: Result =
         await(controller.clearCache(Journey.GetYourEORI).apply(SessionBuilder.buildRequestWithSession(userId)))

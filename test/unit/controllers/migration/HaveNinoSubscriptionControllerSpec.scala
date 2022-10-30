@@ -89,14 +89,14 @@ class HaveNinoSubscriptionControllerSpec extends ControllerSpec with BeforeAndAf
     }
 
     "cache NINO and redirect to Address Page of the flow" in {
-      when(mockSubscriptionDetailsService.cacheCustomsId(any[CustomsId])(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cacheCustomsId(any[CustomsId])(any[Request[_]]))
         .thenReturn(Future.successful(()))
       mockSubscriptionFlow(nextPageFlowUrl)
       submit(Journey.Migrate, ValidNinoRequest) { result =>
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "/customs/subscribe-for-cds/address"
       }
-      verify(mockSubscriptionDetailsService).cacheCustomsId(any[CustomsId])(any[HeaderCarrier])
+      verify(mockSubscriptionDetailsService).cacheCustomsId(any[CustomsId])(any[Request[_]])
     }
   }
 

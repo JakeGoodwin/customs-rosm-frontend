@@ -68,7 +68,7 @@ class CheckYourDetailsSpec extends ViewSpec {
   private val nino = Some(Nino("AB123456C"))
   private val nameDobMatchModel = Some(NameDobMatchModel("FName", None, "LName", LocalDate.parse("2003-04-08")))
 
-  private def strim(s: String): String = s.stripMargin.trim.lines mkString " "
+  private def strim(s: String): String = s.stripMargin.trim.lines.toArray().mkString(" ")
 
   "Check Your Answers Page" should {
     forAll(domIds) { (name, headingId, changeLinkId) =>

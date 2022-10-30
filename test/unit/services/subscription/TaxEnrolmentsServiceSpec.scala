@@ -20,7 +20,7 @@ import org.joda.time.LocalDate
 import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers
 import play.api.test.Helpers._
 import uk.gov.hmrc.customs.rosmfrontend.connector.TaxEnrolmentsConnector

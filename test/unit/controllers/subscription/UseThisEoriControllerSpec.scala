@@ -76,7 +76,7 @@ class UseThisEoriControllerSpec
 
   override def beforeEach: Unit = {
     reset(mockSubscriptionFlowManager, mockSubscriptionDetailsHolderService, mockEnrolmentStoreProxyService)
-    when(mockSubscriptionDetailsHolderService.cachedExistingEoriNumber(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cachedExistingEoriNumber(any[Request[_]]))
       .thenReturn(Future.successful(Some(existingEori)))
     when(mockEnrolmentStoreProxyService.isEoriEnrolledWithAnotherGG(any())(any(), any()))
       .thenReturn(Future.successful(false))
@@ -130,7 +130,7 @@ class UseThisEoriControllerSpec
     }
 
     "fail with MissingExistingEori Exception when EORI number cannot be found in Cache" in {
-      when(mockSubscriptionDetailsHolderService.cachedExistingEoriNumber(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsHolderService.cachedExistingEoriNumber(any[Request[_]]))
         .thenReturn(Future.successful(None))
 
       a[MissingExistingEori] should be thrownBy {
