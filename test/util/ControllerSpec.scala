@@ -260,7 +260,7 @@ trait ControllerSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar
 
   private val cdsEnrolmentId: Option[String] = Some("GB1234567890ABCDE")
 
-  def strim(s: String): String = s.stripMargin.trim.lines().toArray().mkString(" ")
+  def strim(s: String): String = s.stripMargin.trim.linesIterator.mkString(" ")
 
   def oversizedString(maxLength: Int): String = Random.alphanumeric.take(maxLength + 1).mkString
 

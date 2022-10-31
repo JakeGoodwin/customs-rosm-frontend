@@ -144,7 +144,7 @@ class SessionCache @Inject() (
     putData(eoriKey, Json.toJson(eori.id)) map (_ => true)
 
   def subscriptionDetails(implicit request: Request[_]): Future[SubscriptionDetails] =
-    getData[SubscriptionDetails](subDetailsKey).map(_.getOrElse(throwException(subDetailsKey)))
+    getData[SubscriptionDetails](subDetailsKey).map(_.getOrElse(SubscriptionDetails()))
 
   def eori(implicit request: Request[_]): Future[Option[String]] =
     getData[String](eoriKey)

@@ -16,13 +16,12 @@
 
 package integration
 
-import org.scalatest.Ignore
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.customs.rosmfrontend.services.countries.Countries
 
-@Ignore
+
 class AllTheCountriesSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   val countries = new Countries(app)

@@ -36,6 +36,7 @@ import uk.gov.hmrc.mongo.cache.{CacheItem, DataKey}
 import uk.gov.hmrc.mongo.test.MongoSupport
 import util.builders.RegistrationDetailsBuilder._
 
+import java.util
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -45,11 +46,11 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
   lazy val appConfig = app.injector.instanceOf[AppConfig]
   val mockTimeStampSupport = new CurrentTimestampSupport()
 
-  private val save4LaterService      = app.injector.instanceOf[Save4LaterService]
-  implicit val request: Request[Any] = mock[Request[Any]]
-  val hc: HeaderCarrier              = mock[HeaderCarrier]
+  private val save4LaterService               = mock[Save4LaterService]
+  implicit val request: Request[Any]          = mock[Request[Any]]
+  implicit val hc: HeaderCarrier              = mock[HeaderCarrier]
   val sessionCache                   = new SessionCache(appConfig, mongoComponent, save4LaterService, mockTimeStampSupport)
-
+  val sessionId = SessionId("sessionId-" + UUID.randomUUID())
 
   "Session cache" should {
 
@@ -74,19 +75,14 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
 
       await(sessionCache.saveSubscriptionDetails(updatedHolder)(request))
 
-      val expectedUpdatedJson                   = toJson(CachedData(subDetails = Some(updatedHolder)))
-      val updatedCache                          = await(sessionCache.cacheRepo.findById(request))
+      val expectedUpdatedJson = toJson(CachedData(subDetails = Some(updatedHolder)))
+      val updatedCache = await(sessionCache.cacheRepo.findById(request))
       val Some(CacheItem(_, updatedJson, _, _)) = updatedCache
       updatedJson mustBe expectedUpdatedJson
     }
 
     "provide default when subscription details holder not in cache" in {
-      when(request.session).thenReturn(Session(Map(("sessionId", "sessionId-" + UUID.randomUUID()))))
-
-      val e1 = intercept[SessionTimeOutException] {
-        await(sessionCache.subscriptionDetails(request))
-      }
-      e1.errorMessage mustBe "No match session id for signed in user with session : does-not-exist"
+      val s1 = setupSession
 
       await(sessionCache.putSession(DataKey("regDetails"), data = Json.toJson(individualRegistrationDetails)))
 
@@ -105,7 +101,8 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
     }
 
     "store, fetch SubscriptionStatusOutcome correctly" in {
-      val sessionId: SessionId = setupSession
+      setupSession
+
       val subscriptionStatusOutcome = SubscriptionStatusOutcome("23 June 2018")
       await(sessionCache.saveSubscriptionStatusOutcome(subscriptionStatusOutcome)(request))
       val cache = await(sessionCache.cacheRepo.findById(request))
@@ -116,7 +113,8 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
 
     }
     "store, fetch Email correctly" in {
-      val sessionId: SessionId = setupSession
+      setupSession
+
       val email = "test@test.com"
       await(sessionCache.saveEmail(email)(request))
       val cache = await(sessionCache.cacheRepo.findById(request))
@@ -128,7 +126,7 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
 
     }
     "store, fetch Eori correctly" in {
-      val sessionId: SessionId = setupSession
+      setupSession
       val eori = Eori("GB0000000000")
       await(sessionCache.saveEori(eori)(request))
       val cache = await(sessionCache.cacheRepo.findById(request))
@@ -139,16 +137,17 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
     }
 
     "store, fetch and update Registration details with OrgType correctly" in {
-      val sessionId: SessionId = setupSession
+      setupSession
       when(save4LaterService.saveOrgType(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
+
       await(
         sessionCache.saveRegistrationDetails(
           organisationRegistrationDetails,
           InternalId("InternalId"),
           Some(CdsOrganisationType.Company)
-        )(hc, request)
-      )
+        ))
+
       val cache = await(sessionCache.cacheRepo.findById(request))
       val expectedJson = toJson(CachedData(regDetails = Some(organisationRegistrationDetails)))
       val Some(CacheItem(_, json, _, _)) = cache
@@ -158,11 +157,13 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
     }
 
     "store, fetch and update Registration details with OrgType AND SafeId for ROW correctly" in {
-      val sessionId: SessionId = setupSession
+      setupSession
       when(save4LaterService.saveOrgType(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
+
       when(save4LaterService.saveSafeId(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
+
       await(
         sessionCache.saveRegistrationDetailsWithoutId(
           organisationRegistrationDetails,
@@ -177,11 +178,15 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
     }
 
     "store, fetch and update Registration details correctly" in {
+      setupSession
+      when(save4LaterService.saveOrgType(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
       await(sessionCache.saveRegistrationDetails(organisationRegistrationDetails)(request))
 
       val cache = await(sessionCache.cacheRepo.findById(request))
 
-      val expectedJson                   = toJson(CachedData(regDetails = Some(organisationRegistrationDetails)))
+      val expectedJson = toJson(CachedData(regDetails = Some(organisationRegistrationDetails)))
       val Some(CacheItem(_, json, _, _)) = cache
       json mustBe expectedJson
 
@@ -190,13 +195,13 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
 
       val updatedCache = await(sessionCache.cacheRepo.findById(request))
 
-      val expectedUpdatedJson                   = toJson(CachedData(regDetails = Some(individualRegistrationDetails)))
+      val expectedUpdatedJson = toJson(CachedData(regDetails = Some(individualRegistrationDetails)))
       val Some(CacheItem(_, updatedJson, _, _)) = updatedCache
       updatedJson mustBe expectedUpdatedJson
     }
 
     "store and fetch RegisterWith EORI And Id Response correctly for Register with Eori and Id response" in {
-      val sessionId: SessionId = setupSession
+      setupSession
 
       val processingDate = DateTime.now.withTimeAtStartOfDay()
       val responseCommon = ResponseCommon(status = "OK", processingDate = processingDate)
@@ -248,7 +253,7 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
 
       val cache = await(sessionCache.cacheRepo.findById(request))
 
-      val expectedJson                   = toJson(CachedData(regInfo = Some(organisationRegistrationInfoWithAllOptionalValues)))
+      val expectedJson = toJson(CachedData(regInfo = Some(organisationRegistrationInfoWithAllOptionalValues)))
       val Some(CacheItem(_, json, _, _)) = cache
       json mustBe expectedJson
 
@@ -257,14 +262,13 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
 
       val updatedCache = await(sessionCache.cacheRepo.findById(request))
 
-      val expectedUpdatedJson                   = toJson(CachedData(regInfo = Some(individualRegistrationInfoWithAllOptionalValues)))
+      val expectedUpdatedJson = toJson(CachedData(regInfo = Some(individualRegistrationInfoWithAllOptionalValues)))
       val Some(CacheItem(_, updatedJson, _, _)) = updatedCache
       updatedJson mustBe expectedUpdatedJson
     }
 
     "throw exception when registration info requested and not available in cache" in {
       val s: SessionId = setupSession
-      when(request.session).thenReturn(Session(Map(("sessionId", s.value))))
 
       val caught = intercept[DataUnavailableException] {
         await(sessionCache.registrationInfo(request))
@@ -273,7 +277,7 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
     }
 
     "store Registration Details, Info and Subscription Details Holder correctly" in {
-      val sessionId: SessionId = setupSession
+      setupSession
 
       await(sessionCache.saveRegistrationDetails(organisationRegistrationDetails)(request))
       val holder = SubscriptionDetails()
@@ -286,15 +290,15 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
           Some(organisationRegistrationDetails),
           Some(holder),
           Some(organisationRegistrationInfoWithAllOptionalValues)
-          )
         )
+      )
 
       val Some(CacheItem(_, json, _, _)) = cache
       json mustBe expectedJson
     }
 
     "remove from the cache" in {
-      val sessionId: SessionId = setupSession
+      setupSession
       await(sessionCache.saveRegistrationDetails(organisationRegistrationDetails)(request))
 
       await(sessionCache.remove(request))
@@ -303,10 +307,11 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
       cached mustBe None
     }
   }
-
   private def setupSession: SessionId = {
-    val sessionId = SessionId("sessionId-" + UUID.randomUUID())
-    when(hc.sessionId).thenReturn(Some(sessionId))
-    sessionId
+    val id: String = "sessionId-" + UUID.randomUUID()
+    val session = Session(Map[String, String]("sessionId" -> id))
+    when(request.session).thenReturn(session)
+    SessionId(id)
   }
 }
+
