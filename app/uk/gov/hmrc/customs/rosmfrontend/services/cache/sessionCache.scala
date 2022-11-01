@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.http.logging.Mdc.preservingMdc
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.control.NoStackTrace
+import scala.util.control.{NoStackTrace, NonFatal}
 
 sealed case class CachedData(
   regDetails: Option[RegistrationDetails] = None,
@@ -158,8 +158,28 @@ class SessionCache @Inject() (
   def mayBeEmail(implicit request: Request[_]): Future[Option[String]] =
     getData[String](emailKey)
 
-  def safeId(implicit request: Request[_]): Future[SafeId] =
-    getData[SafeId](safeIdKey).map(_.getOrElse(throwException(safeIdKey)))
+  def safeId(implicit request: Request[_]): Future[SafeId] = fetchSafeIdFromRegDetails.flatMap {
+    case Some(value) => Future.successful(value)
+    case None =>
+      fetchSafeIdFromReg06Response.map(
+        _.getOrElse(throw new IllegalStateException(s"$safeIdKey is not cached in data for the sessionId: $sessionId"))
+        )
+  }
+
+  def fetchSafeIdFromReg06Response(implicit request: Request[_]): Future[Option[SafeId]] =
+    registerWithEoriAndIdResponse.map(
+      response =>
+        response.responseDetail.flatMap(_.responseData.map(_.SAFEID))
+                .map(SafeId(_))
+      ).recoverWith {
+      case NonFatal(_) => Future.successful(None)
+    }
+
+  def fetchSafeIdFromRegDetails(implicit request: Request[_]): Future[Option[SafeId]] =
+    registrationDetails.map(response => if (response.safeId.id.nonEmpty) Some(response.safeId) else None)
+                       .recoverWith {
+                         case NonFatal(_) => Future.successful(None)
+                       }
 
   def name(implicit request: Request[_]): Future[Option[String]] =
     getData[RegistrationDetails](regDetailsKey).map(_.map(_.name))
