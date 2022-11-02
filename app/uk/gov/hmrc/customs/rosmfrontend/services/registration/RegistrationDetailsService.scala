@@ -21,7 +21,6 @@ import uk.gov.hmrc.customs.rosmfrontend.domain.CdsOrganisationType._
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.Address
 import uk.gov.hmrc.customs.rosmfrontend.domain.{CdsOrganisationType, RegistrationDetailsIndividual, RegistrationDetailsOrganisation}
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,20 +29,20 @@ import scala.concurrent.Future
 @Singleton
 class RegistrationDetailsService @Inject()(sessionCache: SessionCache) {
 
-  def cacheOrgName(orgName: String)(implicit hq: HeaderCarrier, request: Request[_]): Future[Boolean] =
+  def cacheOrgName(orgName: String)(implicit request: Request[_]): Future[Boolean] =
     sessionCache.registrationDetails.map {
       case rdo: RegistrationDetailsOrganisation => rdo.copy(name = orgName)
       case _                                    => throw new IllegalArgumentException("Expecting RegistrationDetailsOrganisation but found something else")
     }.flatMap(updatedHolder => sessionCache.saveRegistrationDetails(updatedHolder))
 
-  def cacheAddress(address: Address)(implicit hq: HeaderCarrier, request: Request[_]): Future[Boolean] =
+  def cacheAddress(address: Address)(implicit request: Request[_]): Future[Boolean] =
     sessionCache.registrationDetails.map {
       case rdo: RegistrationDetailsOrganisation => rdo.copy(address = address)
       case rdi: RegistrationDetailsIndividual   => rdi.copy(address = address)
       case _                                    => throw new IllegalStateException("Incomplete cache cannot complete journey")
     }.flatMap(updatedHolder => sessionCache.saveRegistrationDetails(updatedHolder))
 
-  def cacheNameDateOfBirth(rd: RegistrationDetailsIndividual)(implicit hq: HeaderCarrier, request: Request[_]): Future[Boolean] =
+  def cacheNameDateOfBirth(rd: RegistrationDetailsIndividual)(implicit request: Request[_]): Future[Boolean] =
     sessionCache.registrationDetails.map {
       case rdi: RegistrationDetailsIndividual => rdi.copy(name = rd.name, dateOfBirth = rd.dateOfBirth)
       case _                                  => throw new IllegalArgumentException("Expecting RegistrationDetailsIndividual but found something else")
@@ -51,7 +50,7 @@ class RegistrationDetailsService @Inject()(sessionCache: SessionCache) {
 
   def initialiseCacheWithRegistrationDetails(
     organisationType: CdsOrganisationType
-  )(implicit hq: HeaderCarrier, request: Request[_]): Future[Boolean] =
+  )(implicit request: Request[_]): Future[Boolean] =
     organisationType match {
       case SoleTrader | Individual | ThirdCountryIndividual | ThirdCountrySoleTrader =>
         sessionCache.saveRegistrationDetails(RegistrationDetailsIndividual())

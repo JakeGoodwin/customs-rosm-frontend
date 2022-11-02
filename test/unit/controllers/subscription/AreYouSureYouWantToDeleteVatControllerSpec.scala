@@ -62,7 +62,7 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
 
   "Are you sure you want to delete these vat details page" should {
     "return ok and display correct form when passed index is correct" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(Some(someVatEuDetailsModel)))
       createForm() { result =>
         status(result) shouldBe OK
@@ -72,7 +72,7 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
     }
 
     "redirect to confirm page in review mode when passed index was not found" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(None))
       reviewForm() { result =>
         status(result) shouldBe SEE_OTHER
@@ -81,7 +81,7 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
     }
 
     "redirect to confirm page in create mode when passed index was not found" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(None))
       createForm() { result =>
         status(result) shouldBe SEE_OTHER
@@ -92,7 +92,7 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
 
   "Submitting the form in create mode" should {
     "return bad request when no option selected" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(Some(someVatEuDetailsModel)))
       submit(invalidRequest) { result =>
         status(result) shouldBe BAD_REQUEST
@@ -100,11 +100,11 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
     }
 
     "redirect to vat eu registered page when answering yes and  no vat details found in cache" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(Some(someVatEuDetailsModel)))
-      when(mockSubscriptionVatEUDetailsService.removeSingleEuVatDetails(any[VatEUDetailsModel])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.removeSingleEuVatDetails(any[VatEUDetailsModel])(any[Request[_]]))
         .thenReturn(Future.successful[Unit](()))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(emptyVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(emptyVatEuDetails)
       submit(ValidRequest) { result =>
         status(result) shouldBe SEE_OTHER
         SubscriptionCreateEUVatDetailsPage.url should endWith(result.header.headers(LOCATION))
@@ -112,11 +112,11 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
     }
 
     "redirect to vat confirm page when answering yes and vat details found in cache" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(Some(someVatEuDetailsModel)))
-      when(mockSubscriptionVatEUDetailsService.removeSingleEuVatDetails(any[VatEUDetailsModel])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.removeSingleEuVatDetails(any[VatEUDetailsModel])(any[Request[_]]))
         .thenReturn(Future.successful[Unit](()))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(someVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(someVatEuDetails)
       submit(ValidRequest) { result =>
         status(result) shouldBe SEE_OTHER
         s"${VatDetailsEuConfirmPage.url}" should endWith(result.header.headers(LOCATION))
@@ -124,9 +124,9 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
     }
 
     "redirect to vat eu registered page when answering no and  no vat details found in cache" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(Some(someVatEuDetailsModel)))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(emptyVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(emptyVatEuDetails)
       submit(validRequestNo) { result =>
         status(result) shouldBe SEE_OTHER
         SubscriptionCreateEUVatDetailsPage.url should endWith(result.header.headers(LOCATION))
@@ -134,9 +134,9 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
     }
 
     "redirect to vat confirm page when answering no and vat details found in cache" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(Some(someVatEuDetailsModel)))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(someVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(someVatEuDetails)
       submit(validRequestNo) { result =>
         status(result) shouldBe SEE_OTHER
         s"${VatDetailsEuConfirmPage.url}" should endWith(result.header.headers(LOCATION))
@@ -146,7 +146,7 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
 
   "Submitting the form in review mode" should {
     "return bad request when no option selected" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(Some(someVatEuDetailsModel)))
       submit(invalidRequest, isInReviewMode = true) { result =>
         status(result) shouldBe BAD_REQUEST
@@ -154,11 +154,11 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
     }
 
     "redirect to vat eu registered page when answering yes and  no vat details found in cache" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(Some(someVatEuDetailsModel)))
-      when(mockSubscriptionVatEUDetailsService.removeSingleEuVatDetails(any[VatEUDetailsModel])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.removeSingleEuVatDetails(any[VatEUDetailsModel])(any[Request[_]]))
         .thenReturn(Future.successful[Unit](()))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(emptyVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(emptyVatEuDetails)
       submit(ValidRequest, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) should endWith("/customs/register-for-cds/vat-registered-eu/review")
@@ -166,11 +166,11 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
     }
 
     "redirect to vat confirm page when answering yes and vat details found in cache" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(Some(someVatEuDetailsModel)))
-      when(mockSubscriptionVatEUDetailsService.removeSingleEuVatDetails(any[VatEUDetailsModel])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.removeSingleEuVatDetails(any[VatEUDetailsModel])(any[Request[_]]))
         .thenReturn(Future.successful[Unit](()))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(someVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(someVatEuDetails)
       submit(ValidRequest, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER
         s"${VatDetailsEuConfirmPage.url}/review" should endWith(result.header.headers(LOCATION))
@@ -178,9 +178,9 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
     }
 
     "redirect to vat eu registered page when answering no and  no vat details found in cache" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(Some(someVatEuDetailsModel)))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(emptyVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(emptyVatEuDetails)
       submit(validRequestNo, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER
         s"${SubscriptionCreateEUVatDetailsPage.url}/review" should endWith(result.header.headers(LOCATION))
@@ -188,9 +188,9 @@ class AreYouSureYouWantToDeleteVatControllerSpec extends ControllerSpec {
     }
 
     "redirect to vat confirm page when answering no and vat details found in cache" in {
-      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.vatEuDetails(any[Int])(any[Request[_]]))
         .thenReturn(Future.successful(Some(someVatEuDetailsModel)))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(someVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(someVatEuDetails)
       submit(validRequestNo, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER
         s"${VatDetailsEuConfirmPage.url}/review" should endWith(result.header.headers(LOCATION))

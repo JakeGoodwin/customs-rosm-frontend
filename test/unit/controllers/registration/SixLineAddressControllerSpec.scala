@@ -127,7 +127,7 @@ class SixLineAddressControllerSpec extends ControllerSpec with MockitoSugar with
     when(mockRegistrationDetailsCreator.registrationAddress(any())).thenReturn(testAddress)
     when(mockSessionCache.saveRegistrationDetails(any[RegistrationDetails]())(any[Request[_]]))
       .thenReturn(Future.successful(true))
-    when(mockRegistrationDetailsService.cacheAddress(any())(any[HeaderCarrier], any[Request[_]])).thenReturn(Future.successful(true))
+    when(mockRegistrationDetailsService.cacheAddress(any())(any[Request[_]])).thenReturn(Future.successful(true))
     when(mockCountries.getCountryParameters(any())).thenReturn(aFewCountries -> AllCountriesExceptIomInCountryPicker)
   }
 

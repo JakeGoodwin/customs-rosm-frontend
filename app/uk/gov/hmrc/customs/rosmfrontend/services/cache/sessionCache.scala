@@ -82,12 +82,12 @@ class SessionCache @Inject() (
       case Some(sessionId) =>  sessionId
     }
 
-  def putData[A: Writes](key: String, data: A)(implicit request: Request[_]): Future[A] =
+  private def putData[A: Writes](key: String, data: A)(implicit request: Request[_]): Future[A] =
     preservingMdc {
       putSession[A](DataKey(key), data).map(_ => data)
     }
 
-  def getData[A: Reads](key: String)(implicit request: Request[_]): Future[Option[A]] =
+  private def getData[A: Reads](key: String)(implicit request: Request[_]): Future[Option[A]] =
     preservingMdc {
       getFromSession[A](DataKey(key))
     }
@@ -166,7 +166,7 @@ class SessionCache @Inject() (
         )
   }
 
-  def fetchSafeIdFromReg06Response(implicit request: Request[_]): Future[Option[SafeId]] =
+  private def fetchSafeIdFromReg06Response(implicit request: Request[_]): Future[Option[SafeId]] =
     registerWithEoriAndIdResponse.map(
       response =>
         response.responseDetail.flatMap(_.responseData.map(_.SAFEID))
@@ -175,7 +175,7 @@ class SessionCache @Inject() (
       case NonFatal(_) => Future.successful(None)
     }
 
-  def fetchSafeIdFromRegDetails(implicit request: Request[_]): Future[Option[SafeId]] =
+  private def fetchSafeIdFromRegDetails(implicit request: Request[_]): Future[Option[SafeId]] =
     registrationDetails.map(response => if (response.safeId.id.nonEmpty) Some(response.safeId) else None)
                        .recoverWith {
                          case NonFatal(_) => Future.successful(None)

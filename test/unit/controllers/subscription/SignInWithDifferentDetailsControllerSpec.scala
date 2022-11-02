@@ -27,7 +27,6 @@ import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.SubscriptionDetails
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.{eori_used, eori_used_signout, sign_in_with_different_details}
-import uk.gov.hmrc.http.HeaderCarrier
 import unit.controllers.CdsPage
 import util.ControllerSpec
 import util.builders.AuthBuilder.withAuthorisedUser

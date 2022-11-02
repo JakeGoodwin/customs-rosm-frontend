@@ -30,20 +30,20 @@ class SubscriptionVatEUDetailsService @Inject()(
   subscriptionDetailsService: SubscriptionDetailsService
 ) {
 
-  def saveOrUpdate(vatEUDetail: VatEUDetailsModel)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def saveOrUpdate(vatEUDetail: VatEUDetailsModel)(implicit request: Request[_]): Future[Unit] =
     (subscriptionBusinessService.retrieveSubscriptionDetailsHolder map { holder =>
       subscriptionDetailsService.saveSubscriptionDetails(
         _ => holder.copy(vatEUDetails = holder.vatEUDetails ++ Seq(vatEUDetail))
       )
     }).flatten
 
-  def saveOrUpdate(vatEUDetailsParam: Seq[VatEUDetailsModel])(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def saveOrUpdate(vatEUDetailsParam: Seq[VatEUDetailsModel])(implicit request: Request[_]): Future[Unit] =
     (subscriptionBusinessService.retrieveSubscriptionDetailsHolder map { holder =>
       subscriptionDetailsService.saveSubscriptionDetails(_ => holder.copy(vatEUDetails = vatEUDetailsParam))
     }).flatten
 
   def updateVatEuDetailsModel(oldVatEUDetail: VatEUDetailsModel, newVatEUDetail: VatEUDetailsModel)(
-    implicit hc: HeaderCarrier, request: Request[_]
+    implicit request: Request[_]
   ): Future[Seq[VatEUDetailsModel]] =
     cachedEUVatDetails map { cachedDetails =>
       val oldDetailsIndex = cachedDetails.indexOf(oldVatEUDetail)
@@ -51,12 +51,12 @@ class SubscriptionVatEUDetailsService @Inject()(
       else throw new IllegalArgumentException("Details for update do not exist in a cache")
     }
 
-  def vatEuDetails(index: Int)(implicit hc: HeaderCarrier, request: Request[_]): Future[Option[VatEUDetailsModel]] =
+  def vatEuDetails(index: Int)(implicit request: Request[_]): Future[Option[VatEUDetailsModel]] =
     cachedEUVatDetails map (_.find(_.index.equals(index)))
 
-  def cachedEUVatDetails(implicit hc: HeaderCarrier, request: Request[_]): Future[Seq[VatEUDetailsModel]] =
+  def cachedEUVatDetails(implicit request: Request[_]): Future[Seq[VatEUDetailsModel]] =
     subscriptionBusinessService.getCachedVatEuDetailsModel
 
-  def removeSingleEuVatDetails(singleVatDetail: VatEUDetailsModel)(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def removeSingleEuVatDetails(singleVatDetail: VatEUDetailsModel)(implicit request: Request[_]): Future[Unit] =
     cachedEUVatDetails.map(vatDetails => saveOrUpdate(vatDetails.filterNot(_ == singleVatDetail)))
 }

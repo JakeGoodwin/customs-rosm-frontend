@@ -104,9 +104,9 @@ class VatRegisteredEuControllerSpec extends ControllerSpec {
       }
     }
     "redirect to add vat details page for yes answer and no vat details in the cache" in {
-      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[Request[_]]))
         .thenReturn(Future.successful[Unit](()))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(emptyVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(emptyVatEuDetails)
       when(mockSubscriptionFlowManager.stepInformation(any())(any[HeaderCarrier], any[Request[AnyContent]]))
         .thenReturn(mockSubscriptionFlowInfo)
       when(mockSubscriptionFlowInfo.nextPage).thenReturn(mockSubscriptionPage)
@@ -118,9 +118,9 @@ class VatRegisteredEuControllerSpec extends ControllerSpec {
     }
 
     "redirect to vat confirm page when vat details found in the cache" in {
-      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[Request[_]]))
         .thenReturn(Future.successful[Unit](()))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(someVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(someVatEuDetails)
       submitForm(ValidRequest) { result =>
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) should endWith("register-for-cds/vat-details-eu-confirm")
@@ -128,9 +128,9 @@ class VatRegisteredEuControllerSpec extends ControllerSpec {
     }
 
     "redirect to disclose page for no answer" in {
-      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[Request[_]]))
         .thenReturn(Future.successful[Unit](()))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(emptyVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(emptyVatEuDetails)
       when(
         mockSubscriptionFlowManager.stepInformation(any())(any[HeaderCarrier], any[Request[AnyContent]]).nextPage.url
       ).thenReturn(DisclosePersonalDetailsConsentPage.url)
@@ -143,9 +143,9 @@ class VatRegisteredEuControllerSpec extends ControllerSpec {
 
   "Submitting Vat registered Eu Controller in review mode" should {
     "redirect to add vat details page for yes answer and none vat details in the cache" in {
-      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[Request[_]]))
         .thenReturn(Future.successful[Unit](()))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(emptyVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(emptyVatEuDetails)
       submitForm(ValidRequest, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) should endWith("register-for-cds/vat-details-eu/review")
@@ -153,9 +153,9 @@ class VatRegisteredEuControllerSpec extends ControllerSpec {
     }
 
     "redirect to add vat confirm page for yes answer and some vat details in the cache" in {
-      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[Request[_]]))
         .thenReturn(Future.successful[Unit](()))
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(someVatEuDetails)
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]])).thenReturn(someVatEuDetails)
       submitForm(ValidRequest, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) should endWith("register-for-cds/vat-details-eu-confirm/review")
@@ -163,9 +163,9 @@ class VatRegisteredEuControllerSpec extends ControllerSpec {
     }
 
     "redirect to review determine controller for no answer" in {
-      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionDetailsService.cacheVatRegisteredEu(any[YesNo])(any[Request[_]]))
         .thenReturn(Future.successful[Unit](()))
-      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[Seq[VatEUDetailsModel]])(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.saveOrUpdate(any[Seq[VatEUDetailsModel]])(any[Request[_]]))
         .thenReturn(Future.successful[Unit](()))
       submitForm(validRequestNo, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER

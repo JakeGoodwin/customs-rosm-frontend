@@ -65,7 +65,7 @@ class RegistrationDisplayServiceSpec extends UnitSpec with MockitoSugar {
         .thenReturn(RegistrationDetailsIndividual())
       when(mockCache.saveRegistrationDetails(any[RegistrationDetailsIndividual])(any()))
         .thenReturn(Future.successful(true))
-      await(testService.cacheDetails(mockDisplayResponse)(HeaderCarrier(), mockRequest, ExecutionContext.global)) shouldBe true
+      await(testService.cacheDetails(mockDisplayResponse)(mockRequest)) shouldBe true
     }
 
     "return false when unable to cache details" in {
@@ -73,7 +73,7 @@ class RegistrationDisplayServiceSpec extends UnitSpec with MockitoSugar {
         .thenReturn(RegistrationDetailsOrganisation())
       when(mockCache.saveRegistrationDetails(any[RegistrationDetailsOrganisation])(any()))
         .thenReturn(Future.successful(false))
-      await(testService.cacheDetails(mockDisplayResponse)(HeaderCarrier(), mockRequest, ExecutionContext.global)) shouldBe false
+      await(testService.cacheDetails(mockDisplayResponse)( mockRequest)) shouldBe false
     }
   }
 }

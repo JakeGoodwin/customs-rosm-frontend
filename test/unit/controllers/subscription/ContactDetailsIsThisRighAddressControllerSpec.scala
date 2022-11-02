@@ -102,7 +102,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
       .thenReturn(Some(CdsOrganisationType("company")))
     when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]])).thenReturn(mockSubscriptionDetails)
     when(mockSubscriptionDetails.addressDetails).thenReturn(cachedAddressDetails)
-    when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(cachedAddressDetails)
+    when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
   }
   val headingXpath = "//h1"
@@ -219,7 +219,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
     )
 
     "save the details when user chooses to use Registered Address having contact details for Subscription journey" in {
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
       when(mockSubscriptionDetails.contactDetails).thenReturn(Some(contactDetailsModel))
 
       setupMockSubscriptionFlowManager(ContactDetailsAddressSubscriptionFlowPageMigrate)
@@ -234,7 +234,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
     }
 
     "save the details when user chooses to use Registered Address for Subscription journey" in {
-     when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(cachedAddressDetails)
+     when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       setupMockSubscriptionFlowManager(ContactDetailsAddressSubscriptionFlowPageMigrate)
 
@@ -248,7 +248,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
     }
 
     "save the details when user chooses not to use Registered Address for Subscription journey" in {
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       setupMockSubscriptionFlowManager(ContactDetailsIsThisRightAddressSubscriptionFlowPageMigrate)
 
@@ -262,7 +262,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
     }
 
     "produce validation error is this right address is not selected  and  submitted" in {
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       val fieldLevelErrorYesNoAnswer: String = "//*[@id='yes-no-answer-field']//span[@class='error-message']"
 
@@ -284,7 +284,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
     )
 
     "save the details when user chooses to use Registered Address for Subscription journey" in {
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       setupMockSubscriptionFlowManager(ContactDetailsAddressSubscriptionFlowPageMigrate)
       submitFormInCreateMode(YesNoFormBuilder.ValidRequest, journey = Journey.Migrate) { result =>
@@ -299,7 +299,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
 
 
     "save the details when user chooses not to use Registered Address for Subscription journey" in {
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       setupMockSubscriptionFlowManager(ContactDetailsIsThisRightAddressSubscriptionFlowPageMigrate)
 
@@ -315,7 +315,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
     "produce validation error is this right address is not selected  and  submitted" in {
 
       val fieldLevelErrorYesNoAnswer: String = "//*[@id='yes-no-answer-field']//span[@class='error-message']"
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier], any[Request[_]])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       submitFormInCreateMode(YesNoFormBuilder.invalidRequest,journey = Journey.Migrate) { result =>
         status(result) shouldBe BAD_REQUEST

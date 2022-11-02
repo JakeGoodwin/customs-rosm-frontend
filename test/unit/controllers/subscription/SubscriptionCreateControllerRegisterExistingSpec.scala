@@ -33,7 +33,6 @@ import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, Sess
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription._
 import uk.gov.hmrc.customs.rosmfrontend.views.html.migration.migration_success
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription._
-import uk.gov.hmrc.http.HeaderCarrier
 import unit.controllers.CdsPage
 import util.ControllerSpec
 import util.builders.AuthBuilder._

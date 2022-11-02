@@ -22,20 +22,17 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.{Application, Configuration}
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContent, Request, Session}
-import uk.gov.hmrc.customs.rosmfrontend.controllers.FeatureFlags
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.SubscriptionFlowManager
 import uk.gov.hmrc.customs.rosmfrontend.domain.registration.UserLocation
-import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{IndividualSubscriptionFlow, _}
+import uk.gov.hmrc.customs.rosmfrontend.domain.subscription._
 import uk.gov.hmrc.customs.rosmfrontend.domain.{CdsOrganisationType, RegistrationDetailsIndividual, RegistrationDetailsOrganisation}
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
-import uk.gov.hmrc.customs.rosmfrontend.services.subscription.SubscriptionDetailsService
 import uk.gov.hmrc.http.HeaderCarrier
-import util.UnitSpec
-import util.ControllerSpec
+import util.{ControllerSpec, UnitSpec}
 
 import scala.concurrent.Future
 

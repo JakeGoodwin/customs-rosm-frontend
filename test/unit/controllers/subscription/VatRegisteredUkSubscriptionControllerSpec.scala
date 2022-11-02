@@ -64,7 +64,7 @@ class VatRegisteredUkSubscriptionControllerSpec extends ControllerSpec with Befo
       mockSubscriptionFlow,
       mockRequestSession
     )
-    when(mockSubscriptionDetailsService.cacheVatRegisteredUk(any[YesNo])(any[HeaderCarrier], any[Request[_]]))
+    when(mockSubscriptionDetailsService.cacheVatRegisteredUk(any[YesNo])(any[Request[_]]))
       .thenReturn(Future.successful({}))
   }
 
@@ -108,7 +108,7 @@ class VatRegisteredUkSubscriptionControllerSpec extends ControllerSpec with Befo
     }
     "redirect to add vat group page for yes answer" in {
       val url = "register-for-cds/vat-group"
-      val sd = SubscriptionDetails(vatRegisteredUk = Some(true))
+      SubscriptionDetails(vatRegisteredUk = Some(true))
       subscriptionFlowUrl(url)
 
       submitForm(ValidRequest) { result =>
@@ -119,7 +119,7 @@ class VatRegisteredUkSubscriptionControllerSpec extends ControllerSpec with Befo
 
     "redirect to eu vat page for no answer" in {
       val url = "register-for-cds/vat-registered-eu"
-      val sd = SubscriptionDetails(vatRegisteredUk = Some(false))
+      SubscriptionDetails(vatRegisteredUk = Some(false))
 
       subscriptionFlowUrl(url)
 
@@ -129,7 +129,7 @@ class VatRegisteredUkSubscriptionControllerSpec extends ControllerSpec with Befo
       }
     }
     "redirect to vat groups review page for yes answer and is in review mode" in {
-      val sd = SubscriptionDetails(vatRegisteredUk = Some(true))
+      SubscriptionDetails(vatRegisteredUk = Some(true))
 
       submitForm(ValidRequest, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER
@@ -138,7 +138,7 @@ class VatRegisteredUkSubscriptionControllerSpec extends ControllerSpec with Befo
     }
 
     "redirect to check answers page for no answer and is in review mode" in {
-      val sd = SubscriptionDetails(vatRegisteredUk = Some(false))
+      SubscriptionDetails(vatRegisteredUk = Some(false))
 
       submitForm(validRequestNo, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER

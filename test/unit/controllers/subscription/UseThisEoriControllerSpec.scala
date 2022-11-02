@@ -30,7 +30,6 @@ import uk.gov.hmrc.customs.rosmfrontend.models.exceptions.MissingExistingEori
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.RequestSessionData
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.EnrolmentStoreProxyService
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.{use_this_eori, use_this_eori_different_gg}
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import unit.controllers.CdsPage
 import util.builders.AuthBuilder.withAuthorisedUser
 import util.builders.SessionBuilder

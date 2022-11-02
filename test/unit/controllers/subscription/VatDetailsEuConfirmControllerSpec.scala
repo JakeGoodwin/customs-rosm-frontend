@@ -74,44 +74,44 @@ class VatDetailsEuConfirmControllerSpec extends ControllerSpec with BeforeAndAft
 
   "Viewing the form" should {
     "return ok and display no errors for cached euVatDetails under limit" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]]))
         .thenReturn(Future.successful(VatEuDetailUnderLimit))
       displayForm() { result =>
         status(result) shouldBe OK
         val page = CdsPage(bodyOf(result))
         page.getElementsText(pageLevelErrorSummaryListXPath) shouldBe empty
-        verify(mockSubscriptionVatEUDetailsService, times(1)).cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])
+        verify(mockSubscriptionVatEUDetailsService, times(1)).cachedEUVatDetails(any[Request[_]])
       }
     }
 
     "return ok and display no errors for cached euVatDetails on limit" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]]))
         .thenReturn(Future.successful(VatEuDetailsOnLimit))
       displayForm() { result =>
         status(result) shouldBe OK
         val page = CdsPage(bodyOf(result))
         page.getElementsText(pageLevelErrorSummaryListXPath) shouldBe empty
-        verify(mockSubscriptionVatEUDetailsService, times(1)).cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])
+        verify(mockSubscriptionVatEUDetailsService, times(1)).cachedEUVatDetails(any[Request[_]])
       }
     }
 
     "redirect to EuVatRegistered page in create mode when cached euVatDetails was empty and isInReviewMode set to false" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]]))
         .thenReturn(Future.successful(Seq()))
       displayForm() { result =>
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) should endWith("/customs/register-for-cds/vat-registered-eu")
-        verify(mockSubscriptionVatEUDetailsService, times(1)).cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])
+        verify(mockSubscriptionVatEUDetailsService, times(1)).cachedEUVatDetails(any[Request[_]])
       }
     }
 
     "redirect to EuVatRegistered page in review mode when cached euVatDetails was empty and isInReviewMode set to true" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]]))
         .thenReturn(Future.successful(Seq()))
       reviewForm() { result =>
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) should endWith("/customs/register-for-cds/vat-registered-eu/review")
-        verify(mockSubscriptionVatEUDetailsService, times(1)).cachedEUVatDetails(any[HeaderCarrier], any[Request[_]])
+        verify(mockSubscriptionVatEUDetailsService, times(1)).cachedEUVatDetails(any[Request[_]])
       }
     }
   }
@@ -119,7 +119,7 @@ class VatDetailsEuConfirmControllerSpec extends ControllerSpec with BeforeAndAft
   "Submitting the form with cached euDetails under limit in create mode" should {
 
     "redirect to vatDetails page when yes answer selected" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]]))
         .thenReturn(Future.successful(VatEuDetailUnderLimit))
       submitForm(ValidRequest) { result =>
         status(result) shouldBe SEE_OTHER
@@ -129,7 +129,7 @@ class VatDetailsEuConfirmControllerSpec extends ControllerSpec with BeforeAndAft
 
     "redirect to disclose personal details eu page when yes selected" in {
       val url = "/customs/register-for-cds/disclose-personal-details-consent"
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]]))
         .thenReturn(Future.successful(VatEuDetailUnderLimit))
       when(mockSubscriptionFlowManager.stepInformation(any())(any[HeaderCarrier], any[Request[AnyContent]]))
         .thenReturn(mockSubscriptionFlowInfo)
@@ -147,7 +147,7 @@ class VatDetailsEuConfirmControllerSpec extends ControllerSpec with BeforeAndAft
   "Submitting the form with cached euDetails under limit in review mode" should {
 
     "redirect to vatDetails page when yes answer selected" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]]))
         .thenReturn(Future.successful(VatEuDetailUnderLimit))
       submitForm(ValidRequest, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER
@@ -156,7 +156,7 @@ class VatDetailsEuConfirmControllerSpec extends ControllerSpec with BeforeAndAft
     }
 
     "redirect to review-determine when no selected" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]]))
         .thenReturn(Future.successful(VatEuDetailUnderLimit))
       submitForm(validRequestNo, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER
@@ -167,7 +167,7 @@ class VatDetailsEuConfirmControllerSpec extends ControllerSpec with BeforeAndAft
 
   "Submitting the form with cached euDetails on limit and no option selected" should {
     "redirect to review-determine when yes answer selected and in review mode" in {
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]]))
         .thenReturn(Future.successful(VatEuDetailsOnLimit))
       submitForm(invalidRequest, isInReviewMode = true) { result =>
         status(result) shouldBe SEE_OTHER
@@ -177,7 +177,7 @@ class VatDetailsEuConfirmControllerSpec extends ControllerSpec with BeforeAndAft
 
     "redirect to disclose personal details eu page when yes selected" in {
       val url = "/customs/register-for-cds/disclose-personal-details-consent"
-      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[HeaderCarrier], any[Request[_]]))
+      when(mockSubscriptionVatEUDetailsService.cachedEUVatDetails(any[Request[_]]))
         .thenReturn(Future.successful(VatEuDetailsOnLimit))
       when(mockSubscriptionFlowManager.stepInformation(any())(any[HeaderCarrier], any[Request[AnyContent]]))
         .thenReturn(mockSubscriptionFlowInfo)

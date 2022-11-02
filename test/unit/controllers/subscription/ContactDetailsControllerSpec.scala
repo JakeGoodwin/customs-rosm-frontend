@@ -542,8 +542,7 @@ class ContactDetailsControllerSpec
                        countryCode = "GB")
     )
     when(
-      mockSubscriptionDetailsHolderService.cachedAddressDetails(
-        any[HeaderCarrier], any[Request[_]]))
+      mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]]))
       .thenReturn(Future.successful(cachedAddressDetails))
   }
 

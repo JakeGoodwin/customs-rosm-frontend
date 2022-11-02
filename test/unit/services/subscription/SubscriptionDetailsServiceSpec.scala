@@ -174,12 +174,12 @@ class SubscriptionDetailsServiceSpec extends UnitSpec with MockitoSugar with Bef
       val mockAddressViewModel = mock[AddressViewModel]
       when(mockSessionCache.subscriptionDetails(any[Request[_]]))
         .thenReturn(SubscriptionDetails(addressDetails = Option(mockAddressViewModel)))
-      await(subscriptionDetailsHolderService.cachedAddressDetails(hc, request)) shouldBe Some(mockAddressViewModel)
+      await(subscriptionDetailsHolderService.cachedAddressDetails(request)) shouldBe Some(mockAddressViewModel)
     }
 
     "return None when no value found in subscription Details" in {
       when(mockSessionCache.subscriptionDetails(any[Request[_]])).thenReturn(SubscriptionDetails())
-      await(subscriptionDetailsHolderService.cachedAddressDetails(hc, request)) shouldBe None
+      await(subscriptionDetailsHolderService.cachedAddressDetails(request)) shouldBe None
     }
   }
 

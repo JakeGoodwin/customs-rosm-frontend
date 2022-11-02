@@ -63,7 +63,7 @@ class SubscriptionDetailsService @Inject()(
     saveSubscriptionDetails(sd => sd.copy(addressDetails = Some(noneForEmptyPostcode(address))))
   }
 
-  def cachedAddressDetails(implicit hc: HeaderCarrier, request: Request[_]): Future[Option[AddressViewModel]] =
+  def cachedAddressDetails(implicit request: Request[_]): Future[Option[AddressViewModel]] =
     sessionCache.subscriptionDetails map (_.addressDetails)
 
   def cacheNameIdDetails(
@@ -123,16 +123,16 @@ class SubscriptionDetailsService @Inject()(
   def clearCachedUkVatDetails(implicit request: Request[_]): Future[Unit] =
     saveSubscriptionDetails(sd => sd.copy(ukVatDetails = None))
 
-  def cacheVatRegisteredUk(yesNoAnswer: YesNo)(implicit hq: HeaderCarrier, request: Request[_]) =
+  def cacheVatRegisteredUk(yesNoAnswer: YesNo)(implicit request: Request[_]) =
     saveSubscriptionDetails(sd => sd.copy(vatRegisteredUk = Some(yesNoAnswer.isYes)))
 
-  def cacheVatGroup(yesNoAnswer: YesNo)(implicit hq: HeaderCarrier, request: Request[_]) =
+  def cacheVatGroup(yesNoAnswer: YesNo)(implicit request: Request[_]) =
     saveSubscriptionDetails(sd => sd.copy(vatGroup = Some(yesNoAnswer.isYes)))
 
-  def cacheConsentToDisclosePersonalDetails(yesNoAnswer: YesNo)(implicit hq: HeaderCarrier, request: Request[_]) =
+  def cacheConsentToDisclosePersonalDetails(yesNoAnswer: YesNo)(implicit request: Request[_]) =
     saveSubscriptionDetails(sd => sd.copy(personalDataDisclosureConsent = Some(yesNoAnswer.isYes)))
 
-  def cacheVatRegisteredEu(yesNoAnswer: YesNo)(implicit hq: HeaderCarrier, request: Request[_]): Future[Unit] =
+  def cacheVatRegisteredEu(yesNoAnswer: YesNo)(implicit request: Request[_]): Future[Unit] =
     for {
       existingHolder <- sessionCache.subscriptionDetails
       updatedHolder = existingHolder.copy(vatRegisteredEu = Some(yesNoAnswer.isYes))

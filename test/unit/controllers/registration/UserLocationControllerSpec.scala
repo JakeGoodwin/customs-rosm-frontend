@@ -115,7 +115,7 @@ class UserLocationControllerSpec extends ControllerSpec with MockitoSugar with B
     when(
       mockRequestSessionData.existingSessionWithUserLocationAdded(any[Session], any[String])(any[Request[AnyContent]])
     ).thenReturn(Session())
-    when(mockRegistrationDisplayService.cacheDetails(any())(any(), any(), any()))
+    when(mockRegistrationDisplayService.cacheDetails(any())(any()))
       .thenReturn(Future.successful(true))
     when(mockSave4LaterService.fetchSafeId(any[InternalId]())(any[HeaderCarrier]())).thenReturn(Future.successful(None))
     when(

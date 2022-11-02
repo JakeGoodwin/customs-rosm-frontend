@@ -151,7 +151,7 @@ class RegisterWithEoriAndIdService @Inject()(
     def save(
       details: RegisterWithEoriAndIdResponse,
       subscriptionDetails: SubscriptionDetails
-    )(implicit hc: HeaderCarrier, request: Request[_], loggedInUserId: LoggedInUser): Future[Boolean] =
+    )(implicit request: Request[_], loggedInUserId: LoggedInUser): Future[Boolean] =
       if (details.isResponseData) {
         (details.isDoE, details.isPersonType) match {
           case (true, true) => dataCache.saveRegisterWithEoriAndIdResponse(details)
