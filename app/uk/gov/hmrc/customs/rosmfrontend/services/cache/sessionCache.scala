@@ -153,7 +153,7 @@ class SessionCache @Inject() (
     getData[String](emailKey).map(_.getOrElse(throwException(emailKey)))
 
   def hasNino(implicit request: Request[_]): Future[Option[Boolean]] =
-    getData[Boolean](hasNinoKey) // .map(_.getOrElse(throwException(hasNinoKey)))
+    getData[Boolean](hasNinoKey)
 
   def mayBeEmail(implicit request: Request[_]): Future[Option[String]] =
     getData[String](emailKey)

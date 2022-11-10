@@ -139,7 +139,6 @@ val testDependencies = Seq(
   "com.vladsch.flexmark"    % "flexmark-all"        % "0.62.0"   % "test,it",
   "com.github.tomakehurst" % "wiremock-standalone" % "2.27.2" % "test, it"
     exclude ("org.apache.httpcomponents", "httpclient") exclude ("org.apache.httpcomponents", "httpcore"),
-//  "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0" % "test,it",
   "org.jsoup" % "jsoup" % "1.15.3" % "test,it",
   "us.codecraft" % "xsoup" % "0.3.5" % "test,it",
   "uk.gov.hmrc" %% "webdriver-factory" % "0.22.0",
