@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.mapping
 
-import javax.inject.Singleton
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.Address
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.{AddressViewModel, ContactDetailsModel}
+
+import javax.inject.Singleton
 
 @Singleton
 class ContactDetailsAdaptor {

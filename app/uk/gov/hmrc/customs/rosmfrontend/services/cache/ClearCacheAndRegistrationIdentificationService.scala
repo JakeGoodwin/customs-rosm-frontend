@@ -16,16 +16,16 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.cache
 
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.mvc.Request
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ClearCacheAndRegistrationIdentificationService @Inject()(sessionCache: SessionCache) {
+class ClearCacheAndRegistrationIdentificationService @Inject()(sessionCache: SessionCache)
+                                                              (implicit ec: ExecutionContext) {
 
-  def clear(implicit hc: HeaderCarrier): Future[Unit] =
+  def clear(implicit request: Request[_]): Future[Unit] =
     for {
       email <- sessionCache.email
       _ <- sessionCache.remove

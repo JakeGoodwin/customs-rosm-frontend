@@ -16,10 +16,10 @@
 
 package unit.services
 
-import org.joda.time.DateTimeZone
+import org.joda.time.{DateTimeComparator, DateTimeZone}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.RequestCommon
 import uk.gov.hmrc.customs.rosmfrontend.services._
 import util.UnitSpec
@@ -44,7 +44,7 @@ class RequestCommonGeneratorSpec extends UnitSpec with MockitoSugar with BeforeA
   "RequestCommonGenerator" should {
 
     "generate request date" in {
-      generator.receiptDate.toString() should equal(in.toString)
+      generator.receiptDate.toInstant.getMillis shouldEqual  in.toEpochMilli
     }
 
     "call generate without requestParameters" should {
@@ -57,7 +57,7 @@ class RequestCommonGeneratorSpec extends UnitSpec with MockitoSugar with BeforeA
 
       "create object with receipt date as current time in UTC timezone" in withFixture { requestCommon =>
         requestCommon.receiptDate.getZone should equal(DateTimeZone.UTC)
-        requestCommon.receiptDate.toString() shouldBe in.toString
+        requestCommon.receiptDate.toInstant.getMillis shouldBe in.toEpochMilli
       }
 
       "create object with acknowledgementReference that is unique and of 32 characters" in withFixture {

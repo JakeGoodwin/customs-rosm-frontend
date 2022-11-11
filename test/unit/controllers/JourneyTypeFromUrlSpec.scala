@@ -17,7 +17,7 @@
 package unit.controllers
 
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.customs.rosmfrontend.controllers.JourneyTypeFromUrl
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey

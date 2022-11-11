@@ -18,7 +18,8 @@ package unit.services.registration
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.Request
 import uk.gov.hmrc.customs.rosmfrontend.connector.{RegistrationDisplayConnector, ServiceUnavailableResponse}
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.matching.ResponseDetail
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.registration.{RegistrationDisplayResponse, ResponseCommon}
@@ -36,6 +37,7 @@ class RegistrationDisplayServiceSpec extends UnitSpec with MockitoSugar {
   val mockConnector = mock[RegistrationDisplayConnector]
   val mockCreator = mock[RegistrationDetailsCreator]
   val testService = new RegistrationDisplayService(mockCache, mockConnector, mockCreator)
+  val mockRequest = mock[Request[_]]
 
   val mockResponseCommon = mock[ResponseCommon]
   val mockResponseDetail = mock[ResponseDetail]
@@ -63,7 +65,7 @@ class RegistrationDisplayServiceSpec extends UnitSpec with MockitoSugar {
         .thenReturn(RegistrationDetailsIndividual())
       when(mockCache.saveRegistrationDetails(any[RegistrationDetailsIndividual])(any()))
         .thenReturn(Future.successful(true))
-      await(testService.cacheDetails(mockDisplayResponse)(HeaderCarrier(), ExecutionContext.global)) shouldBe true
+      await(testService.cacheDetails(mockDisplayResponse)(mockRequest)) shouldBe true
     }
 
     "return false when unable to cache details" in {
@@ -71,7 +73,7 @@ class RegistrationDisplayServiceSpec extends UnitSpec with MockitoSugar {
         .thenReturn(RegistrationDetailsOrganisation())
       when(mockCache.saveRegistrationDetails(any[RegistrationDetailsOrganisation])(any()))
         .thenReturn(Future.successful(false))
-      await(testService.cacheDetails(mockDisplayResponse)(HeaderCarrier(), ExecutionContext.global)) shouldBe false
+      await(testService.cacheDetails(mockDisplayResponse)( mockRequest)) shouldBe false
     }
   }
 }

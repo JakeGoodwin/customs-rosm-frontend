@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.cache
 
-import javax.inject.Singleton
 import play.api.mvc.{AnyContent, Request, Session}
 import uk.gov.hmrc.customs.rosmfrontend.domain.CdsOrganisationType
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.SubscriptionFlow
+
+import javax.inject.Singleton
 
 @Singleton
 class RequestSessionData {

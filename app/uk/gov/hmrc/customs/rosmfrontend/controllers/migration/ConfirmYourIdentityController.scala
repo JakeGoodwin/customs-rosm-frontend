@@ -17,7 +17,7 @@
 package uk.gov.hmrc.customs.rosmfrontend.controllers.migration
 
 import play.api.Application
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
 import uk.gov.hmrc.customs.rosmfrontend.controllers.migration.routes._

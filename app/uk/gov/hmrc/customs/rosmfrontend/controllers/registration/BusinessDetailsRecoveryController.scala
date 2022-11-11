@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.registration
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -32,6 +31,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, Sess
 import uk.gov.hmrc.customs.rosmfrontend.views.html.registration.business_details_recovery
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

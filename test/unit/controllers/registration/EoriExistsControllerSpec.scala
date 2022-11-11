@@ -18,7 +18,7 @@ package unit.controllers.registration
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.EoriExistsController
@@ -30,6 +30,7 @@ import util.ControllerSpec
 import util.builders.AuthBuilder.withAuthorisedUser
 import util.builders.SessionBuilder
 import unit.controllers.CdsPage
+
 import scala.concurrent.Future
 import scala.util.Random
 
@@ -44,8 +45,8 @@ class EoriExistsControllerSpec extends ControllerSpec {
   "EoriExistsController" should {
     "return Ok 200 when eoriExist method is requested" in {
       val eori = s"GB${Random.nextInt(1000000000)}"
-      when(mockSessionCache.eori(any[HeaderCarrier])).thenReturn(Future.successful(Some(eori)))
-      when(mockSessionCache.name(any[HeaderCarrier])).thenReturn(Future.successful(Some("OrgName")))
+      when(mockSessionCache.eori(any[Request[_]])).thenReturn(Future.successful(Some(eori)))
+      when(mockSessionCache.name(any[Request[_]])).thenReturn(Future.successful(Some("OrgName")))
       eoriExistPage(Journey.GetYourEORI) { result =>
         status(result) shouldBe OK
         val page = CdsPage(bodyOf(result))

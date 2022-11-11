@@ -20,6 +20,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.ApplicationController
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
@@ -61,10 +62,10 @@ class ApplicationControllerWithAllowlistVerificationSpec extends ControllerSpec 
   "Navigating to logout" should {
     "logout a non-allowlisted user" in {
       withAuthorisedUser(defaultUserId, mockAuthConnector, userEmail = Some("not@example.com"))
-      when(mockSessionCache.remove(any[HeaderCarrier])).thenReturn(Future.successful(true))
+      when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
 
       controller.logout(Journey.GetYourEORI).apply(SessionBuilder.buildRequestWithSession(defaultUserId)) map { _ =>
-        verify(mockSessionCache).remove(any[HeaderCarrier])
+        verify(mockSessionCache).remove(any[Request[_]])
       }
     }
   }

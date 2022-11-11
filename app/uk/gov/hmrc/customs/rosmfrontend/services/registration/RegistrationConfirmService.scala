@@ -40,6 +40,6 @@ class RegistrationConfirmService @Inject()(
     subscriptionStatusService.getStatus("taxPayerID", registrationDetails.sapNumber.mdgTaxPayerId)
   }
 
-  def clearRegistrationData(implicit hc: HeaderCarrier): Future[Unit] =
+  def clearRegistrationData(implicit request: Request[_]): Future[Unit] =
     clearDataService.clear
 }

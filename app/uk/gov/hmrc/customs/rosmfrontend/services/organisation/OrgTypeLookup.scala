@@ -16,19 +16,18 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.organisation
 
-import javax.inject.{Inject, Singleton}
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.customs.rosmfrontend.domain.{EtmpOrganisationType, RegistrationDetailsOrganisation}
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
-import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class OrgTypeLookup @Inject()(requestSessionData: RequestSessionData, sessionCache: SessionCache) {
 
-  def etmpOrgType(implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Option[EtmpOrganisationType]] =
+  def etmpOrgType(implicit request: Request[AnyContent]): Future[Option[EtmpOrganisationType]] =
     requestSessionData.userSelectedOrganisationType match {
       case Some(cdsOrgType) => Future.successful(Some(EtmpOrganisationType(cdsOrgType)))
       case None =>

@@ -18,7 +18,7 @@ package unit.controllers
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.{EnrolmentExistsAgainstGroupIdController, ExistingApplicationInProgressController}
@@ -51,9 +51,9 @@ class ExistingApplicationInProgressControllerSpec extends ControllerSpec {
 
   "ExistingApplicationInProgressController" should {
     "return OK and redirect to the ExistingApplicationInProgress page" in {
-      when(mockSessionCache.mayBeSubscriptionCreateOutcome(any[HeaderCarrier])).thenReturn(Future.successful(Some(subscriptionCreateOutcome)))
+      when(mockSessionCache.mayBeSubscriptionCreateOutcome(any[Request[_]])).thenReturn(Future.successful(Some(subscriptionCreateOutcome)))
 
-      when(mockSessionCache.remove(any[HeaderCarrier])).thenReturn(Future.successful(true))
+      when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
       displayPage(Journey.GetYourEORI) { result =>
         status(result) shouldBe OK
         val page = CdsPage(bodyOf(result))

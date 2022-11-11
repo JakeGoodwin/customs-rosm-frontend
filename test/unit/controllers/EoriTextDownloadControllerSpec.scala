@@ -20,6 +20,7 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status.OK
+import play.api.mvc.Request
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.EoriTextDownloadController
@@ -43,7 +44,7 @@ class EoriTextDownloadControllerSpec extends ControllerSpec with BeforeAndAfterE
 
   override def beforeEach: Unit = {
     val mockSubscribeOutcome = mock[SubscriptionCreateOutcome]
-    when(mockCache.subscriptionCreateOutcome(any[HeaderCarrier])).thenReturn(Future.successful(mockSubscribeOutcome))
+    when(mockCache.subscriptionCreateOutcome(any[Request[_]])).thenReturn(Future.successful(mockSubscribeOutcome))
     when(mockSubscribeOutcome.processedDate).thenReturn("23 June 2018")
     when(mockSubscribeOutcome.eori).thenReturn(Some("ZZ123456789000"))
     when(mockSubscribeOutcome.fullName).thenReturn("Test Company")

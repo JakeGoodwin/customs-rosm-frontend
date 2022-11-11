@@ -16,16 +16,12 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
 import uk.gov.hmrc.customs.rosmfrontend.controllers.routes.DetermineReviewPageController
-import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.routes.{
-  VatDetailsEuController,
-  VatRegisteredEuController
-}
+import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.routes.{VatDetailsEuController, VatRegisteredEuController}
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.SubscriptionDetails.EuVatDetailsLimit
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.VatEUConfirmSubscriptionFlowPage
 import uk.gov.hmrc.customs.rosmfrontend.domain.{LoggedInUserWithEnrolments, YesNo}
@@ -35,6 +31,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.subscription.SubscriptionVatEUD
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.vat_details_eu_confirm
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class VatDetailsEuConfirmController @Inject()(

@@ -88,21 +88,21 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
       mockSubscriptionFlowManager,
       mockSubscriptionDetailsHolderService
     )
-    when(mockSubscriptionBusinessService.cachedContactDetailsModel(any[HeaderCarrier])).thenReturn(None)
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier])).thenReturn(mockSubscriptionDetails)
-    when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier])).thenReturn(mockRegistrationDetails)
+    when(mockSubscriptionBusinessService.cachedContactDetailsModel(any[Request[_]])).thenReturn(None)
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]])).thenReturn(mockSubscriptionDetails)
+    when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]])).thenReturn(mockRegistrationDetails)
     when(mockRegistrationDetails.address).thenReturn(address)
     registerSaveContactDetailsMockSuccess()
     mockFunctionWithRegistrationDetails(mockRegistrationDetails)
     setupMockSubscriptionFlowManager(ContactDetailsIsThisRightAddressSubscriptionFlowPageGetEori)
     when(mockCountries.all).thenReturn(aFewCountries)
-    when(mockCdsFrontendDataCache.email(any[HeaderCarrier])).thenReturn(Future.successful(Email))
-    when(mockCdsFrontendDataCache.mayBeEmail(any[HeaderCarrier])).thenReturn(Future.successful(Some(Email)))
+    when(mockCdsFrontendDataCache.email(any[Request[_]])).thenReturn(Future.successful(Email))
+    when(mockCdsFrontendDataCache.mayBeEmail(any[Request[_]])).thenReturn(Future.successful(Some(Email)))
     when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]]))
       .thenReturn(Some(CdsOrganisationType("company")))
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier])).thenReturn(mockSubscriptionDetails)
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]])).thenReturn(mockSubscriptionDetails)
     when(mockSubscriptionDetails.addressDetails).thenReturn(cachedAddressDetails)
-    when(mockSubscriptionDetailsHolderService.cachedAddressDetails).thenReturn(cachedAddressDetails)
+    when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
   }
   val headingXpath = "//h1"
@@ -149,7 +149,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
         postcode = Some("SW1A 2BQ"),
         countryCode = "GB")
     )
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier])).thenReturn(mockSubscriptionDetails)
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]])).thenReturn(mockSubscriptionDetails)
     when(mockSubscriptionDetails.addressDetails).thenReturn(cachedAddressDetails)
 
     assertNotLoggedInAndCdsEnrolmentChecksForGetAnEori(mockAuthConnector, controller.createForm(Journey.Migrate))
@@ -210,7 +210,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
       useAddressFromRegistrationDetails = Some(false)
     )
 
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier])).thenReturn(mockSubscriptionDetails)
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]])).thenReturn(mockSubscriptionDetails)
     when(mockSubscriptionDetails.addressDetails).thenReturn(cachedAddressDetails)
 
     assertNotLoggedInAndCdsEnrolmentChecksForGetAnEori(
@@ -219,7 +219,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
     )
 
     "save the details when user chooses to use Registered Address having contact details for Subscription journey" in {
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
       when(mockSubscriptionDetails.contactDetails).thenReturn(Some(contactDetailsModel))
 
       setupMockSubscriptionFlowManager(ContactDetailsAddressSubscriptionFlowPageMigrate)
@@ -227,42 +227,42 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
       submitFormInCreateMode(YesNoFormBuilder.ValidRequest,journey = Journey.Migrate) { result =>
         await(result)
         verify(mockSubscriptionDetailsHolderService)
-          .cacheContactDetails(any[ContactDetailsModel])(any[HeaderCarrier])
+          .cacheContactDetails(any[ContactDetailsModel])(any[Request[_]])
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "next-page-url"
       }
     }
 
     "save the details when user chooses to use Registered Address for Subscription journey" in {
-     when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier])).thenReturn(cachedAddressDetails)
+     when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       setupMockSubscriptionFlowManager(ContactDetailsAddressSubscriptionFlowPageMigrate)
 
       submitFormInCreateMode(YesNoFormBuilder.ValidRequest,journey = Journey.Migrate) { result =>
         await(result)
         verify(mockSubscriptionDetailsHolderService)
-          .cacheContactDetails(any[ContactDetailsModel])(any[HeaderCarrier])
+          .cacheContactDetails(any[ContactDetailsModel])(any[Request[_]])
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "next-page-url"
       }
     }
 
     "save the details when user chooses not to use Registered Address for Subscription journey" in {
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       setupMockSubscriptionFlowManager(ContactDetailsIsThisRightAddressSubscriptionFlowPageMigrate)
 
       submitFormInCreateMode(YesNoFormBuilder.validRequestNo, journey = Journey.Migrate) { result =>
         await(result)
         verify(mockSubscriptionDetailsHolderService)
-          .cacheContactDetails(any[ContactDetailsModel])(any[HeaderCarrier])
+          .cacheContactDetails(any[ContactDetailsModel])(any[Request[_]])
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "next-page-url"
       }
     }
 
     "produce validation error is this right address is not selected  and  submitted" in {
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       val fieldLevelErrorYesNoAnswer: String = "//*[@id='yes-no-answer-field']//span[@class='error-message']"
 
@@ -284,13 +284,13 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
     )
 
     "save the details when user chooses to use Registered Address for Subscription journey" in {
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       setupMockSubscriptionFlowManager(ContactDetailsAddressSubscriptionFlowPageMigrate)
       submitFormInCreateMode(YesNoFormBuilder.ValidRequest, journey = Journey.Migrate) { result =>
         await(result)
         verify(mockSubscriptionDetailsHolderService)
-          .cacheContactDetails(any[ContactDetailsModel])(any[HeaderCarrier])
+          .cacheContactDetails(any[ContactDetailsModel])(any[Request[_]])
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "next-page-url"
       }
@@ -299,14 +299,14 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
 
 
     "save the details when user chooses not to use Registered Address for Subscription journey" in {
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       setupMockSubscriptionFlowManager(ContactDetailsIsThisRightAddressSubscriptionFlowPageMigrate)
 
       submitFormInCreateMode(YesNoFormBuilder.validRequestNo, journey = Journey.Migrate,isInReviewMode = true) { result =>
         await(result)
         verify(mockSubscriptionDetailsHolderService)
-          .cacheContactDetails(any[ContactDetailsModel])(any[HeaderCarrier])
+          .cacheContactDetails(any[ContactDetailsModel])(any[Request[_]])
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "next-page-url/review"
       }
@@ -315,7 +315,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
     "produce validation error is this right address is not selected  and  submitted" in {
 
       val fieldLevelErrorYesNoAnswer: String = "//*[@id='yes-no-answer-field']//span[@class='error-message']"
-      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[HeaderCarrier])).thenReturn(cachedAddressDetails)
+      when(mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]])).thenReturn(cachedAddressDetails)
 
       submitFormInCreateMode(YesNoFormBuilder.invalidRequest,journey = Journey.Migrate) { result =>
         status(result) shouldBe BAD_REQUEST
@@ -340,7 +340,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
       submitFormInCreateMode(YesNoFormBuilder.ValidRequest) { result =>
         await(result)
         verify(mockSubscriptionDetailsHolderService)
-          .cacheContactDetails(any[ContactDetailsModel])(any[HeaderCarrier])
+          .cacheContactDetails(any[ContactDetailsModel])(any[Request[_]])
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "next-page-url"
       }
@@ -352,7 +352,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
       submitFormInCreateMode(YesNoFormBuilder.validRequestNo) { result =>
         await(result)
         verify(mockSubscriptionDetailsHolderService)
-          .cacheContactDetails(any[ContactDetailsModel])(any[HeaderCarrier])
+          .cacheContactDetails(any[ContactDetailsModel])(any[Request[_]])
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "next-page-url"
       }
@@ -384,7 +384,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
       submitFormInCreateMode(YesNoFormBuilder.ValidRequest) { result =>
         await(result)
         verify(mockSubscriptionDetailsHolderService)
-          .cacheContactDetails(any[ContactDetailsModel])(any[HeaderCarrier])
+          .cacheContactDetails(any[ContactDetailsModel])(any[Request[_]])
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "next-page-url"
       }
@@ -397,7 +397,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
       submitFormInCreateMode(YesNoFormBuilder.validRequestNo,isInReviewMode = true) { result =>
         await(result)
         verify(mockSubscriptionDetailsHolderService)
-          .cacheContactDetails(any[ContactDetailsModel])(any[HeaderCarrier])
+          .cacheContactDetails(any[ContactDetailsModel])(any[Request[_]])
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "next-page-url/review"
       }
@@ -418,7 +418,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
 
 
   private def mockFunctionWithRegistrationDetails(registrationDetails: RegistrationDetails) {
-    when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier])).thenReturn(registrationDetails)
+    when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]])).thenReturn(registrationDetails)
   }
 
   private def submitFormInCreateMode(
@@ -449,7 +449,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
     }
 
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
     when(mockRequestSessionData.userSubscriptionFlow(any[Request[AnyContent]])).thenReturn(subscriptionFlow)
 
     test(controller.createForm(journey).apply(SessionBuilder.buildRequestWithSession(defaultUserId)))
@@ -463,7 +463,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
     withAuthorisedUser(defaultUserId, mockAuthConnector)
 
     when(mockRequestSessionData.userSubscriptionFlow(any[Request[AnyContent]])).thenReturn(subscriptionFlow)
-    when(mockSubscriptionBusinessService.cachedContactDetailsModel(any[HeaderCarrier]))
+    when(mockSubscriptionBusinessService.cachedContactDetailsModel(any[Request[_]]))
       .thenReturn(Some(contactDetailsModel))
 
     test(controller.reviewForm(journey).apply(SessionBuilder.buildRequestWithSession(defaultUserId)))
@@ -472,7 +472,7 @@ class ContactDetailsIsThisRighAddressControllerSpec extends SubscriptionFlowSpec
   private def registerSaveContactDetailsMockSuccess() {
     when(
       mockSubscriptionDetailsHolderService
-        .cacheContactDetails(any[ContactDetailsModel])(any[HeaderCarrier])
+        .cacheContactDetails(any[ContactDetailsModel])(any[Request[_]])
     ).thenReturn(Future.successful(()))
   }
 

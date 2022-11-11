@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.forms.models.registration
 
-import play.api.data.Forms.{mapping, text}
+import play.api.data.Form
+import play.api.data.Forms.{mapping, text, _}
 import play.api.i18n.Messages
 import uk.gov.hmrc.customs.rosmfrontend.forms.FormUtils.oneOf
-import play.api.data.{Form}
-import play.api.data.Forms._
 
 object YesNoWrongAddress {
 

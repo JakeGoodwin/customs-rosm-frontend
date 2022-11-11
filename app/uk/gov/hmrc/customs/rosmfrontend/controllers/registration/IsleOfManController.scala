@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.registration
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -28,6 +27,7 @@ import uk.gov.hmrc.customs.rosmfrontend.forms.MatchingForms.isleOfManYesNoAnswer
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.views.html.registration.isle_of_man
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 @Singleton
 class IsleOfManController @Inject()(

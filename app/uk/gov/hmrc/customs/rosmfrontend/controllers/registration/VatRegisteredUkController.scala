@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.registration
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -25,6 +24,7 @@ import uk.gov.hmrc.customs.rosmfrontend.domain.YesNo
 import uk.gov.hmrc.customs.rosmfrontend.forms.MatchingForms._
 import uk.gov.hmrc.customs.rosmfrontend.views.html.registration.vat_registered_uk
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 @Singleton
 class VatRegisteredUkController @Inject()(

@@ -18,6 +18,7 @@ package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import play.api.mvc.Request
 import uk.gov.hmrc.customs.rosmfrontend.connector.SubscriptionStatusConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.{SubscriptionStatusOutcome, SubscriptionStatusQueryParams}
 import uk.gov.hmrc.customs.rosmfrontend.services.RequestCommonGenerator
@@ -37,7 +38,7 @@ class SubscriptionStatusService @Inject()(
 
   private val dateFormat = DateTimeFormat.forPattern("d MMM yyyy")
 
-  def getStatus(idType: String, id: String)(implicit hc: HeaderCarrier): Future[PreSubscriptionStatus] = {
+  def getStatus(idType: String, id: String)(implicit hc: HeaderCarrier, request: Request[_]): Future[PreSubscriptionStatus] = {
 
     def createRequest =
       SubscriptionStatusQueryParams(requestCommonGenerator.receiptDate, "CDS", idType, id)

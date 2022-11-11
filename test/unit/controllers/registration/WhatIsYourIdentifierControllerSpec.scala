@@ -23,7 +23,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.WhatIsYourIdentifierController
@@ -55,7 +55,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
   private val whatIsYourIdentifierController = new WhatIsYourIdentifierController(app, mockAuthConnector,mockMatchingService, mcc, whatIsYourNino,whatIsYourUtr, mockSessionCache)
 
   "WhatIsYourIdentifierController" should {
-    when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+    when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
       Future.successful(Some(true))
     )
 
@@ -87,10 +87,10 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
     val utr = "1111111111"
     val nino = "AB123456C"
 
-    when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+    when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
       Future.successful(Some(true))
     )
-    when(mockSessionCache.subscriptionDetails(any[HeaderCarrier])).thenReturn(
+    when(mockSessionCache.subscriptionDetails(any[Request[_]])).thenReturn(
       Future.successful(
         SubscriptionDetails(nameDobDetails = Some(NameDobMatchModel("test", None, "user", LocalDate.now)))
       )
@@ -98,12 +98,12 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     when(
       mockMatchingService
-        .matchIndividualWithId(ArgumentMatchers.eq(Utr(utr)), any[Individual], any())(any[HeaderCarrier])
+        .matchIndividualWithId(ArgumentMatchers.eq(Utr(utr)), any[Individual], any())(any[HeaderCarrier], any[Request[_]])
     ).thenReturn(Future.successful(true))
 
     when(
       mockMatchingService
-        .matchIndividualWithId(ArgumentMatchers.eq(Nino(nino)), any[Individual], any())(any[HeaderCarrier])
+        .matchIndividualWithId(ArgumentMatchers.eq(Nino(nino)), any[Individual], any())(any[HeaderCarrier], any[Request[_]])
     ).thenReturn(Future.successful(true))
 
 
@@ -119,7 +119,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     "redirect to 'What is your Self Assessment Unique Taxpayer Reference' page when No is selected" in {
       val utrForm = Map("id" -> utr)
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(false))
       )
       submitForm(utrForm) { result =>
@@ -131,12 +131,12 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     "redirect to 'What is your Self Assessment Unique Taxpayer Reference' page when No is selected Utr doesn't match in backend" in {
       val utrForm = Map("id" -> utr)
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(false))
       )
       when(
         mockMatchingService
-          .matchIndividualWithId(ArgumentMatchers.eq(Utr(utr)), any[Individual], any())(any[HeaderCarrier])
+          .matchIndividualWithId(ArgumentMatchers.eq(Utr(utr)), any[Individual], any())(any[HeaderCarrier], any[Request[_]])
       ).thenReturn(Future.successful(false))
 
       submitForm(utrForm) { result =>
@@ -149,12 +149,12 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     "redirect to 'What is your National insurance number' page when yes option is selected and nino doesn't match in backend" in {
       val ninoForm = Map("id" -> nino)
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(true))
       )
       when(
         mockMatchingService
-          .matchIndividualWithId(ArgumentMatchers.eq(Nino(nino)), any[Individual], any())(any[HeaderCarrier])
+          .matchIndividualWithId(ArgumentMatchers.eq(Nino(nino)), any[Individual], any())(any[HeaderCarrier], any[Request[_]])
       ).thenReturn(Future.successful(false))
 
       submitForm(ninoForm) { result =>
@@ -167,7 +167,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     "redirect to 'What is your National insurance number' page when yes option is selected " in {
       val ninoForm = Map("id" -> "")
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(true))
       )
 
@@ -181,7 +181,7 @@ class WhatIsYourIdentifierControllerSpec extends ControllerSpec with BeforeAndAf
 
     "redirect to 'What is your Self Assessment Unique Taxpayer Reference' page when no option is selected " in {
       val utrForm = Map("id" -> "")
-      when(mockSessionCache.hasNino(any[HeaderCarrier])).thenReturn(
+      when(mockSessionCache.hasNino(any[Request[_]])).thenReturn(
         Future.successful(Some(false))
       )
 

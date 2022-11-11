@@ -18,7 +18,7 @@ package uk.gov.hmrc.customs.rosmfrontend.controllers.registration
 
 import org.joda.time.{DateTime, LocalDate}
 import play.api.Application
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.connector.SubscriptionDisplayConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
@@ -32,12 +32,7 @@ import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.RandomUUIDGenerator
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
-import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{
-  HandleSubscriptionService,
-  SubscriptionDetailsService,
-  TaxEnrolmentsService,
-  UpdateVerifiedEmailService
-}
+import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{HandleSubscriptionService, SubscriptionDetailsService, TaxEnrolmentsService, UpdateVerifiedEmailService}
 import uk.gov.hmrc.customs.rosmfrontend.views.html.error_template
 import uk.gov.hmrc.emailaddress.EmailAddress
 import uk.gov.hmrc.http.HeaderCarrier
@@ -210,7 +205,7 @@ class SubscriptionRecoveryController @Inject()(
     subscriptionDisplayResponse: SubscriptionDisplayResponse,
     dateOfEstablishment: Option[LocalDate],
     journey: Journey.Value
-  )(redirect: => Result)(implicit headerCarrier: HeaderCarrier): Future[Result] = {
+  )(redirect: => Result)(implicit headerCarrier: HeaderCarrier, request: Request[_]): Future[Result] = {
     val formBundleId =
       subscriptionDisplayResponse.responseCommon.returnParameters
         .flatMap(_.find(_.paramName.equals("ETMPFORMBUNDLENUMBER")).map(_.paramValue))
@@ -235,12 +230,12 @@ class SubscriptionRecoveryController @Inject()(
       SafeId(safeId),
       dateOfEstablishment
     )
-    completeEnrolment(journey, subscriptionInformation)(redirect)
+    completeEnrolment(journey, subscriptionInformation)(redirect)(hc, request)
   }
 
   private def completeEnrolment(journey: Journey.Value, subscriptionInformation: SubscriptionInformation)(
     redirect: => Result
-  )(implicit hc: HeaderCarrier): Future[Result] =
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     for {
       // Update Recovered Subscription Information
       _ <- updateSubscription(subscriptionInformation)
@@ -257,7 +252,7 @@ class SubscriptionRecoveryController @Inject()(
       }
     }
 
-  private def updateSubscription(subscriptionInformation: SubscriptionInformation)(implicit hc: HeaderCarrier) =
+  private def updateSubscription(subscriptionInformation: SubscriptionInformation)(implicit hc: HeaderCarrier, request: Request[_]) =
     sessionCache.saveSubscriptionCreateOutcome(
       SubscriptionCreateOutcome(
         subscriptionInformation.processedDate,

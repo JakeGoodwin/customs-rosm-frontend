@@ -27,6 +27,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContent, Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.customs.rosmfrontend.controllers.FeatureFlags
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.WhatIsYourOrgNameController
 import uk.gov.hmrc.customs.rosmfrontend.domain.NameOrganisationMatchModel
 import uk.gov.hmrc.customs.rosmfrontend.domain.registration.UserLocation
@@ -54,6 +55,7 @@ class WhatIsYourOrgNameControllerSpec extends ControllerSpec with BeforeAndAfter
   private val mockRequestSessionData = mock[RequestSessionData]
   private val mockSubscriptionDetailsService = mock[SubscriptionDetailsService]
   private val mockNameOrganisationMatchModel = mock[NameOrganisationMatchModel]
+  private val mockFeatureFlags = mock[FeatureFlags]
   private val whatIsYourOrgNameView = app.injector.instanceOf[what_is_your_org_name]
 
   private val controller = new WhatIsYourOrgNameController(
@@ -114,8 +116,8 @@ class WhatIsYourOrgNameControllerSpec extends ControllerSpec with BeforeAndAfter
 
   override def beforeEach: Unit = {
     reset(mockRequestSessionData, mockSubscriptionDetailsService)
-    when(mockSubscriptionDetailsService.cacheNameDetails(any())(any[HeaderCarrier]())).thenReturn(Future.successful(()))
-    when(mockSubscriptionDetailsService.cachedNameDetails(any[HeaderCarrier]()))
+    when(mockSubscriptionDetailsService.cacheNameDetails(any())(any[Request[_]]())).thenReturn(Future.successful(()))
+    when(mockSubscriptionDetailsService.cachedNameDetails(any[Request[_]]()))
       .thenReturn(Future.successful(Some(mockNameOrganisationMatchModel)))
   }
 
@@ -190,7 +192,7 @@ class WhatIsYourOrgNameControllerSpec extends ControllerSpec with BeforeAndAfter
             submitForm(reviewMode, form = ValidNameRequest, organisationType) { result =>
               status(result) shouldBe SEE_OTHER
               result.header.headers("Location") should endWith(submitLocation)
-              verify(mockSubscriptionDetailsService).cacheNameDetails(any())(any[HeaderCarrier])
+              verify(mockSubscriptionDetailsService).cacheNameDetails(any())(any[Request[_]])
             }
           }
         }

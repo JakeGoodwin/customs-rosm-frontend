@@ -17,11 +17,11 @@
 package uk.gov.hmrc.customs.rosmfrontend.filters
 
 import akka.stream.Materializer
-import javax.inject.Inject
 import play.api.mvc.{Filter, RequestHeader, Result}
 import uk.gov.hmrc.customs.rosmfrontend.CdsErrorHandler
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class RouteFilter @Inject()(appConfig: AppConfig, errorHandler: CdsErrorHandler)(implicit val mat: Materializer)

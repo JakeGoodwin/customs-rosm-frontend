@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import play.api.Application
 import play.api.mvc._
@@ -35,6 +34,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{SubscriptionBusin
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.date_of_establishment
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -89,7 +89,7 @@ class DateOfEstablishmentController @Inject()(
         )
     }
 
-  private def fetchDate(implicit hc: HeaderCarrier): Future[LocalDate] =
+  private def fetchDate(implicit hc: HeaderCarrier, request: Request[_]): Future[LocalDate] =
     subscriptionBusinessService.getCachedDateEstablished
 
   def submit(isInReviewMode: Boolean, journey: Journey.Value): Action[AnyContent] =
@@ -125,7 +125,7 @@ class DateOfEstablishmentController @Inject()(
       )
     }
 
-  private def saveDateEstablished(date: LocalDate)(implicit hc: HeaderCarrier) =
+  private def saveDateEstablished(date: LocalDate)(implicit hc: HeaderCarrier, request: Request[_]) =
     subscriptionDetailsHolderService.cacheDateEstablished(date)
 
   private def getSubscriptionPage(journey: Journey.Value, location: Boolean) =

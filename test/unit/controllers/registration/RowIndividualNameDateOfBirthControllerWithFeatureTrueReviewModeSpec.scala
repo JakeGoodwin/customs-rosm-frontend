@@ -22,12 +22,13 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalacheck.Prop
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.prop.Checkers
+import org.scalatestplus.scalacheck.Checkers
 import play.api.Application
 import play.api.data.Form
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc._
 import play.api.test.Helpers._
+import uk.gov.hmrc.customs.rosmfrontend.controllers.FeatureFlags
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.RowIndividualNameDateOfBirthController
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.routes.RowIndividualNameDateOfBirthController
 import uk.gov.hmrc.customs.rosmfrontend.domain._
@@ -56,6 +57,7 @@ class RowIndividualNameDateOfBirthControllerWithFeatureTrueReviewModeSpec
     val mockRequestSessionData = mock[RequestSessionData]
     val mockRegistrationInfo = mock[IndividualRegistrationInfo]
     val mockSubscriptionDetailsService = mock[SubscriptionDetailsService]
+    val mockFeatureFlags = mock[FeatureFlags]
 
     private val rowIndividualNameDob = app.injector.instanceOf[row_individual_name_dob]
 
@@ -100,7 +102,7 @@ class RowIndividualNameDateOfBirthControllerWithFeatureTrueReviewModeSpec
       "show the form in review mode without errors, the input fields are prepopulated from the cache" in withControllerFixture {
         controllerFixture =>
           import controllerFixture._
-          when(mockSubscriptionDetailsService.cachedNameDobDetails(any[HeaderCarrier]))
+          when(mockSubscriptionDetailsService.cachedNameDobDetails(any[Request[_]]))
             .thenReturn(
               Future.successful(
                 Some(NameDobMatchModel("firstName", Some("middleName"), "lastName", new LocalDate(1980, 3, 31)))
@@ -134,7 +136,7 @@ class RowIndividualNameDateOfBirthControllerWithFeatureTrueReviewModeSpec
       "should redirect to sign out page if cachedNameDobDetails not found" in withControllerFixture {
         controllerFixture =>
           import controllerFixture._
-          when(mockSubscriptionDetailsService.cachedNameDobDetails(any[HeaderCarrier])).thenReturn(None)
+          when(mockSubscriptionDetailsService.cachedNameDobDetails(any[Request[_]])).thenReturn(None)
 
           controllerFixture.showForm { result =>
             status(result) shouldBe SEE_OTHER
@@ -155,7 +157,7 @@ class RowIndividualNameDateOfBirthControllerWithFeatureTrueReviewModeSpec
       "redirect to 'review' page" in testControllerWithModel(validFormModelGens) {
         (controllerFixture, individualNameAndDateOfBirth) =>
           import controllerFixture._
-          when(mockSubscriptionDetailsService.cacheNameDobDetails(any[NameDobMatchModel])(any[HeaderCarrier]))
+          when(mockSubscriptionDetailsService.cacheNameDobDetails(any[NameDobMatchModel])(any[Request[_]]))
             .thenReturn(Future.successful(()))
 
           submitForm(formData(individualNameAndDateOfBirth)) { result =>

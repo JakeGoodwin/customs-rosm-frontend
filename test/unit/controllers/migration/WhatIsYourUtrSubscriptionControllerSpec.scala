@@ -132,16 +132,16 @@ class WhatIsYourUtrSubscriptionControllerSpec extends ControllerSpec {
       reset(mockSubscriptionDetailsService)
       val nameOrganisationMatchModel = NameOrganisationMatchModel("orgName")
       when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]])).thenReturn(Some(Company))
-      when(mockSubscriptionDetailsService.cacheCustomsId(any[CustomsId])(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cacheCustomsId(any[CustomsId])(any[Request[_]]))
         .thenReturn(Future.successful(()))
-      when(mockSubscriptionDetailsService.cachedNameDetails(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cachedNameDetails(any[Request[_]]))
         .thenReturn(Future.successful(Some(nameOrganisationMatchModel)))
       submit(Journey.Migrate, ValidUtrRequest) { result =>
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "/customs/subscribe-for-cds/address"
       }
       verify(mockSubscriptionDetailsService, times(1)).cacheNameIdAndCustomsId(meq("orgName"), meq(ValidUtrId))(
-        any[HeaderCarrier]
+        any[Request[_]]
       )
     }
 
@@ -149,23 +149,23 @@ class WhatIsYourUtrSubscriptionControllerSpec extends ControllerSpec {
       reset(mockSubscriptionDetailsService)
       val nameOrganisationMatchModel = NameOrganisationMatchModel("orgName")
       when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]])).thenReturn(Some(SoleTrader))
-      when(mockSubscriptionDetailsService.cacheCustomsId(any[CustomsId])(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cacheCustomsId(any[CustomsId])(any[Request[_]]))
         .thenReturn(Future.successful(()))
-      when(mockSubscriptionDetailsService.cachedNameDetails(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cachedNameDetails(any[Request[_]]))
         .thenReturn(Future.successful(Some(nameOrganisationMatchModel)))
       submit(Journey.Migrate, ValidUtrRequest) { result =>
         status(result) shouldBe SEE_OTHER
         result.header.headers(LOCATION) shouldBe "/customs/subscribe-for-cds/address"
       }
-      verify(mockSubscriptionDetailsService, times(1)).cacheCustomsId(any[CustomsId])(any[HeaderCarrier])
+      verify(mockSubscriptionDetailsService, times(1)).cacheCustomsId(any[CustomsId])(any[Request[_]])
     }
 
     "throws an exception with the orgType is Company and No business name or CustomsId cached" in {
       reset(mockSubscriptionDetailsService)
       when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]])).thenReturn(Some(Company))
-      when(mockSubscriptionDetailsService.cacheCustomsId(any[CustomsId])(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cacheCustomsId(any[CustomsId])(any[Request[_]]))
         .thenReturn(Future.successful(()))
-      when(mockSubscriptionDetailsService.cachedNameDetails(any[HeaderCarrier])).thenReturn(Future.successful(None))
+      when(mockSubscriptionDetailsService.cachedNameDetails(any[Request[_]])).thenReturn(Future.successful(None))
       intercept[IllegalStateException] {
         submit(Journey.Migrate, ValidUtrRequest)(result => status(result))
       }.getMessage shouldBe "No business name or CustomsId cached"

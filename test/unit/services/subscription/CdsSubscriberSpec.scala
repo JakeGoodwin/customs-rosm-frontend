@@ -23,8 +23,8 @@ import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito.{when, _}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.SubscriptionFlowManager
 import uk.gov.hmrc.customs.rosmfrontend.domain._
@@ -57,7 +57,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
   private val mockSubscriptionDetailsService = mock[SubscriptionDetailsService]
 
   implicit private val hc: HeaderCarrier = mock[HeaderCarrier]
-  implicit private val mockRequest: Request[AnyContent] = mock[Request[AnyContent]]
+  implicit private val request: Request[AnyContent] = mock[Request[AnyContent]]
 
   private val eori = "EORI-Number"
   private val formBundleId = "Form-Bundle-Id"
@@ -113,7 +113,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
             processingDate,
             Some(emailVerificationTimestamp)
           )
-          inOrder.verify(mockCdsFrontendDataCache).registrationDetails(any[HeaderCarrier])
+          inOrder.verify(mockCdsFrontendDataCache).registrationDetails(any[Request[_]])
           inOrder
             .verify(mockSubscriptionService)
             .subscribe(
@@ -126,8 +126,8 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
     "call SubscriptionService when there is a cache hit when user journey type is Migrate and ContactDetails Missing Subscribe" in {
       val expectedEmail = "email@address.fromCache"
       when(mockRequestSessionData.selectedUserLocation(any())).thenReturn(Some(UserLocation.Uk))
-      when(mockCdsFrontendDataCache.email(any[HeaderCarrier])).thenReturn(Future.successful(expectedEmail))
-      when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.email(any[Request[_]])).thenReturn(Future.successful(expectedEmail))
+      when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[Request[_]]))
         .thenReturn(Future.successful(true))
       mockSuccessfulExistingRegistration(
         stubRegisterWithEoriAndIdResponse,
@@ -154,7 +154,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
             processingDate,
             Some(emailVerificationTimestamp)
           )
-          inOrder.verify(mockCdsFrontendDataCache).registerWithEoriAndIdResponse(any[HeaderCarrier])
+          inOrder.verify(mockCdsFrontendDataCache).registerWithEoriAndIdResponse(any[Request[_]])
           inOrder
             .verify(mockSubscriptionService)
             .existingReg(meq(stubRegisterWithEoriAndIdResponse), any[SubscriptionDetails], meq(expectedEmail))(
@@ -175,7 +175,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
 
     "call SubscriptionService when there is a cache hit when user journey type is Migrate and ContactDetails have Contact Name populated " in {
       val expectedEmail = "email@address.fromCache"
-      when(mockCdsFrontendDataCache.email(any[HeaderCarrier])).thenReturn(Future.successful(expectedEmail))
+      when(mockCdsFrontendDataCache.email(any[Request[_]])).thenReturn(Future.successful(expectedEmail))
 
       val expectedRecipient =
         RecipientDetails(Journey.Migrate, expectedEmail, "TEST NAME", Some("New trading"), Some(processingDate))
@@ -206,7 +206,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
 
           val inOrder = org.mockito.Mockito
             .inOrder(mockCdsFrontendDataCache, mockSubscriptionService, mockHandleSubscriptionService)
-          inOrder.verify(mockCdsFrontendDataCache).registerWithEoriAndIdResponse(any[HeaderCarrier])
+          inOrder.verify(mockCdsFrontendDataCache).registerWithEoriAndIdResponse(any[Request[_]])
           inOrder
             .verify(mockSubscriptionService)
             .existingReg(
@@ -230,7 +230,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
     "call handle-subscription service when subscription successful when Journey is Migrate" in {
       mockSuccessfulExistingRegistration(stubRegisterWithEoriAndIdResponseWithContactDetails, subscriptionDetails)
       val expectedEmail = "test@example.com"
-      when(mockCdsFrontendDataCache.email(any[HeaderCarrier])).thenReturn(Future.successful(expectedEmail))
+      when(mockCdsFrontendDataCache.email(any[Request[_]])).thenReturn(Future.successful(expectedEmail))
 
       val expectedRecipient =
         RecipientDetails(Journey.Migrate, expectedEmail, "TEST NAME", Some("New trading"), Some(processingDate))
@@ -246,7 +246,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
         val inOrder = org.mockito.Mockito.inOrder(mockCdsFrontendDataCache, mockHandleSubscriptionService)
         inOrder
           .verify(mockCdsFrontendDataCache)
-          .saveSubscriptionCreateOutcome(meq(SubscriptionCreateOutcome(processingDate, "New trading", Some(eori))))(meq(hc))
+          .saveSubscriptionCreateOutcome(meq(SubscriptionCreateOutcome(processingDate, "New trading", Some(eori))))(meq(request))
         inOrder
           .verify(mockHandleSubscriptionService)
           .handleSubscription(
@@ -262,7 +262,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
 
     "call to SubscriptionService Future should fail when there is no email in subscription Details when user journey type is Migrate" in {
       when(mockRequestSessionData.selectedUserLocation(any())).thenReturn(Some(UserLocation.Uk))
-      when(mockCdsFrontendDataCache.email(any[HeaderCarrier])).thenReturn(Future.failed(new IllegalStateException))
+      when(mockCdsFrontendDataCache.email(any[Request[_]])).thenReturn(Future.failed(new IllegalStateException))
 
       mockSuccessfulExistingRegistration(stubRegisterWithEoriAndIdResponseWithContactDetails, subscriptionDetails)
 
@@ -273,7 +273,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
 
     "throw an exception when there is no email in the cache" in {
       when(mockRequestSessionData.selectedUserLocation(any())).thenReturn(Some(UserLocation.Uk))
-      when(mockCdsFrontendDataCache.email(any[HeaderCarrier])).thenReturn(Future.failed(new IllegalStateException))
+      when(mockCdsFrontendDataCache.email(any[Request[_]])).thenReturn(Future.failed(new IllegalStateException))
 
       mockSuccessfulExistingRegistration(stubRegisterWithEoriAndIdResponse, subscriptionDetails)
 
@@ -288,38 +288,38 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
 
       whenReady(cdsSubscriber.subscribeWithCachedDetails(mockCdsOrganisationType, Journey.GetYourEORI)) { result =>
         result shouldBe SubscriptionPending(formBundleId, processingDate, Some(emailVerificationTimestamp))
-        inOrder.verify(mockCdsFrontendDataCache).registrationDetails(any[HeaderCarrier])
+        inOrder.verify(mockCdsFrontendDataCache).registrationDetails(any[Request[_]])
         inOrder
           .verify(mockSubscriptionService)
           .subscribe(
             meq(mockRegistrationDetails),
             meq(subscriptionDetails),
             any[Option[CdsOrganisationType]])(any[HeaderCarrier])
-        verify(mockCdsFrontendDataCache, never).remove(any[HeaderCarrier])
+        verify(mockCdsFrontendDataCache, never).remove(any[Request[_]])
       }
     }
 
     "propagate a failure when registrationDetails cache fails to be accessed" in {
-      when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier])).thenReturn(Future.failed(emulatedFailure))
+      when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]])).thenReturn(Future.failed(emulatedFailure))
 
       val caught = the[UnsupportedOperationException] thrownBy {
         await(cdsSubscriber.subscribeWithCachedDetails(mockCdsOrganisationType, Journey.GetYourEORI))
       }
       caught shouldBe emulatedFailure
       verifyNoInteractions(mockSubscriptionService)
-      verify(mockCdsFrontendDataCache, never).remove(any[HeaderCarrier])
+      verify(mockCdsFrontendDataCache, never).remove(any[Request[_]])
     }
 
     "propagate a failure when subscriptionDetailsHolder cache fails to be accessed" in {
-      when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier])).thenReturn(mockRegistrationDetails)
-      when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier])).thenReturn(Future.failed(emulatedFailure))
+      when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]])).thenReturn(mockRegistrationDetails)
+      when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]])).thenReturn(Future.failed(emulatedFailure))
 
       val caught = the[UnsupportedOperationException] thrownBy {
         await(cdsSubscriber.subscribeWithCachedDetails(mockCdsOrganisationType, Journey.GetYourEORI))
       }
       caught shouldBe emulatedFailure
       verifyNoInteractions(mockSubscriptionService)
-      verify(mockCdsFrontendDataCache, never).remove(any[HeaderCarrier])
+      verify(mockCdsFrontendDataCache, never).remove(any[Request[_]])
     }
 
     "call handle-subscription service when subscription successful" in {
@@ -348,7 +348,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
         val inOrder = org.mockito.Mockito.inOrder(mockCdsFrontendDataCache, mockHandleSubscriptionService)
         inOrder
           .verify(mockCdsFrontendDataCache)
-          .saveSubscriptionCreateOutcome(meq(SubscriptionCreateOutcome(processingDate, expectedOrgName, Some(eori))))(meq(hc))
+          .saveSubscriptionCreateOutcome(meq(SubscriptionCreateOutcome(processingDate, expectedOrgName, Some(eori))))(meq(request))
         inOrder
           .verify(mockHandleSubscriptionService)
           .handleSubscription(
@@ -388,7 +388,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
         val inOrder = org.mockito.Mockito.inOrder(mockCdsFrontendDataCache, mockHandleSubscriptionService)
         inOrder
           .verify(mockCdsFrontendDataCache)
-          .saveSubscriptionCreateOutcome(meq(SubscriptionCreateOutcome(processingDate, expectedOrgName)))(meq(hc))
+          .saveSubscriptionCreateOutcome(meq(SubscriptionCreateOutcome(processingDate, expectedOrgName)))(meq(request))
         inOrder
           .verify(mockHandleSubscriptionService)
           .handleSubscription(
@@ -407,7 +407,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
       mockFailedSubscribe(mockRegistrationDetails, subscriptionDetails, expectedName)
       whenReady(cdsSubscriber.subscribeWithCachedDetails(mockCdsOrganisationType, Journey.GetYourEORI)) { result =>
         result shouldBe SubscriptionFailed("EORI already exists", processingDate)
-        verify(mockCdsFrontendDataCache).saveSubscriptionCreateOutcome(meq(SubscriptionCreateOutcome(processingDate, expectedName)))(meq(hc))
+        verify(mockCdsFrontendDataCache).saveSubscriptionCreateOutcome(meq(SubscriptionCreateOutcome(processingDate, expectedName)))(meq(request))
         verifyNoInteractions(mockHandleSubscriptionService)
       }
     }
@@ -465,9 +465,9 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
     mockSubscribeOutcome: SubscriptionCreateOutcome,
     registeredName: String = "orgName"
   ) = {
-    when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockRegistrationDetails))
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]]))
       .thenReturn(Future.successful(cachedSubscriptionDetailsHolder))
     when(
       mockSubscriptionService.subscribe(
@@ -488,7 +488,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
         any[SafeId]
       )(any[HeaderCarrier], any[ExecutionContext])
     ).thenReturn(Future.successful(()))
-    when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[Request[_]]))
       .thenReturn(Future.successful(true))
     when(mockRegistrationDetails.name).thenReturn(registeredName)
     when(mockRegistrationDetails.safeId).thenReturn(SafeId("safeId"))
@@ -500,10 +500,10 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
     cachedSubscriptionDetailsHolder: SubscriptionDetails
   ) = {
 
-    when(mockCdsFrontendDataCache.registerWithEoriAndIdResponse(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.registerWithEoriAndIdResponse(any[Request[_]]))
       .thenReturn(Future.successful(cachedRegistrationDetails))
 
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]]))
       .thenReturn(Future.successful(cachedSubscriptionDetailsHolder))
 
     when(
@@ -523,7 +523,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
         any[SafeId]
       )(any[HeaderCarrier], any[ExecutionContext])
     ).thenReturn(Future.successful(()))
-    when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[Request[_]]))
       .thenReturn(Future.successful(true))
   }
 
@@ -532,7 +532,7 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
     registeredName: String = "orgName"
   ) = {
 
-    when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier])).thenReturn(cachedRegistrationDetails)
+    when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]])).thenReturn(cachedRegistrationDetails)
     when(mockCdsFrontendDataCache.subscriptionDetails).thenReturn(subscriptionDetails)
     when(
       mockSubscriptionService
@@ -562,8 +562,8 @@ class CdsSubscriberSpec extends UnitSpec with MockitoSugar with ScalaFutures wit
     registeredName: String = "orgName"
   ) = {
 
-    when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier])).thenReturn(registrationDetails)
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier])).thenReturn(subscriptionDetails)
+    when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]])).thenReturn(registrationDetails)
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]])).thenReturn(subscriptionDetails)
     when(
       mockSubscriptionService
         .subscribe(

@@ -28,7 +28,7 @@ class FeatureFlagsSpec extends ControllerSpec {
       val testFeatureFlags = new FeatureFlags {
         override def currentApp: Application =
           new GuiceApplicationBuilder()
-            .configure(configMap ++ Map("features.matchingEnabled" -> true, "features.rowHaveUtrEnabled" -> true))
+            .configure(Map("features.matchingEnabled" -> true, "features.rowHaveUtrEnabled" -> true))
             .build()
       }
 

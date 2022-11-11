@@ -19,7 +19,7 @@ package uk.gov.hmrc.customs.rosmfrontend.connector
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.customs.rosmfrontend.audit.Auditable
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
-import uk.gov.hmrc.customs.rosmfrontend.connector.EmailVerificationKeys.{LinkExpiryDurationKey, TemplateIdKey, _}
+import uk.gov.hmrc.customs.rosmfrontend.connector.EmailVerificationKeys._
 import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.EmailVerificationRequestHttpParser.EmailVerificationRequestResponse
 import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.EmailVerificationStateHttpParser.EmailVerificationStateResponse
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}

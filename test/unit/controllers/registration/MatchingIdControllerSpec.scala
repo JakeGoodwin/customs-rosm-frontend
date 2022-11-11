@@ -19,9 +19,10 @@ package unit.controllers.registration
 import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.mvc.Http.Status.SEE_OTHER
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.customs.rosmfrontend.controllers.FeatureFlags
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.MatchingIdController
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
@@ -39,6 +40,7 @@ class MatchingIdControllerSpec extends ControllerSpec with BeforeAndAfterEach {
   private val mockAuthConnector = mock[AuthConnector]
   private val mockMatchingService = mock[MatchingService]
   private val mockRequestSessionData = mock[RequestSessionData]
+  private val mockFeatureFlags = mock[FeatureFlags]
 
   private val userId: String = "someUserId"
   private val ctUtrId: String = "ct-utr-Id"
@@ -70,7 +72,7 @@ class MatchingIdControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     "for Journey GetAnEori redirect to Confirm page when a match found with CT UTR only" in {
       withAuthorisedUser(userId, mockAuthConnector, ctUtrId = Some(ctUtrId))
 
-      when(mockMatchingService.matchBusinessWithIdOnly(meq(Utr(ctUtrId)), any[LoggedInUser])(any[HeaderCarrier]))
+      when(mockMatchingService.matchBusinessWithIdOnly(meq(Utr(ctUtrId)), any[LoggedInUser])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(true))
 
       val result = controller.matchWithIdOnly().apply(SessionBuilder.buildRequestWithSession(userId))
@@ -86,8 +88,8 @@ class MatchingIdControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     "for Journey GetAnEori redirect to Select user location page when no match found for SA UTR" in {
       withAuthorisedUser(userId, mockAuthConnector, saUtrId = Some(saUtrId))
 
-      when(mockMatchingService.matchBusinessWithIdOnly(meq(Utr(saUtrId)), any[LoggedInUser])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(false))
+      when(mockMatchingService.matchBusinessWithIdOnly(meq(Utr(saUtrId)), any[LoggedInUser])(any[HeaderCarrier],any[Request[_]]))
+      .thenReturn(Future.successful(false))
 
       val controller =
         new MatchingIdController(app, mockAuthConnector, mockMatchingService, mockRequestSessionData, mcc)
@@ -100,7 +102,7 @@ class MatchingIdControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     "for Journey GetAnEori redirect to Confirm page when a match found with SA UTR only" in {
       withAuthorisedUser(userId, mockAuthConnector, saUtrId = Some(saUtrId))
 
-      when(mockMatchingService.matchBusinessWithIdOnly(meq(Utr(saUtrId)), any[LoggedInUser])(any[HeaderCarrier]))
+      when(mockMatchingService.matchBusinessWithIdOnly(meq(Utr(saUtrId)), any[LoggedInUser])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(true))
 
       val result = controller.matchWithIdOnly().apply(SessionBuilder.buildRequestWithSession(userId))
@@ -116,7 +118,7 @@ class MatchingIdControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     "for Journey GetAnEori redirect to Confirm page when a match found with a valid PAYE Nino" in {
       withAuthorisedUser(userId, mockAuthConnector, payeNinoId = Some(payeNinoId))
 
-      when(mockMatchingService.matchBusinessWithIdOnly(meq(Nino(payeNinoId)), any[LoggedInUser])(any[HeaderCarrier]))
+      when(mockMatchingService.matchBusinessWithIdOnly(meq(Nino(payeNinoId)), any[LoggedInUser])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(true))
 
       val result = controller.matchWithIdOnly().apply(SessionBuilder.buildRequestWithSession(userId))
@@ -132,7 +134,7 @@ class MatchingIdControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     "for Journey GetAnEori use CT UTR when user is registered for CT and SA" in {
       withAuthorisedUser(userId, mockAuthConnector, ctUtrId = Some(ctUtrId), saUtrId = Some(saUtrId))
 
-      when(mockMatchingService.matchBusinessWithIdOnly(meq(Utr(ctUtrId)), any[LoggedInUser])(any[HeaderCarrier]))
+      when(mockMatchingService.matchBusinessWithIdOnly(meq(Utr(ctUtrId)), any[LoggedInUser])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(true))
 
       val result = controller.matchWithIdOnly().apply(SessionBuilder.buildRequestWithSession(userId))
@@ -179,7 +181,7 @@ class MatchingIdControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     "redirect to Select Location Type page for selected journey type Subscribe " in {
       withAuthorisedUser(userId, mockAuthConnector, ctUtrId = Some(ctUtrId))
 
-      when(mockMatchingService.matchBusinessWithIdOnly(meq(Utr(ctUtrId)), any[LoggedInUser])(any[HeaderCarrier]))
+      when(mockMatchingService.matchBusinessWithIdOnly(meq(Utr(ctUtrId)), any[LoggedInUser])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(false))
 
       val controller =

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
-import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.customs.rosmfrontend.domain._
@@ -27,6 +26,7 @@ import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -127,7 +127,7 @@ class CdsSubscriber @Inject()(
     subscriptionResult: SubscriptionResult,
     regDetails: RegistrationDetails,
     subscriptionDetails: Option[SubscriptionDetails]
-  )(implicit hc: HeaderCarrier): Future[Unit] =
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
     subscriptionResult match {
       case success: SubscriptionSuccessful =>
         CdsLogger.info(s"SubscriptionSuccessful=${Journey.GetYourEORI}")
@@ -184,7 +184,7 @@ class CdsSubscriber @Inject()(
     regDetails: RegistrationDetails,
     subDetails: SubscriptionDetails,
     email: String
-  )(implicit hc: HeaderCarrier): Future[Unit] =
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] =
     subscriptionResult match {
       case success: SubscriptionSuccessful =>
         CdsLogger.info(s"SubscriptionSuccessful=${Journey.Migrate}")
@@ -229,7 +229,7 @@ class CdsSubscriber @Inject()(
     regDetails: RegisterWithEoriAndIdResponse,
     subDetails: SubscriptionDetails,
     email: String
-  )(implicit hc: HeaderCarrier): Future[Unit] = {
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] = {
     val safeId = regDetails.responseDetail
       .flatMap(_.responseData.map(x => SafeId(x.SAFEID)))
       .getOrElse(throw new IllegalArgumentException("SAFEID Missing"))
@@ -283,7 +283,7 @@ class CdsSubscriber @Inject()(
     processingDate: String,
     formBundleId: String,
     emailVerificationTimestamp: Option[DateTime]
-  )(implicit hc: HeaderCarrier): Future[Unit] = {
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Unit] = {
     sessionCache.saveSubscriptionCreateOutcome(SubscriptionCreateOutcome(processingDate, cdsFullName.getOrElse(name), mayBeEORI.map(_.id)))
     val recipientDetails =
       RecipientDetails(journey, email, contactName.getOrElse(""), cdsFullName, Some(processingDate))

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -24,10 +23,7 @@ import uk.gov.hmrc.customs.rosmfrontend.OrgTypeNotFoundException
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
 import uk.gov.hmrc.customs.rosmfrontend.domain.LoggedInUserWithEnrolments
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription._
-import uk.gov.hmrc.customs.rosmfrontend.forms.subscription.SubscriptionForm.{
-  subscriptionCompanyShortNameForm,
-  subscriptionPartnershipShortNameForm
-}
+import uk.gov.hmrc.customs.rosmfrontend.forms.subscription.SubscriptionForm.{subscriptionCompanyShortNameForm, subscriptionPartnershipShortNameForm}
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.RequestSessionData
 import uk.gov.hmrc.customs.rosmfrontend.services.organisation.OrgTypeLookup
@@ -35,6 +31,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{SubscriptionBusin
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription._
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

@@ -20,13 +20,13 @@ import common.pages.matching.AddressPageFactoring
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
-import play.api.mvc.Result
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.customs.rosmfrontend.connector.Save4LaterConnector
-import uk.gov.hmrc.customs.rosmfrontend.controllers.EmailController
+import uk.gov.hmrc.customs.rosmfrontend.controllers.{EmailController, FeatureFlags}
 import uk.gov.hmrc.customs.rosmfrontend.domain.{EnrolmentResponse, EnrolmentStoreProxyResponse, InternalId, KeyValue}
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.email.EmailStatus
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
@@ -52,14 +52,15 @@ class EmailControllerSpec extends ControllerSpec with AddressPageFactoring with 
   private val mockEnrolmentStoreProxyService = mock[EnrolmentStoreProxyService]
   private val mockSubscriptionStatusService = mock[SubscriptionStatusService]
   private val mockAppConfig = mock[AppConfig]
-  private val mockUserGroupIdSubscriptionStatusCheckService =
+  private val mockUserGroupIdSubscriptionStatusCheckService = {
     new UserGroupIdSubscriptionStatusCheckService(
       mockSubscriptionStatusService,
       mockEnrolmentStoreProxyService,
       mockSave4LaterConnector,
       mockAppConfig
     )
-
+  }
+  private val mockFeatureFlags = mock[FeatureFlags]
   private val controller = new EmailController(
     app,
     mockAuthConnector,
@@ -87,7 +88,7 @@ class EmailControllerSpec extends ControllerSpec with AddressPageFactoring with 
     ).thenReturn(Future.successful(Some(true)))
     when(mockSave4LaterService.saveEmail(any(), any())(any[HeaderCarrier]))
       .thenReturn(Future.successful(()))
-    when(mockSessionCache.saveEmail(any())(any[HeaderCarrier]))
+    when(mockSessionCache.saveEmail(any())(any[Request[_]]))
       .thenReturn(Future.successful(true))
     when(mockSave4LaterConnector.get(any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(None))
@@ -97,7 +98,7 @@ class EmailControllerSpec extends ControllerSpec with AddressPageFactoring with 
     ).thenReturn(Future.successful(false))
     when(mockEnrolmentStoreProxyService.groupIdEnrolments(any())(any(), any()))
       .thenReturn(Future.successful(enrolments.enrolments))
-    when(mockSessionCache.saveEori(any())(any[HeaderCarrier]))
+    when(mockSessionCache.saveEori(any())(any[Request[_]]))
       .thenReturn(Future.successful(true))
   }
 
