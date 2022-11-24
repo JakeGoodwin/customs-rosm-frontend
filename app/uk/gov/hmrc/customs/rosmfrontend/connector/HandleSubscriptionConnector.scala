@@ -39,12 +39,11 @@ class HandleSubscriptionConnector @Inject()(http: HttpClient, appConfig: AppConf
     val url = s"${appConfig.handleSubscriptionBaseUrl}/${appConfig.handleSubscriptionServiceContext}"
     CdsLogger.info(s"[$LoggerComponentId][call] postUrl: $url")
     val headers = Seq(ACCEPT -> "application/vnd.hmrc.1.0+json", CONTENT_TYPE -> MimeTypes.JSON)
-    val headersForLogging = hc.headers(explicitlyIncludedHeaders) ++ hc.extraHeaders ++ headers
     http.POST[HandleSubscriptionRequest, HttpResponse](url, request, headers) map { response =>
       response.status match {
         case OK | NO_CONTENT => {
           CdsLogger.info(
-            s"[$LoggerComponentId][call] complete for call to $url and headers $headersForLogging. Status:${response.status}"
+            s"[$LoggerComponentId][call] complete for call to $url. Status:${response.status}"
           )
           ()
         }
@@ -53,13 +52,13 @@ class HandleSubscriptionConnector @Inject()(http: HttpClient, appConfig: AppConf
     } recoverWith {
       case e: BadRequestException =>
         CdsLogger.error(
-          s"[$LoggerComponentId][call] request failed with BAD_REQUEST status for call to $url and headers $headersForLogging: ${e.getMessage}",
+          s"[$LoggerComponentId][call] request failed with BAD_REQUEST status for call to $url: ${e.getMessage}",
           e
         )
         Future.failed(e)
       case NonFatal(e) =>
         CdsLogger.error(
-          s"[$LoggerComponentId][call] request failed for call to $url and headers $headersForLogging: ${e.getMessage}",
+          s"[$LoggerComponentId][call] request failed for call to $url: ${e.getMessage}",
           e
         )
         Future.failed(e)

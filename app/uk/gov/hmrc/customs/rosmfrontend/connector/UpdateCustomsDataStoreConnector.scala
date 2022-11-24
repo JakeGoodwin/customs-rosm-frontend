@@ -40,14 +40,13 @@ class UpdateCustomsDataStoreConnector @Inject()(http: HttpClient, appConfig: App
     val url = s"${appConfig.handleSubscriptionBaseUrl}/customs/update/datastore"
     CdsLogger.info(s"[$LoggerComponentId][call] postUrl: $url")
     val headers = Seq(ACCEPT -> "application/vnd.hmrc.1.0+json", CONTENT_TYPE -> MimeTypes.JSON)
-    val headersForLogging = hc.headers(explicitlyIncludedHeaders) ++ hc.extraHeaders ++ headers
     auditCallRequest(url, request)
     http.POST[CustomsDataStoreRequest, HttpResponse](url, request, headers) map { response =>
       auditCallResponse(url, response)
       response.status match {
         case OK | NO_CONTENT => {
           CdsLogger.info(
-            s"[$LoggerComponentId][call] complete for call to $url and headers $headersForLogging. Status:${response.status}"
+            s"[$LoggerComponentId][call] complete for call to $url. Status:${response.status}"
           )
           ()
         }
@@ -56,13 +55,13 @@ class UpdateCustomsDataStoreConnector @Inject()(http: HttpClient, appConfig: App
     } recoverWith {
       case e: BadRequestException =>
         CdsLogger.error(
-          s"[$LoggerComponentId][call] request failed with BAD_REQUEST status for call to $url and headers $headersForLogging: ${e.getMessage}",
+          s"[$LoggerComponentId][call] request failed with BAD_REQUEST status for call to $url: ${e.getMessage}",
           e
         )
         Future.failed(e)
       case NonFatal(e) =>
         CdsLogger.error(
-          s"[$LoggerComponentId][call] request failed for call to $url and headers $headersForLogging: ${e.getMessage}",
+          s"[$LoggerComponentId][call] request failed for call to $url: ${e.getMessage}",
           e
         )
         Future.failed(e)
