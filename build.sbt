@@ -141,7 +141,7 @@ val testDependencies = Seq(
     exclude ("org.apache.httpcomponents", "httpclient") exclude ("org.apache.httpcomponents", "httpcore"),
   "org.jsoup" % "jsoup" % "1.15.3" % "test,it",
   "us.codecraft" % "xsoup" % "0.3.5" % "test,it",
-  "uk.gov.hmrc" %% "webdriver-factory" % "0.22.0",
+  "uk.gov.hmrc" %% "webdriver-factory" % "0.38.0",
   "uk.gov.hmrc" %% "play-language" % "5.1.0-play-28",
   "org.pegdown" % "pegdown" % "1.6.0" % "test,it"
 )
