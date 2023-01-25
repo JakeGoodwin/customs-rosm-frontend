@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.domain
 
-import java.lang.reflect.Field
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging._
 import uk.gov.hmrc.customs.rosmfrontend.forms.FormValidation.{postCodeMandatoryCountryCodes, postcodeRegex}
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.AddressViewModel
 import uk.gov.hmrc.customs.rosmfrontend.services.countries.Country
+
+import java.lang.reflect.Field
 
 case class GovGatewayCredentials(email: String) extends CaseClassAuditHelper
 

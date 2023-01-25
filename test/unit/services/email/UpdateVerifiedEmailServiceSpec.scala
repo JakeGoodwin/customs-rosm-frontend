@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,21 +21,12 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time.{Millis, Span}
-import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.{
-  HttpErrorResponse,
-  ServiceUnavailable,
-  VerifiedEmailRequest,
-  VerifiedEmailResponse
-}
+import org.scalatestplus.mockito.MockitoSugar
+import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.{HttpErrorResponse, ServiceUnavailable, VerifiedEmailRequest, VerifiedEmailResponse}
 import uk.gov.hmrc.customs.rosmfrontend.connector.{UpdateCustomsDataStoreConnector, UpdateVerifiedEmailConnector}
 import uk.gov.hmrc.customs.rosmfrontend.domain.email.UpdateVerifiedEmailResponse
-import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.MessagingServiceParam.{
-  formBundleIdParamName,
-  positionParamName,
-  Fail
-}
+import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.MessagingServiceParam.{Fail, formBundleIdParamName, positionParamName}
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.{MessagingServiceParam, RequestCommon, ResponseCommon}
 import uk.gov.hmrc.customs.rosmfrontend.services.RequestCommonGenerator
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.UpdateVerifiedEmailService

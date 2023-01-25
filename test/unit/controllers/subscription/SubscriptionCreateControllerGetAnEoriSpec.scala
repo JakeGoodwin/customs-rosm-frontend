@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ class SubscriptionCreateControllerGetAnEoriSpec extends ControllerSpec with Befo
 
   override def beforeEach: Unit = {
     reset(mockAuthConnector, mockCdsSubscriber, mockPdfGeneratorService, mockSessionCache)
-    when(mockSubscriptionDetailsService.saveKeyIdentifiers(any[GroupId], any[InternalId])(any()))
+    when(mockSubscriptionDetailsService.saveKeyIdentifiers(any[GroupId], any[InternalId])(any(), any()))
       .thenReturn(Future.successful(()))
 
   }
@@ -323,7 +323,7 @@ class SubscriptionCreateControllerGetAnEoriSpec extends ControllerSpec with Befo
         result =>
           status(result) shouldBe OK
           val page = CdsPage(bodyOf(result))
-          verify(mockSessionCache).remove(any[HeaderCarrier])
+          verify(mockSessionCache).remove(any[Request[_]])
           page.title should startWith("Application complete")
           page.getElementsText(RegistrationCompletePage.pageHeadingXpath) shouldBe s"The EORI number for orgName is $EORI"
           page.getElementsText(RegistrationCompletePage.eoriXpath) shouldBe EORI
@@ -361,9 +361,9 @@ class SubscriptionCreateControllerGetAnEoriSpec extends ControllerSpec with Befo
 
   "calling eoriAlreadyExists on SubscriptionCreateController" should {
     "render eori already exists page" in {
-      when(mockSessionCache.subscriptionCreateOutcome(any[HeaderCarrier]))
+      when(mockSessionCache.subscriptionCreateOutcome(any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionCreateOutcome("testDate", "testFullName", Some("EoriTest"))))
-      when(mockSessionCache.remove(any[HeaderCarrier])).thenReturn(Future.successful(true))
+      when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
       invokeEoriAlreadyExists { result =>
         status(result) shouldBe OK
       }
@@ -372,9 +372,9 @@ class SubscriptionCreateControllerGetAnEoriSpec extends ControllerSpec with Befo
 
   "calling subscriptionInProgress on SubscriptionCreateController" should {
     "render subscription in-progress page" in {
-      when(mockSessionCache.subscriptionCreateOutcome(any[HeaderCarrier]))
+      when(mockSessionCache.subscriptionCreateOutcome(any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionCreateOutcome("testDate", "testFullName", Some("EoriTest"))))
-      when(mockSessionCache.remove(any[HeaderCarrier])).thenReturn(Future.successful(true))
+      when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
       invokeSubscriptionInProgress { result =>
         status(result) shouldBe OK
       }
@@ -383,9 +383,9 @@ class SubscriptionCreateControllerGetAnEoriSpec extends ControllerSpec with Befo
 
   "calling pending on SubscriptionCreateController" should {
     "render subscription status processing page" in {
-      when(mockSessionCache.subscriptionCreateOutcome(any[HeaderCarrier]))
+      when(mockSessionCache.subscriptionCreateOutcome(any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionCreateOutcome("testDate", "testFullName", Some("EoriTest"))))
-      when(mockSessionCache.remove(any[HeaderCarrier])).thenReturn(Future.successful(true))
+      when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
       invokePending { result =>
         status(result) shouldBe OK
       }
@@ -397,12 +397,12 @@ class SubscriptionCreateControllerGetAnEoriSpec extends ControllerSpec with Befo
 
     "render page with name for UK location" in {
       when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]])).thenReturn(Some("uk"))
-      when(mockSubscriptionDetailsService.cachedCustomsId(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cachedCustomsId(any[Request[_]]))
         .thenReturn(Future.successful(Some(Utr("someUtr"))))
       mockNameAndSubscriptionCreateOutcomeRetrieval
-      when(mockSessionCache.subscriptionCreateOutcome(any[HeaderCarrier])).thenReturn(Future.successful(subscriptionCreateOutcome))
-      when(mockSessionCache.remove(any[HeaderCarrier])).thenReturn(Future.successful(true))
-      when(mockSessionCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[HeaderCarrier])).thenReturn(Future.successful(true))
+      when(mockSessionCache.subscriptionCreateOutcome(any[Request[_]])).thenReturn(Future.successful(subscriptionCreateOutcome))
+      when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
+      when(mockSessionCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[Request[_]])).thenReturn(Future.successful(true))
       invokeMigrationEnd { result =>
         status(result) shouldBe OK
       }
@@ -410,12 +410,12 @@ class SubscriptionCreateControllerGetAnEoriSpec extends ControllerSpec with Befo
 
     "render page with name for ROW location when customsId exists" in {
       when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]])).thenReturn(Some("third-country"))
-      when(mockSubscriptionDetailsService.cachedCustomsId(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cachedCustomsId(any[Request[_]]))
         .thenReturn(Future.successful(Some(Utr("someUtr"))))
       mockNameAndSubscriptionCreateOutcomeRetrieval
-      when(mockSessionCache.subscriptionCreateOutcome(any[HeaderCarrier])).thenReturn(Future.successful(subscriptionCreateOutcome))
-      when(mockSessionCache.remove(any[HeaderCarrier])).thenReturn(Future.successful(true))
-      when(mockSessionCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[HeaderCarrier])).thenReturn(Future.successful(true))
+      when(mockSessionCache.subscriptionCreateOutcome(any[Request[_]])).thenReturn(Future.successful(subscriptionCreateOutcome))
+      when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
+      when(mockSessionCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[Request[_]])).thenReturn(Future.successful(true))
       invokeMigrationEnd { result =>
         status(result) shouldBe OK
       }
@@ -423,10 +423,10 @@ class SubscriptionCreateControllerGetAnEoriSpec extends ControllerSpec with Befo
 
     "render page with name for ROW location when no customsId exists" in {
       when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]])).thenReturn(Some("third-country"))
-      when(mockSubscriptionDetailsService.cachedCustomsId(any[HeaderCarrier])).thenReturn(Future.successful(None))
-      when(mockSessionCache.subscriptionCreateOutcome(any[HeaderCarrier])).thenReturn(Future.successful(subscriptionCreateOutcome))
-      when(mockSessionCache.remove(any[HeaderCarrier])).thenReturn(Future.successful(true))
-      when(mockSessionCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[HeaderCarrier])).thenReturn(Future.successful(true))
+      when(mockSubscriptionDetailsService.cachedCustomsId(any[Request[_]])).thenReturn(Future.successful(None))
+      when(mockSessionCache.subscriptionCreateOutcome(any[Request[_]])).thenReturn(Future.successful(subscriptionCreateOutcome))
+      when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
+      when(mockSessionCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[Request[_]])).thenReturn(Future.successful(true))
       invokeMigrationEnd { result =>
         status(result) shouldBe OK
       }
@@ -434,11 +434,11 @@ class SubscriptionCreateControllerGetAnEoriSpec extends ControllerSpec with Befo
   }
 
   private def mockSessionCacheForOutcomePage = {
-    when(mockSessionCache.registrationDetails(any[HeaderCarrier])).thenReturn(Future.successful(mockRegDetails))
-    when(mockSessionCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[HeaderCarrier])).thenReturn(Future.successful(true))
+    when(mockSessionCache.registrationDetails(any[Request[_]])).thenReturn(Future.successful(mockRegDetails))
+    when(mockSessionCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[Request[_]])).thenReturn(Future.successful(true))
     when(mockRegDetails.name).thenReturn("orgName")
-    when(mockSessionCache.remove(any[HeaderCarrier])).thenReturn(Future.successful(true))
-    when(mockSessionCache.subscriptionCreateOutcome(any[HeaderCarrier])).thenReturn(Future.successful(mockSubscribeOutcome))
+    when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
+    when(mockSessionCache.subscriptionCreateOutcome(any[Request[_]])).thenReturn(Future.successful(mockSubscribeOutcome))
     when(mockSubscribeOutcome.processedDate).thenReturn("22 May 2016")
   }
 
@@ -494,7 +494,7 @@ class SubscriptionCreateControllerGetAnEoriSpec extends ControllerSpec with Befo
     val mrweaird = mock[RegisterWithEoriAndIdResponseDetail]
     val rd = mock[ResponseData]
     val trader = mock[Trader]
-    when(mockSessionCache.registerWithEoriAndIdResponse(any[HeaderCarrier])).thenReturn(Future.successful(mrweair))
+    when(mockSessionCache.registerWithEoriAndIdResponse(any[Request[_]])).thenReturn(Future.successful(mrweair))
     when(mrweair.responseDetail).thenReturn(Some(mrweaird))
     when(mrweaird.responseData).thenReturn(Some(rd))
     when(rd.trader).thenReturn(trader)

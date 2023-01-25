@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package unit.controllers.auth
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 import uk.gov.hmrc.customs.rosmfrontend.controllers.auth.EnrolmentExtractor
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 
-class EnrolmentExtractorSpec extends WordSpec with Matchers {
+class EnrolmentExtractorSpec extends AnyWordSpec with Matchers {
 
   private val eori = Eori("GB123456789012") //TOOD: Maybe use example eori?  i.e. ZZ123456789000
   private val utr = Utr("1111111111K")

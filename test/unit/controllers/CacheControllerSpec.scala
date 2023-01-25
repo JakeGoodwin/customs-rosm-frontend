@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class CacheControllerSpec extends ControllerSpec {
 
     "clear cache for subscription holder for subscription journey" in {
       withAuthorisedUser(userId, mockAuthConnector)
-      when(mockSessionCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[HeaderCarrier]))
+      when(mockSessionCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[Request[_]]))
         .thenReturn(Future.successful(true))
       val result: Result =
         await(controller.clearCache(Journey.Migrate).apply(SessionBuilder.buildRequestWithSession(userId)))
@@ -61,7 +61,7 @@ class CacheControllerSpec extends ControllerSpec {
 
     "clear cache for subscription holder for get an eori journey" in {
       withAuthorisedUser(userId, mockAuthConnector)
-      when(mockSessionCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[HeaderCarrier]))
+      when(mockSessionCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[Request[_]]))
         .thenReturn(Future.successful(true))
       val result: Result =
         await(controller.clearCache(Journey.GetYourEORI).apply(SessionBuilder.buildRequestWithSession(userId)))

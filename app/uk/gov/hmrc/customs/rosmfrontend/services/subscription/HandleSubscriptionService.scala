@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
-import java.time.Clock
-
-import javax.inject.{Inject, Singleton}
 import org.joda.time.{DateTime, DateTimeZone}
 import uk.gov.hmrc.customs.rosmfrontend.connector.HandleSubscriptionConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.subscription.HandleSubscriptionRequest
@@ -26,6 +23,8 @@ import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.RecipientDetails
 import uk.gov.hmrc.customs.rosmfrontend.domain.{Eori, SafeId, TaxPayerId}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.Clock
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

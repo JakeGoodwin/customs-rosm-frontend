@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.registration
 
-import javax.inject.{Inject, Singleton}
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.SubscriptionCreateController
 import uk.gov.hmrc.customs.rosmfrontend.domain._
@@ -29,6 +28,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, Sess
 import uk.gov.hmrc.customs.rosmfrontend.services.organisation.OrgTypeLookup
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

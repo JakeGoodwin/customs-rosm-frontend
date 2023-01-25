@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ import org.joda.time.{DateTime, LocalDate}
 import org.mockito.ArgumentMatchers.{any, anyString, startsWith, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{AnyContent, Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.customs.rosmfrontend.connector.{SubscriptionDisplayConnector, ServiceUnavailableResponse}
+import uk.gov.hmrc.customs.rosmfrontend.connector.{ServiceUnavailableResponse, SubscriptionDisplayConnector}
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.SubscriptionRecoveryController
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{RecipientDetails, SubscriptionDetails}
@@ -32,12 +32,7 @@ import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.ContactDetails
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.RandomUUIDGenerator
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
-import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{
-  HandleSubscriptionService,
-  SubscriptionDetailsService,
-  TaxEnrolmentsService,
-  UpdateVerifiedEmailService
-}
+import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{HandleSubscriptionService, SubscriptionDetailsService, TaxEnrolmentsService, UpdateVerifiedEmailService}
 import uk.gov.hmrc.customs.rosmfrontend.views.html.error_template
 import uk.gov.hmrc.http.HeaderCarrier
 import util.ControllerSpec
@@ -115,25 +110,25 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
   }
 
   def setupMockCommon() = {
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockSubscriptionDetailsHolder))
     when(mockSubscriptionDisplayConnector.subscriptionDisplay(any())(any[HeaderCarrier]))
       .thenReturn(Future.successful(Right(fullyPopulatedResponse)))
     when(mockSubscriptionDetailsHolder.contactDetails).thenReturn(Some(contactDetails))
     when(contactDetails.emailAddress).thenReturn("test@example.com")
     when(mockSubscriptionDetailsHolder.email).thenReturn(Some("test@example.com"))
-    when(mockCdsFrontendDataCache.email(any[HeaderCarrier])).thenReturn(Future.successful("test@example.com"))
-    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[HeaderCarrier])).thenReturn(Future.successful(true))
-    when(mockCdsFrontendDataCache.eori(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.email(any[Request[_]])).thenReturn(Future.successful("test@example.com"))
+    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[Request[_]])).thenReturn(Future.successful(true))
+    when(mockCdsFrontendDataCache.eori(any[Request[_]]))
       .thenReturn(Future.successful(Some("GBEORI111222111")))
     when(mockSubscriptionDetailsHolder.dateOfBirth).thenReturn(None)
     when(mockSubscriptionDetailsHolder.nameDobDetails)
       .thenReturn(Some(NameDobMatchModel("fname", Some("mName"), "lname", LocalDate.parse("2019-01-01"))))
 
-    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[HeaderCarrier])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
+    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[Request[_]])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
     when(mockSubscriptionStatusOutcome.processedDate).thenReturn("01 May 2016")
 
-    when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[Request[_]]))
       .thenReturn(Future.successful(true))
     when(
       mockHandleSubscriptionService.handleSubscription(
@@ -156,7 +151,7 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
     "call Enrolment Complete with successful Subscription Display call for Get Your EORI journey" in {
 
       setupMockCommon()
-      when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]]))
         .thenReturn(Future.successful(mockOrgRegistrationDetails))
       when(mockOrgRegistrationDetails.safeId).thenReturn(SafeId("testsafeId"))
 
@@ -177,7 +172,7 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
         .thenReturn(Future.successful(Some(true)))
       when(mockSubscriptionDetailsHolder.eoriNumber).thenReturn(Some("testEORInumber"))
 
-      when(mockCdsFrontendDataCache.registerWithEoriAndIdResponse(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.registerWithEoriAndIdResponse(any[Request[_]]))
         .thenReturn(Future.successful(mockRegisterWithEoriAndIdResponse))
       when(mockRegisterWithEoriAndIdResponse.responseDetail).thenReturn(registerWithEoriAndIdResponseDetail)
 
@@ -202,10 +197,10 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
       when(mockUpdateVerifiedEmailService.updateVerifiedEmail(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(true)))
       when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]])).thenReturn(Some("third-country"))
-      when(mockSubscriptionDetailsService.cachedCustomsId(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cachedCustomsId(any[Request[_]]))
         .thenReturn(Future.successful(Some(Utr("someUtr"))))
       when(mockSubscriptionDetailsHolder.eoriNumber).thenReturn(Some("testEORInumber"))
-      when(mockCdsFrontendDataCache.registerWithEoriAndIdResponse(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.registerWithEoriAndIdResponse(any[Request[_]]))
         .thenReturn(Future.successful(mockRegisterWithEoriAndIdResponse))
       when(mockRegisterWithEoriAndIdResponse.responseDetail).thenReturn(registerWithEoriAndIdResponseDetail)
 
@@ -231,11 +226,11 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
       when(mockUpdateVerifiedEmailService.updateVerifiedEmail(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(false)))
       when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]])).thenReturn(Some("third-country"))
-      when(mockSubscriptionDetailsService.cachedCustomsId(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cachedCustomsId(any[Request[_]]))
         .thenReturn(Future.successful(Some(Utr("someUtr"))))
 
       when(mockSubscriptionDetailsHolder.eoriNumber).thenReturn(Some("testEORInumber"))
-      when(mockCdsFrontendDataCache.registerWithEoriAndIdResponse(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.registerWithEoriAndIdResponse(any[Request[_]]))
         .thenReturn(Future.successful(mockRegisterWithEoriAndIdResponse))
       when(mockRegisterWithEoriAndIdResponse.responseDetail).thenReturn(registerWithEoriAndIdResponseDetail)
 
@@ -259,10 +254,10 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
       when(mockUpdateVerifiedEmailService.updateVerifiedEmail(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(true)))
       when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]])).thenReturn(Some("third-country"))
-      when(mockSubscriptionDetailsService.cachedCustomsId(any[HeaderCarrier]))
+      when(mockSubscriptionDetailsService.cachedCustomsId(any[Request[_]]))
         .thenReturn(Future.successful(None))
       when(mockSubscriptionDetailsHolder.eoriNumber).thenReturn(Some("testEORInumber"))
-      when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]]))
         .thenReturn(Future.successful(mockOrgRegistrationDetails))
       when(mockOrgRegistrationDetails.safeId).thenReturn(SafeId("testsafeId"))
 
@@ -284,16 +279,16 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
     }
 
     "call Enrolment Complete with unsuccessful Subscription Display call" in {
-      when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]]))
         .thenReturn(Future.successful(mockOrgRegistrationDetails))
       when(mockOrgRegistrationDetails.safeId).thenReturn(SafeId("testSapNumber"))
-      when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]]))
         .thenReturn(Future.successful(mockSubscriptionDetailsHolder))
       when(mockSubscriptionDisplayConnector.subscriptionDisplay(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Left(ServiceUnavailableResponse)))
 
-      when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[HeaderCarrier])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
-      when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[Request[_]])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
+      when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[Request[_]]))
         .thenReturn(Future.successful(true))
       when(
         mockHandleSubscriptionService.handleSubscription(
@@ -316,7 +311,7 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
       when(mockSubscriptionDetailsHolder.eoriNumber).thenReturn(Some("testEORInumber"))
       when(mockUpdateVerifiedEmailService.updateVerifiedEmail(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(true)))
-      when(mockCdsFrontendDataCache.registerWithEoriAndIdResponse(any[HeaderCarrier]))
+      when(mockCdsFrontendDataCache.registerWithEoriAndIdResponse(any[Request[_]]))
         .thenReturn(Future.successful(mockRegisterWithEoriAndIdResponse))
       when(mockRegisterWithEoriAndIdResponse.responseDetail).thenReturn(registerWithEoriAndIdResponseDetail)
 
@@ -352,17 +347,17 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
   }
 
   "call Enrolment Complete with successful Subscription Display call with empty ResponseCommon should throw IllegalArgumentException" in {
-    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[HeaderCarrier])).thenReturn(Future.successful(true))
-    when(mockCdsFrontendDataCache.eori(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[Request[_]])).thenReturn(Future.successful(true))
+    when(mockCdsFrontendDataCache.eori(any[Request[_]]))
       .thenReturn(Future.successful(Some("GBEORI111222111")))
-    when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockOrgRegistrationDetails))
     when(mockOrgRegistrationDetails.safeId).thenReturn(SafeId("testSapNumber"))
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockSubscriptionDetailsHolder))
     when(mockSubscriptionDisplayConnector.subscriptionDisplay(any())(any[HeaderCarrier]))
       .thenReturn(Future.successful(Right(responseWithoutEmailAddress)))
-    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[HeaderCarrier])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
+    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[Request[_]])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
 
     callEnrolmentComplete(journey = Journey.GetYourEORI) { result =>
       status(result) shouldBe SEE_OTHER
@@ -373,17 +368,17 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
   }
 
   "call Enrolment Complete with successful Subscription Display call with ResponseCommon with no ETMPFORMBUNDLENUMBER should throw IllegalStateException" in {
-    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[HeaderCarrier])).thenReturn(Future.successful(true))
-    when(mockCdsFrontendDataCache.eori(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[Request[_]])).thenReturn(Future.successful(true))
+    when(mockCdsFrontendDataCache.eori(any[Request[_]]))
       .thenReturn(Future.successful(Some("GBEORI111222111")))
-    when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockOrgRegistrationDetails))
     when(mockOrgRegistrationDetails.safeId).thenReturn(SafeId("testSapNumber"))
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockSubscriptionDetailsHolder))
     when(mockSubscriptionDisplayConnector.subscriptionDisplay(any())(any[HeaderCarrier]))
       .thenReturn(Future.successful(Right(fullyPopulatedResponseWithNoETMPFORMBUNDLENUMBER)))
-    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[HeaderCarrier])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
+    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[Request[_]])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
 
     the[IllegalStateException] thrownBy {
       callEnrolmentComplete(journey = Journey.GetYourEORI) { result =>
@@ -393,17 +388,17 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
   }
 
   "call Enrolment Complete with successful Subscription Display call with empty ContactDetails should throw IllegalStateException" in {
-    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[HeaderCarrier])).thenReturn(Future.successful(true))
-    when(mockCdsFrontendDataCache.eori(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[Request[_]])).thenReturn(Future.successful(true))
+    when(mockCdsFrontendDataCache.eori(any[Request[_]]))
       .thenReturn(Future.successful(Some("GBEORI111222111")))
-    when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockOrgRegistrationDetails))
     when(mockOrgRegistrationDetails.safeId).thenReturn(SafeId("testSapNumber"))
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockSubscriptionDetailsHolder))
     when(mockSubscriptionDisplayConnector.subscriptionDisplay(any())(any[HeaderCarrier]))
       .thenReturn(Future.successful(Right(responseWithoutContactDetails)))
-    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[HeaderCarrier])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
+    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[Request[_]])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
     callEnrolmentComplete(journey = Journey.GetYourEORI) { result =>
       status(result) shouldBe SEE_OTHER
       header(LOCATION, result) shouldBe Some("/customs/register-for-cds/eori-exist")
@@ -411,17 +406,17 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
   }
 
   "call Enrolment Complete with successful Subscription Display call without EmailAddress should throw IllegalStateException" in {
-    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[HeaderCarrier])).thenReturn(Future.successful(true))
-    when(mockCdsFrontendDataCache.eori(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[Request[_]])).thenReturn(Future.successful(true))
+    when(mockCdsFrontendDataCache.eori(any[Request[_]]))
       .thenReturn(Future.successful(Some("GBEORI111222111")))
-    when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockOrgRegistrationDetails))
     when(mockOrgRegistrationDetails.safeId).thenReturn(SafeId("testSapNumber"))
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockSubscriptionDetailsHolder))
     when(mockSubscriptionDisplayConnector.subscriptionDisplay(any())(any[HeaderCarrier]))
       .thenReturn(Future.successful(Right(responseWithoutEmailAddress)))
-    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[HeaderCarrier])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
+    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[Request[_]])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
 
     callEnrolmentComplete(journey = Journey.GetYourEORI) { result =>
       status(result) shouldBe SEE_OTHER
@@ -430,19 +425,19 @@ class SubscriptionRecoveryControllerSpec extends ControllerSpec with MockitoSuga
   }
 
   "call Enrolment Complete with successful Subscription Display call without personOfContact should not throw exception" in {
-    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[HeaderCarrier])).thenReturn(Future.successful(true))
-    when(mockCdsFrontendDataCache.eori(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.saveEori(any[Eori])(any[Request[_]])).thenReturn(Future.successful(true))
+    when(mockCdsFrontendDataCache.eori(any[Request[_]]))
       .thenReturn(Future.successful(Some("GBEORI111222111")))
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockSubscriptionDetailsHolder))
-    when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]]))
       .thenReturn(Future.successful(mockOrgRegistrationDetails))
     when(mockOrgRegistrationDetails.safeId).thenReturn(SafeId("testSapNumber"))
 
     when(mockSubscriptionDisplayConnector.subscriptionDisplay(any())(any[HeaderCarrier]))
       .thenReturn(Future.successful(Right(responseWithoutPersonOfContact)))
-    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[HeaderCarrier])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
-    when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.subscriptionStatusOutcome(any[Request[_]])).thenReturn(Future.successful(mockSubscriptionStatusOutcome))
+    when(mockCdsFrontendDataCache.saveSubscriptionCreateOutcome(any[SubscriptionCreateOutcome])(any[Request[_]]))
       .thenReturn(Future.successful(true))
     when(
       mockHandleSubscriptionService.handleSubscription(

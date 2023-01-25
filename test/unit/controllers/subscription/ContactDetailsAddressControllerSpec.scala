@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,16 +104,16 @@ class ContactDetailsAddressControllerSpec
     )
     when(
       mockSubscriptionBusinessService.cachedContactDetailsModel(
-        any[HeaderCarrier])).thenReturn(None)
-    when(mockCdsFrontendDataCache.subscriptionDetails(any[HeaderCarrier]))
+        any[Request[_]])).thenReturn(None)
+    when(mockCdsFrontendDataCache.subscriptionDetails(any[Request[_]]))
       .thenReturn(mockSubscriptionDetails)
     registerSaveContactDetailsMockSuccess()
     mockFunctionWithRegistrationDetails(mockRegistrationDetails)
     setupMockSubscriptionFlowManager(ContactDetailsSubscriptionFlowPageGetEori)
     when(mockCountries.all).thenReturn(aFewCountries)
-    when(mockCdsFrontendDataCache.email(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.email(any[Request[_]]))
       .thenReturn(Future.successful(Email))
-    when(mockCdsFrontendDataCache.mayBeEmail(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.mayBeEmail(any[Request[_]]))
       .thenReturn(Future.successful(Some(Email)))
     when(
       mockRequestSessionData.userSelectedOrganisationType(
@@ -170,7 +170,7 @@ class ContactDetailsAddressControllerSpec
     "fill fields with contact details if stored in cache (new address entered)" in {
       when(
         mockSubscriptionBusinessService.cachedContactDetailsModel(
-          any[HeaderCarrier]))
+          any[Request[_]]))
         .thenReturn(Some(contactDetailsModel))
       showReviewForm() { result =>
         val page = CdsPage(bodyOf(result))
@@ -235,7 +235,7 @@ class ContactDetailsAddressControllerSpec
         await(result)
         verify(mockSubscriptionDetailsHolderService)
           .cacheContactDetails(any[ContactDetailsModel])(
-            any[HeaderCarrier])
+            any[Request[_]])
       }
     }
 
@@ -250,13 +250,12 @@ class ContactDetailsAddressControllerSpec
                          countryCode = "GB")
       )
       when(
-        mockSubscriptionDetailsHolderService.cachedAddressDetails(
-          any[HeaderCarrier]))
+        mockSubscriptionDetailsHolderService.cachedAddressDetails(any[Request[_]]))
         .thenReturn(Future.successful(cachedAddressDetails))
 
       when(
         mockRegistrationDetailsService.cacheAddress(any())(
-          any[HeaderCarrier]())).thenReturn(Future.successful(true))
+          any[Request[_]])).thenReturn(Future.successful(true))
       setupMockSubscriptionFlowManager(
         ContactDetailsSubscriptionFlowPageMigrate)
 
@@ -265,7 +264,7 @@ class ContactDetailsAddressControllerSpec
           await(result)
           verify(mockSubscriptionDetailsHolderService)
             .cacheContactDetails(any[ContactDetailsModel])(
-              any[HeaderCarrier])
+              any[Request[_]])
       }
     }
 
@@ -334,7 +333,7 @@ class ContactDetailsAddressControllerSpec
 
   private def mockFunctionWithRegistrationDetails(
       registrationDetails: RegistrationDetails) {
-    when(mockCdsFrontendDataCache.registrationDetails(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.registrationDetails(any[Request[_]]))
       .thenReturn(registrationDetails)
   }
 
@@ -370,8 +369,7 @@ class ContactDetailsAddressControllerSpec
     }
 
     when(
-      mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]],
-                                    any[HeaderCarrier]))
+      mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]]))
       .thenReturn(Some(orgType))
     when(mockRequestSessionData.userSubscriptionFlow(any[Request[AnyContent]]))
       .thenReturn(subscriptionFlow)
@@ -393,7 +391,7 @@ class ContactDetailsAddressControllerSpec
       .thenReturn(subscriptionFlow)
     when(
       mockSubscriptionBusinessService.cachedContactDetailsModel(
-        any[HeaderCarrier]))
+        any[Request[_]]))
       .thenReturn(Some(contactDetailsModel))
 
     test(
@@ -406,7 +404,7 @@ class ContactDetailsAddressControllerSpec
     when(
       mockSubscriptionDetailsHolderService
         .cacheContactDetails(any[ContactDetailsModel])(
-          any[HeaderCarrier])
+          any[Request[_]])
     ).thenReturn(Future.successful(()))
   }
 

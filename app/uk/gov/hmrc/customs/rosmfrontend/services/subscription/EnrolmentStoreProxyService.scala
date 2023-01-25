@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.subscription
 
-import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.customs.rosmfrontend.connector.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.{EnrolmentResponse, Eori, GroupId}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

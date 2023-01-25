@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ class SicCodeControllerSpec
       mockSubscriptionDetailsHolderService,
       mockRequestSessionData
     )
-    when(mockSubscriptionBusinessService.cachedSicCode(any[HeaderCarrier])).thenReturn(None)
+    when(mockSubscriptionBusinessService.cachedSicCode(any[Request[_]])).thenReturn(None)
     registerSaveDetailsMockSuccess()
     setupMockSubscriptionFlowManager(SicCodeSubscriptionFlowPage)
   }
@@ -227,7 +227,7 @@ class SicCodeControllerSpec
     }
 
     "have SIC code input field prepopulated if cached previously" in {
-      when(mockSubscriptionBusinessService.cachedSicCode(any[HeaderCarrier])).thenReturn(Future.successful(Some(sic)))
+      when(mockSubscriptionBusinessService.cachedSicCode(any[Request[_]])).thenReturn(Future.successful(Some(sic)))
       showCreateForm(userSelectedOrgType = Company) { result =>
         val page = CdsPage(bodyOf(result))
         verifyPrincipalEconomicActivityFieldExistsAndPopulatedCorrectly(page)
@@ -251,7 +251,7 @@ class SicCodeControllerSpec
     "retrieve the cached data" in {
       showReviewForm(userSelectedOrgType = Company) { result =>
         CdsPage(bodyOf(result))
-        verify(mockSubscriptionBusinessService).getCachedSicCode(any[HeaderCarrier])
+        verify(mockSubscriptionBusinessService).getCachedSicCode(any[Request[_]])
       }
     }
 
@@ -416,7 +416,7 @@ class SicCodeControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
     when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]]))
       .thenReturn(Some(userSelectedOrgType))
 
@@ -435,7 +435,7 @@ class SicCodeControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
     when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]]))
       .thenReturn(Some(userSelectedOrgType))
 
@@ -446,12 +446,12 @@ class SicCodeControllerSpec
   }
 
   private def registerSaveDetailsMockSuccess() {
-    when(mockSubscriptionDetailsHolderService.cacheSicCode(anyString())(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheSicCode(anyString())(any[Request[_]]))
       .thenReturn(Future.successful(()))
   }
 
   private def registerSaveDetailsMockFailure(exception: Throwable) {
-    when(mockSubscriptionDetailsHolderService.cacheSicCode(anyString)(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheSicCode(anyString)(any[Request[_]]))
       .thenReturn(Future.failed(exception))
   }
 
@@ -464,7 +464,7 @@ class SicCodeControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
     when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]]))
       .thenReturn(Some(userSelectedOrgType))
     when(mockRequestSessionData.selectedUserLocation(any[Request[AnyContent]])).thenReturn(userLocation)
@@ -481,10 +481,10 @@ class SicCodeControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
     when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]]))
       .thenReturn(Some(userSelectedOrgType))
-    when(mockSubscriptionBusinessService.getCachedSicCode(any[HeaderCarrier])).thenReturn(dataToEdit)
+    when(mockSubscriptionBusinessService.getCachedSicCode(any[Request[_]])).thenReturn(dataToEdit)
 
     test(controller.reviewForm(journey).apply(SessionBuilder.buildRequestWithSession(userId)))
   }

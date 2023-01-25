@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,7 +140,7 @@ class RegisterWithEoriAndIdService @Inject()(
     value: RegisterWithEoriAndIdDetail,
     subscriptionDetails: SubscriptionDetails,
     maybeOrganisationTypeConfiguration: Option[OrganisationTypeConfiguration]
-  )(implicit hc: HeaderCarrier, loggedInUser: LoggedInUser): Future[Boolean] = {
+  )(implicit hc: HeaderCarrier, request: Request[_], loggedInUser: LoggedInUser): Future[Boolean] = {
 
     def stripKFromUtr: RegisterWithEoriAndIdDetail => RegisterWithEoriAndIdDetail = {
       case r @ RegisterWithEoriAndIdDetail(_, id, _) if id.IDType == UTR =>
@@ -151,7 +151,7 @@ class RegisterWithEoriAndIdService @Inject()(
     def save(
       details: RegisterWithEoriAndIdResponse,
       subscriptionDetails: SubscriptionDetails
-    )(implicit hc: HeaderCarrier, loggedInUserId: LoggedInUser): Future[Boolean] =
+    )(implicit request: Request[_], loggedInUserId: LoggedInUser): Future[Boolean] =
       if (details.isResponseData) {
         (details.isDoE, details.isPersonType) match {
           case (true, true) => dataCache.saveRegisterWithEoriAndIdResponse(details)

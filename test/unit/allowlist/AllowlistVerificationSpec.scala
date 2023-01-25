@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Request
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.EoriTextDownloadController
@@ -51,7 +52,7 @@ class AllowlistVerificationSpec extends ControllerSpec with BeforeAndAfterEach {
     new EoriTextDownloadController(app, mockAuthConnector, mockCache, eoriNumberTextDownloadView, mcc)
 
   override def beforeEach(): Unit =
-    when(mockCache.subscriptionCreateOutcome(any[HeaderCarrier]))
+    when(mockCache.subscriptionCreateOutcome(any[Request[_]]))
       .thenReturn(Future.successful(SubscriptionCreateOutcome("20/01/2019", "John Doe", Some("GB123456789012"))))
 
   "Allowlist verification" should {

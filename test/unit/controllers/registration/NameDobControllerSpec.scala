@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.joda.time.LocalDate
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.NameDobController
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.SubscriptionDetails
@@ -61,7 +61,7 @@ class NameDobControllerSpec extends ControllerSpec with BeforeAndAfterEach with 
     s"The $field name must be $maxLength characters or less"
 
   override def beforeEach: Unit =
-    when(mockCdsFrontendDataCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[HeaderCarrier]))
+    when(mockCdsFrontendDataCache.saveSubscriptionDetails(any[SubscriptionDetails])(any[Request[_]]))
       .thenReturn(Future.successful(true))
 
   "Viewing the Individual Matching with ID form" should {

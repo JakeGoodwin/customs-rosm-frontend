@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 
 package unit.models
 
-import org.scalatest.{EitherValues, MustMatchers, OptionValues, WordSpec}
+import org.scalatest.{EitherValues, OptionValues}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.mvc.{PathBindable, QueryStringBindable}
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 
-class JourneySpec extends WordSpec with MustMatchers with EitherValues with OptionValues {
+class JourneySpec extends AnyWordSpec with Matchers with EitherValues with OptionValues {
 
   "Journey" must {
 

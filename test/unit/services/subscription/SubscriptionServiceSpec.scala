@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import org.mockito.Mockito.when
 import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.scalacheck.{Gen, Prop}
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.prop.Checkers
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.Checkers
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.mvc.Http.Status._
 import uk.gov.hmrc.customs.rosmfrontend.connector.SubscriptionServiceConnector

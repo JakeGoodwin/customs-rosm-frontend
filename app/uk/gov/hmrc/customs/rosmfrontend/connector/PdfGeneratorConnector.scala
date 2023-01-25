@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
 package uk.gov.hmrc.customs.rosmfrontend.connector
 
 import akka.util.ByteString
-import javax.inject.{Inject, Singleton}
 import play.api.http.HeaderNames.CONTENT_TYPE
 import play.api.http.MimeTypes
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
-import uk.gov.hmrc.http._
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
@@ -37,7 +36,7 @@ class PdfGeneratorConnector @Inject()(http: WSClient, appConfig: AppConfig) {
 
   private lazy val url = s"$baseUrl/pdf-generator-service/generate"
 
-  def generatePdf(html: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ByteString] = {
+  def generatePdf(html: String)(implicit ec: ExecutionContext): Future[ByteString] = {
     CdsLogger.debug(s"[$loggerComponentId][generatePdf] postUrl: $url")
     http
       .url(url)

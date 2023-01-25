@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 package common.pages
 
 import org.openqa.selenium.By
-import org.scalatest.MustMatchers
-import org.scalatest.selenium.{Page, WebBrowser}
+import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.selenium.{Page, WebBrowser}
 
-trait WebPage extends Page with WebBrowser with MustMatchers {
+trait WebPage extends Page with WebBrowser with Matchers {
 
   val backLinkXPath: String = "//*[@id='back']"
   val pageLevelErrorSummaryListXPath = "//ul[@class='error-summary-list']"

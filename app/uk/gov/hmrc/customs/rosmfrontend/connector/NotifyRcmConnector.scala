@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,13 +41,12 @@ class NotifyRcmConnector @Inject()(http: HttpClient, appConfig: AppConfig, audit
     CdsLogger.info(s"[$LoggerComponentId][call] postUrl: $url")
     val headers = Seq(ACCEPT -> "application/vnd.hmrc.1.0+json", CONTENT_TYPE -> MimeTypes.JSON)
     auditCallRequest(url, request)
-    val headersForLogging = hc.headers(explicitlyIncludedHeaders) ++ hc.extraHeaders ++ headers
     http.POST[NotifyRcmRequest, HttpResponse](url, request, headers) map { response =>
       auditCallResponse(url, response)
       response.status match {
         case OK | NO_CONTENT => {
           CdsLogger.info(
-            s"[$LoggerComponentId][call] complete for call to $url and headers $headersForLogging. Status:${response.status}"
+            s"[$LoggerComponentId][call] complete for call to $url. Status:${response.status}"
           )
           ()
         }
@@ -56,13 +55,13 @@ class NotifyRcmConnector @Inject()(http: HttpClient, appConfig: AppConfig, audit
     } recoverWith {
       case e: BadRequestException =>
         CdsLogger.error(
-          s"[$LoggerComponentId][call] request failed with BAD_REQUEST status for call to $url and headers $headersForLogging: ${e.getMessage}",
+          s"[$LoggerComponentId][call] request failed with BAD_REQUEST status for call to $url: ${e.getMessage}",
           e
         )
         Future.failed(e)
       case NonFatal(e) =>
         CdsLogger.error(
-          s"[$LoggerComponentId][call] request failed for call to $url and headers $headersForLogging: ${e.getMessage}",
+          s"[$LoggerComponentId][call] request failed for call to $url: ${e.getMessage}",
           e
         )
         Future.failed(e)

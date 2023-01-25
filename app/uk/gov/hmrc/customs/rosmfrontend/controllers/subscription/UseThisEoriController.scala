@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,20 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
-import uk.gov.hmrc.customs.rosmfrontend.domain.{Eori, LoggedInUserWithEnrolments}
+import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.routes.SignInWithDifferentDetailsController
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.EoriNumberSubscriptionFlowPage
+import uk.gov.hmrc.customs.rosmfrontend.domain.{Eori, LoggedInUserWithEnrolments}
 import uk.gov.hmrc.customs.rosmfrontend.forms.MatchingForms.useThisEoriYesNoAnswer
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.models.exceptions.MissingExistingEori
 import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{EnrolmentStoreProxyService, SubscriptionDetailsService}
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.{use_this_eori, use_this_eori_different_gg}
-import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.routes.SignInWithDifferentDetailsController
+
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

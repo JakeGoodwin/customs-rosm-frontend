@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@ package unit.services.cache
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.Request
 import uk.gov.hmrc.customs.rosmfrontend.domain.LoggedInUser
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{ClearCacheAndRegistrationIdentificationService, SessionCache}
 import uk.gov.hmrc.http.HeaderCarrier
 import util.UnitSpec
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ClearCacheAndRegistrationIdentificationServiceSpec extends UnitSpec with MockitoSugar with BeforeAndAfterAll {
@@ -44,17 +46,17 @@ class ClearCacheAndRegistrationIdentificationServiceSpec extends UnitSpec with M
   "ClearCacheAndRegistrationIdentificationService" should {
     "clear cache and database" in {
       when(mockSessionCache.saveEmail(any())(any())).thenReturn(Future.successful(true))
-      when(mockSessionCache.email).thenReturn(Future.successful("testEmail"))
-      when(mockSessionCache.remove).thenReturn(Future.successful(true))
+      when(mockSessionCache.email(any[Request[_]])).thenReturn(Future.successful("testEmail"))
+      when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
 
-      await(service.clear) should be(())
+      await(service.clear(any[Request[_]])) should be(())
     }
 
     "return a failure if cache clear fails unexpectedly" in {
-      when(mockSessionCache.remove).thenReturn(Future.failed(Failure))
+      when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.failed(Failure))
 
       intercept[RuntimeException] {
-        await(service.clear)
+        await(service.clear(any[Request[_]]))
       } shouldBe Failure
     }
   }

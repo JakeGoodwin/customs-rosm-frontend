@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ class WhatIsYourUtrSubscriptionController @Inject()(
     }
 
   private def cacheNameIdDetails(form: UtrMatchModel, journey: Journey.Value)(
-    implicit hc: HeaderCarrier
+    implicit hc: HeaderCarrier, request: Request[_]
   ): Future[Result] =
     for {
       optionalName <- subscriptionDetailsService.cachedNameDetails

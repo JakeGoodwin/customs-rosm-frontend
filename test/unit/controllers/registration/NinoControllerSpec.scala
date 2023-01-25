@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.{ArgumentMatchers, Mockito}
 import org.scalatest.BeforeAndAfter
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.NinoController
@@ -192,7 +192,7 @@ class NinoControllerSpec extends ControllerSpec with BeforeAndAfter {
           ArgumentMatchers.eq(NinoFormBuilder.Nino),
           ArgumentMatchers.eq(NinoFormBuilder.asIndividual),
           any()
-        )(any[HeaderCarrier])
+        )(any[HeaderCarrier], any[Request[_]])
       ).thenReturn(Future.successful(true))
 
       submitForm(form = NinoFormBuilder.asForm) { result =>
@@ -202,7 +202,7 @@ class NinoControllerSpec extends ControllerSpec with BeforeAndAfter {
         status(result) shouldBe SEE_OTHER
         result.header.headers("Location") should endWith("/customs/register-for-cds/matching/confirm")
 
-        verify(mockMatchingService).matchIndividualWithNino(any(), any(), any())(any[HeaderCarrier])
+        verify(mockMatchingService).matchIndividualWithNino(any(), any(), any())(any[HeaderCarrier], any[Request[_]])
       }
     }
 
@@ -212,7 +212,7 @@ class NinoControllerSpec extends ControllerSpec with BeforeAndAfter {
           ArgumentMatchers.eq(NinoFormBuilder.Nino),
           ArgumentMatchers.eq(NinoFormBuilder.asIndividual),
           any()
-        )(any[HeaderCarrier])
+        )(any[HeaderCarrier], any[Request[_]])
       ).thenReturn(Future.successful(false))
 
       submitForm(form = NinoFormBuilder.asForm) { result =>
@@ -220,7 +220,7 @@ class NinoControllerSpec extends ControllerSpec with BeforeAndAfter {
         val page = CdsPage(bodyOf(result))
         page.getElementsText(NinoMatchPage.pageLevelErrorSummaryListXPath) shouldBe "Your details have not been found. Check that your details are correct and then try again."
 
-        verify(mockMatchingService).matchIndividualWithNino(any(), any(), any())(any[HeaderCarrier])
+        verify(mockMatchingService).matchIndividualWithNino(any(), any(), any())(any[HeaderCarrier], any[Request[_]])
       }
     }
   }

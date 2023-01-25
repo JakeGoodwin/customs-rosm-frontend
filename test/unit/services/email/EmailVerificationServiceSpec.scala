@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,13 @@ package unit.services.email
 import org.mockito.Mockito._
 import org.mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.BAD_REQUEST
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.customs.rosmfrontend.connector.EmailVerificationConnector
-import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.EmailVerificationRequestHttpParser.{
-  EmailAlreadyVerified,
-  EmailVerificationRequestFailure,
-  EmailVerificationRequestResponse,
-  EmailVerificationRequestSent
-}
-import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.EmailVerificationStateHttpParser.{
-  EmailNotVerified,
-  EmailVerificationStateErrorResponse,
-  EmailVerificationStateResponse,
-  EmailVerified
-}
+import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.EmailVerificationRequestHttpParser.{EmailAlreadyVerified, EmailVerificationRequestFailure, EmailVerificationRequestResponse, EmailVerificationRequestSent}
+import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.EmailVerificationStateHttpParser.{EmailNotVerified, EmailVerificationStateErrorResponse, EmailVerificationStateResponse, EmailVerified}
 import uk.gov.hmrc.customs.rosmfrontend.services.email.EmailVerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 import util.UnitSpec

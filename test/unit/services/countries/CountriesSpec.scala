@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
 
 package unit.services.countries
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.customs.rosmfrontend.services.countries.{Countries, Country}
 
-class CountriesSpec extends WordSpec with Matchers with GuiceOneAppPerSuite {
+class CountriesSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(

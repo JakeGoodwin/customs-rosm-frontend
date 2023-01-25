@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,28 +21,13 @@ import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
 import uk.gov.hmrc.customs.rosmfrontend.controllers.routes._
-import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{
-  ContactDetailsAddressSubscriptionFlowPageGetEori,
-  ContactDetailsAddressSubscriptionFlowPageMigrate,
-  ContactDetailsIsThisRightAddressSubscriptionFlowPageGetEori,
-  ContactDetailsIsThisRightAddressSubscriptionFlowPageMigrate,
-  ContactDetailsSubscriptionFlowPageMigrate
-}
-import uk.gov.hmrc.customs.rosmfrontend.domain.{
-  LoggedInUserWithEnrolments,
-  YesNo
-}
+import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{ContactDetailsAddressSubscriptionFlowPageGetEori, ContactDetailsAddressSubscriptionFlowPageMigrate, ContactDetailsIsThisRightAddressSubscriptionFlowPageGetEori, ContactDetailsIsThisRightAddressSubscriptionFlowPageMigrate}
+import uk.gov.hmrc.customs.rosmfrontend.domain.{LoggedInUserWithEnrolments, YesNo}
 import uk.gov.hmrc.customs.rosmfrontend.forms.MatchingForms.isThisRightContactAddressYesNoAnswer
-import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.{
-  AddressViewModel,
-  ContactDetailsModel
-}
+import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.{AddressViewModel, ContactDetailsModel}
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
-import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{
-  SubscriptionBusinessService,
-  SubscriptionDetailsService
-}
+import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{SubscriptionBusinessService, SubscriptionDetailsService}
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.contact_is_right_address
 import uk.gov.hmrc.http.HeaderCarrier
 

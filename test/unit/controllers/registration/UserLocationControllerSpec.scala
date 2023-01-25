@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,12 @@
 package unit.controllers.registration
 
 import java.util.UUID
-
 import common.pages.registration.UserLocationPageOrganisation._
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterEach, mock => _}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{AnyContent, Request, Result, Session}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -34,23 +33,10 @@ import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.routes._
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.SubscriptionFlowManager
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.routes.SignInWithDifferentDetailsController
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.Address
-import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.matching.{
-  ContactResponse,
-  IndividualResponse,
-  OrganisationResponse
-}
-import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.registration.{
-  RegistrationDisplayResponse,
-  ResponseCommon,
-  ResponseDetail
-}
+import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.matching.{ContactResponse, IndividualResponse, OrganisationResponse}
+import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.registration.{RegistrationDisplayResponse, ResponseCommon, ResponseDetail}
 import uk.gov.hmrc.customs.rosmfrontend.domain.registration.UserLocation
-import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{
-  BusinessDetailsRecoveryPage,
-  ContactDetailsSubscriptionFlowPageGetEori,
-  SubscriptionPage,
-  UserLocationPage
-}
+import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.{BusinessDetailsRecoveryPage, ContactDetailsSubscriptionFlowPageGetEori, SubscriptionPage, UserLocationPage}
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.Save4LaterService
@@ -129,7 +115,7 @@ class UserLocationControllerSpec extends ControllerSpec with MockitoSugar with B
     when(
       mockRequestSessionData.existingSessionWithUserLocationAdded(any[Session], any[String])(any[Request[AnyContent]])
     ).thenReturn(Session())
-    when(mockRegistrationDisplayService.cacheDetails(any())(any(), any()))
+    when(mockRegistrationDisplayService.cacheDetails(any())(any()))
       .thenReturn(Future.successful(true))
     when(mockSave4LaterService.fetchSafeId(any[InternalId]())(any[HeaderCarrier]())).thenReturn(Future.successful(None))
     when(
@@ -384,7 +370,7 @@ class UserLocationControllerSpec extends ControllerSpec with MockitoSugar with B
           .thenReturn(Future.successful(Some(SafeId("safeid"))))
         when(
           mockSubscriptionStatusService
-            .getStatus(any[String], any[String])(any[HeaderCarrier])
+            .getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]])
         ).thenReturn(Future.successful(SubscriptionProcessing))
 
         submitForm(ValidRequest + (locationFieldName -> selectedOptionValue)) { result =>
@@ -398,11 +384,11 @@ class UserLocationControllerSpec extends ControllerSpec with MockitoSugar with B
           .thenReturn(Future.successful(Some(SafeId("safeid"))))
         when(
           mockSubscriptionStatusService
-            .getStatus(any[String], any[String])(any[HeaderCarrier])
+            .getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]])
         ).thenReturn(Future.successful(SubscriptionExists))
         when(mockTaxEnrolmentsService.doesEnrolmentExist(any[SafeId])(any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.successful(true))
-        when(mockSessionCache.saveRegistrationDetails(any[RegistrationDetailsSafeId])(any[HeaderCarrier]))
+        when(mockSessionCache.saveRegistrationDetails(any[RegistrationDetailsSafeId])(any[Request[_]]))
           .thenReturn(Future.successful(true))
 
         submitForm(ValidRequest + (locationFieldName -> selectedOptionValue)) { result =>
@@ -418,7 +404,7 @@ class UserLocationControllerSpec extends ControllerSpec with MockitoSugar with B
           .thenReturn(Future.successful(Some(SafeId("safeid"))))
         when(
           mockSubscriptionStatusService
-            .getStatus(any[String], any[String])(any[HeaderCarrier])
+            .getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]])
         ).thenReturn(Future.successful(SubscriptionExists))
         when(mockTaxEnrolmentsService.doesEnrolmentExist(any[SafeId])(any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.successful(false))
@@ -443,7 +429,7 @@ class UserLocationControllerSpec extends ControllerSpec with MockitoSugar with B
           .thenReturn(Future.successful(Some(SafeId("safeid"))))
         when(
           mockSubscriptionStatusService
-            .getStatus(any[String], any[String])(any[HeaderCarrier])
+            .getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]])
         ).thenReturn(Future.successful(SubscriptionRejected))
         when(mockRegistrationDisplayService.requestDetails(any())(any(), any()))
           .thenReturn(
@@ -497,7 +483,7 @@ class UserLocationControllerSpec extends ControllerSpec with MockitoSugar with B
           .thenReturn(Future.successful(Some(SafeId("safeid"))))
         when(
           mockSubscriptionStatusService
-            .getStatus(any[String], any[String])(any[HeaderCarrier])
+            .getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]])
         ).thenReturn(Future.successful(NewSubscription))
         when(mockRegistrationDisplayService.requestDetails(any())(any(), any()))
           .thenReturn(
@@ -560,7 +546,7 @@ class UserLocationControllerSpec extends ControllerSpec with MockitoSugar with B
 
       val processedDate = SubscriptionStatusOutcome("01/01/2011")
 
-      when(mockSessionCache.subscriptionStatusOutcome(any[HeaderCarrier]))
+      when(mockSessionCache.subscriptionStatusOutcome(any[Request[_]]))
         .thenReturn(Future.successful(processedDate))
       processing() { result =>
         status(result) shouldBe OK

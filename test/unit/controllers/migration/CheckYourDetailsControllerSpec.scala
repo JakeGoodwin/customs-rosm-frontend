@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,10 +78,10 @@ class CheckYourDetailsControllerSpec
         Some(AddressViewModel(street = "street", city = "city", postcode = Some("postcode"), countryCode = "GB")),
       email = Some("john.doe@example.com")
     )
-    when(mockCdsDataCache.email(any[HeaderCarrier])).thenReturn(Future.successful(Email))
+    when(mockCdsDataCache.email(any[Request[_]])).thenReturn(Future.successful(Email))
 
-    when(mockCdsDataCache.subscriptionDetails(any[HeaderCarrier])).thenReturn(subscriptionDetailsHolderForCompany)
-    when(mockCdsDataCache.registrationDetails(any[HeaderCarrier])).thenReturn(individualRegistrationDetails)
+    when(mockCdsDataCache.subscriptionDetails(any[Request[_]])).thenReturn(subscriptionDetailsHolderForCompany)
+    when(mockCdsDataCache.registrationDetails(any[Request[_]])).thenReturn(individualRegistrationDetails)
   }
 
   "Reviewing the details" should {
@@ -89,7 +89,7 @@ class CheckYourDetailsControllerSpec
     assertNotLoggedInAndCdsEnrolmentChecksForGetAnEori(mockAuthConnector, controller.reviewDetails(Journey.Migrate))
 
     "return ok when data has been provided" in {
-      when(mockCdsDataCache.registrationDetails(any[HeaderCarrier])).thenReturn(existingOrganisationRegistrationDetails)
+      when(mockCdsDataCache.registrationDetails(any[Request[_]])).thenReturn(existingOrganisationRegistrationDetails)
 
       showForm() { result =>
         status(result) shouldBe OK

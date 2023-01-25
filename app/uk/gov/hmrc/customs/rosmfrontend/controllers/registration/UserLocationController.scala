@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.Save4LaterService
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
 import uk.gov.hmrc.customs.rosmfrontend.services.registration.RegistrationDisplayService
-import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{NewSubscription, _}
+import uk.gov.hmrc.customs.rosmfrontend.services.subscription._
 import uk.gov.hmrc.customs.rosmfrontend.views.html.error_template
 import uk.gov.hmrc.customs.rosmfrontend.views.html.registration._
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.{subscription_status_outcome_processing, subscription_status_outcome_rejected}
@@ -125,7 +125,7 @@ class UserLocationController @Inject()(
 
     }
 
-  private def subscriptionStatusBasedOnSafeId(internalId: InternalId)(implicit hc: HeaderCarrier) =
+  private def subscriptionStatusBasedOnSafeId(internalId: InternalId)(implicit hc: HeaderCarrier, request: Request[_]) =
     for {
       mayBeSafeId <- save4LaterService.fetchSafeId(internalId)
       preSubscriptionStatus <- mayBeSafeId match {

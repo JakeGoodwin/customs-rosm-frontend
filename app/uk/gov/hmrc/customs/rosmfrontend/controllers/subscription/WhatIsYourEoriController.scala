@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,7 @@ import uk.gov.hmrc.customs.rosmfrontend.forms.subscription.SubscriptionForm.eori
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.models.exceptions.MissingExistingEori
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.RequestSessionData
-import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{
-  EnrolmentStoreProxyService,
-  SubscriptionBusinessService,
-  SubscriptionDetailsService
-}
+import uk.gov.hmrc.customs.rosmfrontend.services.subscription.{EnrolmentStoreProxyService, SubscriptionBusinessService, SubscriptionDetailsService}
 import uk.gov.hmrc.customs.rosmfrontend.views.html.migration._
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -75,7 +71,7 @@ class WhatIsYourEoriController @Inject()(
       }
     }
 
-  private def useExistingEori(eori: Eori, journey: Journey.Value)(implicit headerCarrier: HeaderCarrier) =
+  private def useExistingEori(eori: Eori, journey: Journey.Value)(implicit hc: HeaderCarrier, request: Request[_]) =
     subscriptionDetailsHolderService.cacheExistingEoriNumber(eori.id).map { _ =>
       Redirect(uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.routes.UseThisEoriController.display(journey))
     }

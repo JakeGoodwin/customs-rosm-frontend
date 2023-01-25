@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ package unit.services.subscription
 import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.Request
 import uk.gov.hmrc.customs.rosmfrontend.connector.NotifyRcmConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.subscription.NotifyRcmRequest
 import uk.gov.hmrc.customs.rosmfrontend.domain.subscription.SubscriptionDetails
@@ -39,6 +40,7 @@ class NotifyRcmServiceSpec extends UnitSpec with MockitoSugar with BeforeAndAfte
 
   private val service = new NotifyRcmService(mockSessionCache, mockNotifyRcmConnector)
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
+  private implicit val req: Request[_] = mock[Request[_]]
 
   before {
     reset(mockSessionCache, mockSessionCache)

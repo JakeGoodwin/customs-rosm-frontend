@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.customs.rosmfrontend.connector.RegisterWithoutIdConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.SubscriptionCreateController
@@ -129,18 +129,18 @@ class RegisterWithoutIdServiceSpec
     when(
       mockSessionCache
         .saveRegistrationDetails(any[RegistrationDetails], any[InternalId], any[Option[CdsOrganisationType]])(
-          any[HeaderCarrier]
+          any[HeaderCarrier], any[Request[_]]
         )
     ).thenReturn(Future.successful(true))
     when(
       mockSessionCache
-        .saveRegistrationDetails(any[RegistrationDetails])(any[HeaderCarrier])
+        .saveRegistrationDetails(any[RegistrationDetails])(any[Request[_]])
     ).thenReturn(Future.successful(true))
 
     when(mockReqCommonGen.generate()).thenReturn(mockRequestCommon)
     when(
       mockSessionCache
-        .saveRegistrationDetails(any[RegistrationDetails])(any[HeaderCarrier])
+        .saveRegistrationDetails(any[RegistrationDetails])(any[Request[_]])
     ).thenReturn(Future.successful(true))
   }
 
@@ -249,7 +249,7 @@ class RegisterWithoutIdServiceSpec
       await(service.registerOrganisation(orgName, address, contactDetails, mockLoggedInUser))
 
       verify(mockSessionCache).saveRegistrationDetails(ArgumentMatchers.eq(mockDetailsOrganisation))(
-        ArgumentMatchers.eq(hc)
+        ArgumentMatchers.eq(rq)
       )
     }
 
@@ -258,7 +258,7 @@ class RegisterWithoutIdServiceSpec
 
       when(
         mockSessionCache
-          .saveRegistrationDetails(any[RegistrationDetails])(any[HeaderCarrier])
+          .saveRegistrationDetails(any[RegistrationDetails])(any[Request[_]])
       ).thenReturn(Future.failed(emulatedFailure))
 
       val caught = intercept[RuntimeException] {
@@ -272,7 +272,7 @@ class RegisterWithoutIdServiceSpec
       when(
         mockSessionCache
           .saveRegistrationDetails(any[RegistrationDetails], any[InternalId], any[Option[CdsOrganisationType]])(
-            any[HeaderCarrier]
+            any[HeaderCarrier], any[Request[_]]
           )
       ).thenReturn(Future.successful(true))
       service
@@ -336,7 +336,7 @@ class RegisterWithoutIdServiceSpec
       )
 
       verify(mockSessionCache).saveRegistrationDetails(ArgumentMatchers.eq(mockDetailsIndividual))(
-        ArgumentMatchers.eq(hc)
+        ArgumentMatchers.eq(rq)
       )
     }
 
@@ -345,7 +345,7 @@ class RegisterWithoutIdServiceSpec
 
       when(
         mockSessionCache
-          .saveRegistrationDetails(any[RegistrationDetails])(any[HeaderCarrier])
+          .saveRegistrationDetails(any[RegistrationDetails])(any[Request[_]])
       ).thenReturn(Future.failed(emulatedFailure))
 
       val caught = intercept[RuntimeException] {

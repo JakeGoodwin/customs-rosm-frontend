@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package unit.services.organisation
 
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterEach, mock => _}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.customs.rosmfrontend.domain.{CdsOrganisationType, CorporateBody, Partnership}
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, SessionCache}
@@ -49,38 +49,38 @@ class OrgTypeLookupSpec extends UnitSpec with BeforeAndAfterEach with MockitoSug
       when(mockReqSessionData.userSelectedOrganisationType(any[Request[AnyContent]]))
         .thenReturn(Some(CdsOrganisationType.Company))
 
-      val orgType = await(lookup.etmpOrgType(req, hc))
+      val orgType = await(lookup.etmpOrgType(req))
 
       orgType shouldBe Some(CorporateBody)
     }
 
     "give org type from cache" in {
       when(mockReqSessionData.userSelectedOrganisationType(any[Request[AnyContent]])).thenReturn(None)
-      when(mockCache.registrationDetails(any[HeaderCarrier]))
+      when(mockCache.registrationDetails(any[Request[_]]))
         .thenReturn(Future.successful(RegistrationDetailsBuilder.partnershipRegistrationDetails))
 
-      val orgType = await(lookup.etmpOrgType(req, hc))
+      val orgType = await(lookup.etmpOrgType(req))
 
       orgType shouldBe Some(Partnership)
     }
 
     "return None when neither the request session or cache contains the org type" in {
       when(mockReqSessionData.userSelectedOrganisationType(any[Request[AnyContent]])).thenReturn(None)
-      when(mockCache.registrationDetails(any[HeaderCarrier]))
+      when(mockCache.registrationDetails(any[Request[_]]))
         .thenReturn(Future.successful(RegistrationDetailsBuilder.emptyETMPOrgTypeRegistrationDetails))
 
-      val orgType = await(lookup.etmpOrgType(req, hc))
+      val orgType = await(lookup.etmpOrgType(req))
 
       orgType shouldBe None
     }
 
     "throw an exception when different type of registration details is retrieved" in {
       when(mockReqSessionData.userSelectedOrganisationType(any[Request[AnyContent]])).thenReturn(None)
-      when(mockCache.registrationDetails(any[HeaderCarrier]))
+      when(mockCache.registrationDetails(any[Request[_]]))
         .thenReturn(Future.successful(RegistrationDetailsBuilder.individualRegistrationDetails))
 
       val thrown = intercept[IllegalStateException] {
-        await(lookup.etmpOrgType(req, hc))
+        await(lookup.etmpOrgType(req))
       }
 
       thrown.getMessage shouldBe "No Registration details in cache."

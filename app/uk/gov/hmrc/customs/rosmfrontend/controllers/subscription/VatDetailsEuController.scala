@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.Messages
@@ -34,6 +33,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.subscription.SubscriptionVatEUD
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.vat_details_eu
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -210,7 +210,7 @@ class VatDetailsEuController @Inject()(
       )
     )
 
-  private def isEuVatDetailsSeqOnLimit(implicit hc: HeaderCarrier): Future[Boolean] =
+  private def isEuVatDetailsSeqOnLimit(implicit hc: HeaderCarrier, request: Request[_]): Future[Boolean] =
     vatEUDetailsService.cachedEUVatDetails map (_.size == EuVatDetailsLimit)
 
   private def goToConfirmVat(journey: Journey.Value, isInReviewMode: Boolean) =

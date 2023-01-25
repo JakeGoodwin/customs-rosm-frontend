@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package uk.gov.hmrc.customs.rosmfrontend.connector
 import play.mvc.Http.Status._
 import uk.gov.hmrc.customs.rosmfrontend.audit.Auditable
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
-import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers.{HttpErrorResponse, UnhandledException, VerifiedEmailRequest, VerifiedEmailResponse, _}
+import uk.gov.hmrc.customs.rosmfrontend.connector.httpparsers._
 import uk.gov.hmrc.customs.rosmfrontend.logging.CdsLogger
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{ForbiddenException, HttpClient, _}

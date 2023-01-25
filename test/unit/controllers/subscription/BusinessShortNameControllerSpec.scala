@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ class BusinessShortNameControllerSpec
       mockOrgTypeLookup,
       mockSubscriptionDetailsHolderService
     )
-    when(mockSubscriptionBusinessService.companyShortName(any[HeaderCarrier])).thenReturn(None)
+    when(mockSubscriptionBusinessService.companyShortName(any[Request[_]])).thenReturn(None)
     registerSaveDetailsMockSuccess()
     setupMockSubscriptionFlowManager(BusinessShortNameSubscriptionFlowPage)
   }
@@ -148,7 +148,7 @@ class BusinessShortNameControllerSpec
     }
 
     "short name input field is prepopulated with data retrieved from cache" in {
-      when(mockSubscriptionBusinessService.companyShortName(any[HeaderCarrier]))
+      when(mockSubscriptionBusinessService.companyShortName(any[Request[_]]))
         .thenReturn(Some(allShortNameFieldsAsShortName))
       showCreateForm() { result =>
         val page = CdsPage(bodyOf(result))
@@ -321,7 +321,7 @@ class BusinessShortNameControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
 
     test(
       controller.submit(isInReviewMode = false, Journey.GetYourEORI)(
@@ -337,7 +337,7 @@ class BusinessShortNameControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
 
     test(
       controller.submit(isInReviewMode = true, Journey.GetYourEORI)(
@@ -347,12 +347,12 @@ class BusinessShortNameControllerSpec
   }
 
   private def registerSaveDetailsMockSuccess() {
-    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[Request[_]]))
       .thenReturn(Future.successful(()))
   }
 
   private def registerSaveDetailsMockFailure(exception: Throwable) {
-    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[Request[_]]))
       .thenReturn(Future.failed(exception))
   }
 
@@ -363,7 +363,7 @@ class BusinessShortNameControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
 
     test(controller.createForm(journey).apply(SessionBuilder.buildRequestWithSession(userId)))
   }
@@ -376,8 +376,8 @@ class BusinessShortNameControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
-    when(mockSubscriptionBusinessService.getCachedCompanyShortName(any[HeaderCarrier])).thenReturn(dataToEdit)
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
+    when(mockSubscriptionBusinessService.getCachedCompanyShortName(any[Request[_]])).thenReturn(dataToEdit)
 
     test(controller.reviewForm(journey).apply(SessionBuilder.buildRequestWithSession(userId)))
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,18 @@ package uk.gov.hmrc.customs.rosmfrontend.controllers.registration
 
 import play.api.Application
 import play.api.i18n.Messages
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
 import uk.gov.hmrc.customs.rosmfrontend.controllers.registration.routes._
 import uk.gov.hmrc.customs.rosmfrontend.controllers.routes.SecuritySignOutController
-import uk.gov.hmrc.customs.rosmfrontend.domain.{CustomsId, _}
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.Individual
-import uk.gov.hmrc.customs.rosmfrontend.forms.MatchingForms.{
-  ninoIdentityForm,
-  utrIdentityForm
-}
+import uk.gov.hmrc.customs.rosmfrontend.domain._
+import uk.gov.hmrc.customs.rosmfrontend.forms.MatchingForms.{ninoIdentityForm, utrIdentityForm}
 import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
 import uk.gov.hmrc.customs.rosmfrontend.services.registration.MatchingService
-import uk.gov.hmrc.customs.rosmfrontend.views.html.registration.{
-  what_is_your_nino,
-  what_is_your_utr
-}
+import uk.gov.hmrc.customs.rosmfrontend.views.html.registration.{what_is_your_nino, what_is_your_utr}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
@@ -190,7 +184,7 @@ class WhatIsYourIdentifierController @Inject()(
   }
 
   private def retrieveNameDobFromCache()(
-      implicit hc: HeaderCarrier): Future[Individual] =
+      implicit hc: HeaderCarrier, request: Request[_]): Future[Individual] =
     for {
       mayBeNameDobDetails <- sessionCache.subscriptionDetails.map(
         _.nameDobDetails)

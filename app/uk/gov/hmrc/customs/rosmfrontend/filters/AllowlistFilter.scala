@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@
 package uk.gov.hmrc.customs.rosmfrontend.filters
 
 import akka.stream.Materializer
-
-import javax.inject.Inject
 import play.api.mvc._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.customs.rosmfrontend.config.AppConfig
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

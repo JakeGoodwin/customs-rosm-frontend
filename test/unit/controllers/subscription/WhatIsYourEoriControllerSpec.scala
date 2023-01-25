@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ class WhatIsYourEoriControllerSpec
       mockSubscriptionDetailsHolderService,
       mockEnrolmentStoreProxyService
     )
-    when(mockSubscriptionBusinessService.cachedEoriNumber(any[HeaderCarrier])).thenReturn(None)
+    when(mockSubscriptionBusinessService.cachedEoriNumber(any[Request[_]])).thenReturn(None)
     when(mockEnrolmentStoreProxyService.groupIdEnrolments(any())(any(), any()))
       .thenReturn(Future.successful(List.empty))
     when(mockEnrolmentStoreProxyService.isEoriEnrolledWithAnotherGG(any())(any(), any()))
@@ -135,7 +135,7 @@ class WhatIsYourEoriControllerSpec
       when(mockEnrolmentStoreProxyService.isEoriEnrolledWithAnotherGG(any())(any(), any()))
         .thenReturn(Future.successful(true))
 
-      when(mockSubscriptionBusinessService.cachedEoriNumber(any[HeaderCarrier]))
+      when(mockSubscriptionBusinessService.cachedEoriNumber(any[Request[_]]))
         .thenReturn(Future.successful(Some(eori)))
       when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]])).thenReturn(None)
       submitFormInCreateMode(mandatoryFieldsMap)(
@@ -162,7 +162,7 @@ class WhatIsYourEoriControllerSpec
     }
 
     "have Eori Number input field prepopulated if cached previously" in {
-      when(mockSubscriptionBusinessService.cachedEoriNumber(any[HeaderCarrier]))
+      when(mockSubscriptionBusinessService.cachedEoriNumber(any[Request[_]]))
         .thenReturn(Future.successful(Some(EoriNumber)))
       showCreateForm(journey = Journey.Migrate) { result =>
         val page = CdsPage(bodyOf(result))
@@ -197,7 +197,7 @@ class WhatIsYourEoriControllerSpec
     "retrieve the cached data" in {
       showReviewForm() { result =>
         CdsPage(bodyOf(result))
-        verify(mockSubscriptionBusinessService).cachedEoriNumber(any[HeaderCarrier])
+        verify(mockSubscriptionBusinessService).cachedEoriNumber(any[Request[_]])
       }
     }
 
@@ -247,7 +247,7 @@ class WhatIsYourEoriControllerSpec
     }
 
     "redirect to next screen when unmatched journey is  set" in {
-      when(mockSubscriptionBusinessService.cachedEoriNumber(any[HeaderCarrier]))
+      when(mockSubscriptionBusinessService.cachedEoriNumber(any[Request[_]]))
         .thenReturn(Future.successful(Some("EORINUMBER")))
       when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]])).thenReturn(None)
       submitFormInCreateMode(mandatoryFieldsMap)(verifyRedirectToNextPageIn(_)("next-page-url"))
@@ -360,12 +360,12 @@ class WhatIsYourEoriControllerSpec
   }
 
   private def registerSaveDetailsMockSuccess() {
-    when(mockSubscriptionDetailsHolderService.cacheEoriNumber(anyString())(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheEoriNumber(anyString())(any[Request[_]]))
       .thenReturn(Future.successful(()))
   }
 
   private def registerSaveDetailsMockFailure(exception: Throwable) {
-    when(mockSubscriptionDetailsHolderService.cacheEoriNumber(anyString)(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheEoriNumber(anyString)(any[Request[_]]))
       .thenReturn(Future.failed(exception))
   }
 
@@ -391,7 +391,7 @@ class WhatIsYourEoriControllerSpec
 
     when(mockRequestSessionData.userSelectedOrganisationType(any[Request[AnyContent]]))
       .thenReturn(userSelectedOrganisationType)
-    when(mockSubscriptionBusinessService.cachedEoriNumber(any[HeaderCarrier])).thenReturn(Some(dataToEdit))
+    when(mockSubscriptionBusinessService.cachedEoriNumber(any[Request[_]])).thenReturn(Some(dataToEdit))
 
     test(controller.reviewForm(Journey.Migrate).apply(SessionBuilder.buildRequestWithSession(userId)))
   }

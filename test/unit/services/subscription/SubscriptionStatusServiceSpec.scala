@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,11 @@ import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
+import play.api.mvc.Request
 import play.mvc.Http.Status._
 import uk.gov.hmrc.customs.rosmfrontend.connector.SubscriptionStatusConnector
 import uk.gov.hmrc.customs.rosmfrontend.domain.{SubscriptionStatusOutcome, SubscriptionStatusQueryParams, SubscriptionStatusResponseHolder, TaxPayerId}
@@ -49,6 +50,7 @@ class SubscriptionStatusServiceSpec extends UnitSpec with MockitoSugar with Befo
     new SubscriptionStatusService(mockConnector, mockRequestCommonGenerator, mockSessionCache)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val req: Request[_] = mock[Request[_]]
 
   override protected def beforeEach() {
     reset(mockConnector)

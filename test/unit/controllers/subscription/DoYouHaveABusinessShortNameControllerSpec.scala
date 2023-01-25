@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package unit.controllers.subscription
 
 import common.pages.subscription.{ShortNamePage, SubscriptionAmendCompanyDetailsPage}
-import org.mockito.ArgumentMatchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -32,7 +32,6 @@ import uk.gov.hmrc.customs.rosmfrontend.models.Journey
 import uk.gov.hmrc.customs.rosmfrontend.services.cache.RequestSessionData
 import uk.gov.hmrc.customs.rosmfrontend.services.organisation.OrgTypeLookup
 import uk.gov.hmrc.customs.rosmfrontend.views.html.subscription.business_short_name_yes_no
-import uk.gov.hmrc.http.HeaderCarrier
 import unit.controllers.CdsPage
 import util.builders.AuthBuilder.withAuthorisedUser
 import util.builders.SessionBuilder
@@ -69,12 +68,9 @@ class DoYouHaveABusinessShortNameControllerSpec
     mockOrgTypeLookup
   )
 
-  private val emulatedFailure = new UnsupportedOperationException("Emulation of service call failure")
   private val useShortNameError = "Tell us if your organisation uses a shortened name"
   private val useShortNameWithError = "Error:Tell us if your organisation uses a shortened name"
   private val partnershipUseShortNameError = "Tell us if your partnership uses a shortened name"
-  private val shortNameError = "Enter your organisation's shortened name"
-  private val partnershipShortNameError = "Enter your partnership's shortened name"
 
   override def beforeEach: Unit = {
     reset(
@@ -83,7 +79,7 @@ class DoYouHaveABusinessShortNameControllerSpec
       mockOrgTypeLookup,
       mockSubscriptionDetailsHolderService
     )
-    when(mockSubscriptionBusinessService.companyShortName(any[HeaderCarrier])).thenReturn(None)
+    when(mockSubscriptionBusinessService.companyShortName(any[Request[_]])).thenReturn(None)
     registerSaveDetailsMockSuccess()
     setupMockSubscriptionFlowManager(BusinessShortNameSubscriptionFlowYesNoPage)
   }
@@ -228,7 +224,7 @@ class DoYouHaveABusinessShortNameControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
 
     test(
       controller.submit(isInReviewMode = false, Journey.GetYourEORI)(
@@ -244,7 +240,7 @@ class DoYouHaveABusinessShortNameControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
 
     test(
       controller.submit(isInReviewMode = true, Journey.GetYourEORI)(
@@ -254,12 +250,12 @@ class DoYouHaveABusinessShortNameControllerSpec
   }
 
   private def registerSaveDetailsMockSuccess() {
-    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[Request[_]]))
       .thenReturn(Future.successful(()))
   }
 
   private def registerSaveDetailsMockFailure(exception: Throwable) {
-    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheCompanyShortName(any[BusinessShortName])(any[Request[_]]))
       .thenReturn(Future.failed(exception))
   }
 
@@ -270,7 +266,7 @@ class DoYouHaveABusinessShortNameControllerSpec
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
 
-    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]], any[HeaderCarrier])).thenReturn(Some(orgType))
+    when(mockOrgTypeLookup.etmpOrgType(any[Request[AnyContent]])).thenReturn(Some(orgType))
 
     test(controller.createForm(journey).apply(SessionBuilder.buildRequestWithSession(userId)))
   }

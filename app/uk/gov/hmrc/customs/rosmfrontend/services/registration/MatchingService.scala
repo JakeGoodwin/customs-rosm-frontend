@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.registration
 
-import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.customs.rosmfrontend.DateConverter._
@@ -29,6 +28,7 @@ import uk.gov.hmrc.customs.rosmfrontend.services.cache.{RequestSessionData, Sess
 import uk.gov.hmrc.customs.rosmfrontend.services.mapping.RegistrationDetailsCreator
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -91,7 +91,7 @@ class MatchingService @Inject()(
     } yield result
 
   def matchBusinessWithIdOnly(customsId: CustomsId, loggedInUser: LoggedInUser)(
-    implicit hc: HeaderCarrier
+    implicit hc: HeaderCarrier, request: Request[_]
   ): Future[Boolean] =
     for {
       maybeMatchFound <- matchingConnector.lookup(idOnlyMatchRequest(customsId, loggedInUser.isAgent))
@@ -102,7 +102,7 @@ class MatchingService @Inject()(
     } yield foundAndStored
 
   def matchBusinessWithIdOnly(customsId: CustomsId, loggedInUser: LoggedInUser, capturedDate: Option[LocalDate] = None)(
-    implicit hc: HeaderCarrier
+    implicit hc: HeaderCarrier, request: Request[_]
   ): Future[Boolean] =
     for {
       maybeMatchFound <- matchingConnector.lookup(idOnlyMatchRequest(customsId, loggedInUser.isAgent))
@@ -137,14 +137,14 @@ class MatchingService @Inject()(
   }
 
   def matchIndividualWithId(customsId: CustomsId, individual: Individual, internalId: InternalId)(
-    implicit hc: HeaderCarrier
+    implicit hc: HeaderCarrier, request: Request[_]
   ): Future[Boolean] =
     matchingConnector
       .lookup(individualIdMatchRequest(customsId, individual))
       .flatMap(storeInCacheIfFound(convert(customsId, toLocalDate(individual.dateOfBirth)), internalId))
 
   def matchIndividualWithNino(nino: String, individual: Individual, internalId: InternalId)(
-    implicit hc: HeaderCarrier
+    implicit hc: HeaderCarrier, request: Request[_]
   ): Future[Boolean] =
     matchingConnector
       .lookup(individualNinoMatchRequest(nino, individual))
@@ -159,7 +159,7 @@ class MatchingService @Inject()(
     convert: MatchingResponse => RegistrationDetails,
     internalId: InternalId,
     orgType: Option[CdsOrganisationType] = None
-  )(mayBeMatchSuccess: Option[MatchingResponse])(implicit hc: HeaderCarrier): Future[Boolean] =
+  )(mayBeMatchSuccess: Option[MatchingResponse])(implicit hc: HeaderCarrier, request: Request[_]): Future[Boolean] =
     mayBeMatchSuccess.map(convert).fold(Future.successful(false)) { details =>
       cache.saveRegistrationDetails(details, internalId, orgType)
     }

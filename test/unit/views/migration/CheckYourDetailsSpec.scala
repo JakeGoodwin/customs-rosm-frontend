@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class CheckYourDetailsSpec extends ViewSpec {
   private val nino = Some(Nino("AB123456C"))
   private val nameDobMatchModel = Some(NameDobMatchModel("FName", None, "LName", LocalDate.parse("2003-04-08")))
 
-  private def strim(s: String): String = s.stripMargin.trim.lines mkString " "
+  private def strim(s: String): String = s.stripMargin.trim.linesIterator.mkString(" ")
 
   "Check Your Answers Page" should {
     forAll(domIds) { (name, headingId, changeLinkId) =>

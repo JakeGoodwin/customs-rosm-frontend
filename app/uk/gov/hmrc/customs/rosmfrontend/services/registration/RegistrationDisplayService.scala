@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.registration
 
-import java.time.Clock
-
-import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
+import play.api.mvc.Request
 import uk.gov.hmrc.customs.rosmfrontend.connector.{EoriHttpResponse, RegistrationDisplayConnector}
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.RequestParameter
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.registration._
@@ -28,6 +26,8 @@ import uk.gov.hmrc.customs.rosmfrontend.services.cache.SessionCache
 import uk.gov.hmrc.customs.rosmfrontend.services.mapping.RegistrationDetailsCreator
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.Clock
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationDisplayService @Inject()(
@@ -57,7 +57,7 @@ class RegistrationDisplayService @Inject()(
 
   def cacheDetails(
     response: RegistrationDisplayResponse
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
+  )(implicit request: Request[_]): Future[Boolean] = {
     val registrationDetails: RegistrationDisplayResponse => RegistrationDetails = details =>
       creator.registrationDetails(details)
     sessionCache.saveRegistrationDetails(registrationDetails(response))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package unit.controllers
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.EnrolmentPendingAgainstGroupIdController
@@ -48,7 +48,7 @@ class EnrolmentPendingAgainstGroupIdControllerSpec extends ControllerSpec {
 
   "Enrolment Pending Against GroupId Controller" should {
     "return OK and redirect to the enrolment pending against groupId page" in {
-      when(mockSessionCache.remove(any[HeaderCarrier])).thenReturn(Future.successful(true))
+      when(mockSessionCache.remove(any[Request[_]])).thenReturn(Future.successful(true))
       displayPage(Journey.Migrate) { result =>
         status(result) shouldBe OK
         val page = CdsPage(bodyOf(result))

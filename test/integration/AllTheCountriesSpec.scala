@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,16 @@
 
 package integration
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.customs.rosmfrontend.services.countries.Countries
 
-class AllTheCountriesSpec extends WordSpec with Matchers with GuiceOneAppPerSuite {
+
+class AllTheCountriesSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   val countries = new Countries(app)
+
 
   "Countries" should {
     "be filtered according to the enum values that backend accepts " in {

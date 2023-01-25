@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.joda.time.LocalDate
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.customs.rosmfrontend.connector.{InvalidResponse, NotFoundResponse, ServiceUnavailableResponse, VatControlListConnector}
 import uk.gov.hmrc.customs.rosmfrontend.controllers.subscription.VatDetailsController
@@ -285,7 +285,7 @@ class VatDetailsControllerSpec
     journey: Journey.Value = Journey.GetYourEORI
   )(test: Future[Result] => Any) {
     withAuthorisedUser(userId, mockAuthConnector)
-    when(mockSubscriptionBusinessService.maybeCachedDateEstablished(any[HeaderCarrier]))
+    when(mockSubscriptionBusinessService.maybeCachedDateEstablished(any[Request[_]]))
       .thenReturn(Future.successful(cachedDate))
 
     test(controller.createForm(journey).apply(SessionBuilder.buildRequestWithSession(userId)))
@@ -301,7 +301,7 @@ class VatDetailsControllerSpec
     form: Map[String, String]
   )(test: Future[Result] => Any): Unit = {
     withAuthorisedUser(defaultUserId, mockAuthConnector)
-    when(mockSubscriptionDetailsHolderService.cacheUkVatDetails(any[VatDetails])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheUkVatDetails(any[VatDetails])(any[Request[_]]))
       .thenReturn(Future.successful(()))
     test(
       controller
@@ -321,7 +321,7 @@ class VatDetailsControllerSpec
 
     when(mockVatControlListConnector.vatControlList(any[VatControlListRequest])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Right(vatControlResponse)))
-    when(mockSubscriptionDetailsHolderService.cacheUkVatDetails(any[VatDetails])(any[HeaderCarrier]))
+    when(mockSubscriptionDetailsHolderService.cacheUkVatDetails(any[VatDetails])(any[Request[_]]))
       .thenReturn(Future.successful(()))
     test(
       controller

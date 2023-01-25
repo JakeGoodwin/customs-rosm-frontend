@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time.{Millis, Span}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.SEE_OTHER
 import play.api.libs.json.{Reads, Writes}
 import play.api.mvc.Results.Redirect
@@ -103,7 +103,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(Some(cacheIds)))
 
-      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier]))
+      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionProcessing))
 
       val result: Result = service.checksToProceed(
@@ -125,7 +125,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(Some(cacheIds)))
 
-      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier]))
+      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionExists))
 
       val result: Result = service.checksToProceed(
@@ -147,7 +147,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(Some(cacheIds.copy(internalId = InternalId("otherUserInternalId")))))
 
-      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier]))
+      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionProcessing))
 
       val result: Result = service.checksToProceed(
@@ -169,7 +169,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(Some(cacheIds)))
 
-      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier]))
+      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionRejected))
 
       when(mockSave4LaterConnector.delete(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(()))
@@ -193,7 +193,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(Some(cacheIds)))
 
-      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier]))
+      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(NewSubscription))
 
       when(mockSave4LaterConnector.delete(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(()))
@@ -338,7 +338,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
           )
       ).thenReturn(Future.successful(Future.successful(Some(cacheIds))))
 
-      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier]))
+      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionProcessing))
 
       val result: Result = service.checksToProceed(

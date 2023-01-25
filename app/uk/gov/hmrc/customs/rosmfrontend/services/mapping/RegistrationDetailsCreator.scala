@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,15 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.services.mapping
 
-import javax.inject.Singleton
 import org.joda.time.LocalDate
 import uk.gov.hmrc.customs.rosmfrontend.DateConverter._
 import uk.gov.hmrc.customs.rosmfrontend.domain._
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging._
-import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.matching.{
-  IndividualResponse,
-  OrganisationResponse,
-  RegisterWithIDResponse
-}
+import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.matching.{IndividualResponse, OrganisationResponse, RegisterWithIDResponse}
 import uk.gov.hmrc.customs.rosmfrontend.domain.messaging.registration.RegistrationDisplayResponse
 import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.AddressViewModel
+
+import javax.inject.Singleton
 
 @Singleton
 class RegistrationDetailsCreator {

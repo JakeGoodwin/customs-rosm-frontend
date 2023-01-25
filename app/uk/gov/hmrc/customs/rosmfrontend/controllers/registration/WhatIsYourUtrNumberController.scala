@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.joda.time.LocalDate
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.Messages
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.customs.rosmfrontend.controllers.CdsController
@@ -100,7 +100,7 @@ class WhatIsYourUtrNumberController @Inject()(
   )(implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Boolean] =
     matchingService.matchBusiness(id, Organisation(name, matchingServiceType), dateEstablished, internalId)
 
-  private def matchIndividual(id: CustomsId, internalId: InternalId)(implicit hc: HeaderCarrier): Future[Boolean] =
+  private def matchIndividual(id: CustomsId, internalId: InternalId)(implicit hc: HeaderCarrier, request: Request[_]): Future[Boolean] =
     subscriptionDetailsService.cachedNameDobDetails flatMap {
       case Some(details) =>
         matchingService.matchIndividualWithId(

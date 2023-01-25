@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,12 @@
 
 package uk.gov.hmrc.customs.rosmfrontend.domain.subscription
 
-import java.io
-
 import org.joda.time.LocalDate
 import play.api.libs.json.{Format, Json}
 import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
 import uk.gov.hmrc.customs.rosmfrontend.domain._
-import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.{
-  AddressViewModel,
-  ContactDetailsModel,
-  VatDetails,
-  VatEUDetailsModel
-}
+import uk.gov.hmrc.customs.rosmfrontend.forms.models.subscription.{AddressViewModel, ContactDetailsModel, VatDetails, VatEUDetailsModel}
 
 case class SubscriptionDetails(
   businessShortName: Option[BusinessShortName] = None,
