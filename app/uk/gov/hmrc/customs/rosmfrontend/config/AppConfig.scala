@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ class AppConfig @Inject()(
   lazy val feedbackLink = config.get[String]("external-url.feedback-survey")
   lazy val feedbackLinkSubscribe = config.get[String]("external-url.feedback-survey-subscribe")
   lazy val subscribeLinkSubscribe = config.get[String]("external-url.subscription-url")
+  lazy val eccRegistrationEntryPoint = config.get[String]("external-url.ecc-registration-url")
 
   //get help link feedback for Get an EORI
   val reportAProblemPartialUrlGetAnEori: String =

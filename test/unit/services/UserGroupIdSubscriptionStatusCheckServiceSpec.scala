@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package unit.services
 
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
@@ -83,12 +84,10 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
   "checksToProceed" should {
 
     "block the user for the groupID if enrolment exists" in {
-
-      val result: Result = service
-        . checksToProceed(groupId, internalId,false, Journey.Migrate) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
-          otherUserWithinGroupIsInProcess
-        }
-        .futureValue
+      val result: Result = service.checksToProceed(
+          groupId, internalId, false, false, Journey.Migrate
+      ) { continue } { groupIsEnrolled } { userIsInProcess }
+      { existingApplicationInProgress } { otherUserWithinGroupIsInProcess }.futureValue
 
       result.header.headers(LOCATION) shouldBe "/blocked/groupIsEnrolled"
     }
@@ -98,39 +97,41 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
       ).thenReturn(Future.successful(false))
+
       when(
         mockSave4LaterConnector
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(Some(cacheIds)))
+
       when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionProcessing))
 
-      val result: Result = service
-        . checksToProceed(groupId, internalId,false,Journey.Migrate) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
-          otherUserWithinGroupIsInProcess
-        }
-        .futureValue
+      val result: Result = service.checksToProceed(
+        groupId, internalId, false, false, Journey.Migrate
+      ) { continue } { groupIsEnrolled } { userIsInProcess }
+      { existingApplicationInProgress} { otherUserWithinGroupIsInProcess }.futureValue
 
       result.header.headers(LOCATION) shouldBe "/blocked/existingApplicationInProgress"
     }
 
-    "allow the user for the groupID is cache any other subscription status " in {
+    "allow the user for the groupID is cache any other subscription status" in {
       when(
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
       ).thenReturn(Future.successful(false))
+
       when(
         mockSave4LaterConnector
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(Some(cacheIds)))
+
       when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionExists))
 
-      val result: Result = service
-        . checksToProceed(groupId, internalId,false, Journey.Migrate) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
-          otherUserWithinGroupIsInProcess
-        }
-        .futureValue
+      val result: Result = service.checksToProceed(
+        groupId, internalId, false, false, Journey.Migrate
+      ) { continue } { groupIsEnrolled } { userIsInProcess }
+      { existingApplicationInProgress} { otherUserWithinGroupIsInProcess }.futureValue
 
       result.header.headers(LOCATION) shouldBe "/continue"
     }
@@ -140,18 +141,19 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
       ).thenReturn(Future.successful(false))
+
       when(
         mockSave4LaterConnector
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(Some(cacheIds.copy(internalId = InternalId("otherUserInternalId")))))
+
       when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionProcessing))
 
-      val result: Result = service
-        . checksToProceed(groupId, internalId,false, Journey.Migrate) { continue } { groupIsEnrolled } { userIsInProcess } {existingApplicationInProgress}{
-          otherUserWithinGroupIsInProcess
-        }
-        .futureValue
+      val result: Result = service.checksToProceed(
+        groupId, internalId, false, false, Journey.Migrate
+      ) { continue } { groupIsEnrolled } { userIsInProcess }
+      { existingApplicationInProgress} {otherUserWithinGroupIsInProcess }.futureValue
 
       result.header.headers(LOCATION) shouldBe "/blocked/otherUserWithinGroupIsInProcess"
     }
@@ -161,19 +163,21 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
       ).thenReturn(Future.successful(false))
+
       when(
         mockSave4LaterConnector
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(Some(cacheIds)))
+
       when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(SubscriptionRejected))
+
       when(mockSave4LaterConnector.delete(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(()))
 
-      val result: Result = service
-        . checksToProceed(groupId, internalId,false, Journey.Migrate) { continue } { groupIsEnrolled } { userIsInProcess }{existingApplicationInProgress} {
-          otherUserWithinGroupIsInProcess
-        }
-        .futureValue
+      val result: Result = service.checksToProceed(
+        groupId, internalId,false, false, Journey.Migrate
+      ) { continue } { groupIsEnrolled } { userIsInProcess }
+      { existingApplicationInProgress } { otherUserWithinGroupIsInProcess }.futureValue
 
       result.header.headers(LOCATION) shouldBe "/continue"
     }
@@ -183,24 +187,26 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
       ).thenReturn(Future.successful(false))
+
       when(
         mockSave4LaterConnector
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(Some(cacheIds)))
+
       when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
         .thenReturn(Future.successful(NewSubscription))
+
       when(mockSave4LaterConnector.delete(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(()))
 
-      val result: Result = service
-        . checksToProceed(groupId, internalId,false, Journey.Migrate) { continue } { groupIsEnrolled } { userIsInProcess } {existingApplicationInProgress}{
-          otherUserWithinGroupIsInProcess
-        }
-        .futureValue
+      val result: Result = service.checksToProceed(
+        groupId, internalId, false, false, Journey.Migrate
+      ) { continue } { groupIsEnrolled } { userIsInProcess }
+      { existingApplicationInProgress} { otherUserWithinGroupIsInProcess }.futureValue
 
       result.header.headers(LOCATION) shouldBe "/continue"
     }
 
-    "continue in to CDS service when groupID is not cached and redirectToECCEnabled is set to false for Migration journey" in {
+    "continue to CDS when groupID is not cached and redirectSubToECC is set to false for Sub journey" in {
       when(
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
@@ -215,7 +221,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
 
       val result: Result =
         service.checksToProceed(
-          groupId, internalId, redirectToECCEnabled = false, Journey.Migrate
+          groupId, internalId, redirectSubToECC = false, redirectRegToECC = false, Journey.Migrate
         ) { continue } { groupIsEnrolled } {userIsInProcess}
           { existingApplicationInProgress}{ otherUserWithinGroupIsInProcess }.futureValue
 
@@ -223,7 +229,30 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       result.header.headers(LOCATION) shouldBe "/continue"
     }
 
-    "redirect to ECC when groupID is not cached and redirectToECCEnabled is set to true for Migration journey only" in {
+    "continue to CDS when groupID is not cached and redirectRegToECC is set to false for Reg journey" in {
+      when(
+        mockEnrolmentStoreProxyService
+          .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
+      ).thenReturn(Future.successful(false))
+
+      when(
+        mockSave4LaterConnector
+          .get[CacheIds](any[String], any[String])(
+            any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]]
+          )
+      ).thenReturn(Future.successful(None))
+
+      val result: Result =
+        service.checksToProceed(
+          groupId, internalId, redirectSubToECC = false, redirectRegToECC = false, Journey.GetYourEORI
+        ) { continue } { groupIsEnrolled } { userIsInProcess }
+        { existingApplicationInProgress } { otherUserWithinGroupIsInProcess }.futureValue
+
+      status(result) shouldBe SEE_OTHER
+      result.header.headers(LOCATION) shouldBe "/continue"
+    }
+
+    "redirect to ECC when groupID is not cached and redirectSubToECC is set to true for Sub journey" in {
       when(
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
@@ -240,12 +269,35 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
         .thenReturn("/customs-enrolment-services/cds/subscribe")
 
       val result: Result =
-        service. checksToProceed(groupId, internalId,redirectToECCEnabled = true, Journey.Migrate)
+        service. checksToProceed(groupId, internalId, redirectSubToECC = true, redirectRegToECC = false, Journey.Migrate)
         { continue } { groupIsEnrolled } { userIsInProcess }
         { existingApplicationInProgress }{ otherUserWithinGroupIsInProcess }.futureValue
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some("/customs-enrolment-services/cds/subscribe")
+    }
+
+    "redirect to ECC when groupID is not cached and redirectRegToECC is set to true for Reg journey" in {
+      when(
+        mockEnrolmentStoreProxyService
+          .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
+      ).thenReturn(Future.successful(false))
+
+      when(
+        mockSave4LaterConnector
+          .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
+      ).thenReturn(Future.successful(None))
+
+      when(mockAppConfig.eccRegistrationEntryPoint)
+        .thenReturn("/customs-registration-services/eori-only/register/check-user")
+
+      val result: Result =
+        service.checksToProceed(groupId, internalId, redirectSubToECC = false, redirectRegToECC = true, Journey.GetYourEORI)
+        { continue } { groupIsEnrolled } { userIsInProcess } { existingApplicationInProgress }
+        { otherUserWithinGroupIsInProcess }.futureValue
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some("/customs-registration-services/eori-only/register/check-user")
     }
 
     "redirect to ECC when groupID is cached and redirectToECCEnabled is set to true for Migration journey only" in {
@@ -265,7 +317,7 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
         .thenReturn("/customs-enrolment-services/cds/subscribe")
 
       val result: Result =
-        service. checksToProceed(groupId, internalId,redirectToECCEnabled = true, Journey.Migrate)
+        service. checksToProceed(groupId, internalId,redirectSubToECC = true, redirectRegToECC = false, Journey.Migrate)
         { continue } { groupIsEnrolled } { userIsInProcess }
         { existingApplicationInProgress }{ otherUserWithinGroupIsInProcess }.futureValue
 
@@ -273,7 +325,31 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
       redirectLocation(result) shouldBe Some("/customs-enrolment-services/cds/subscribe")
     }
 
-    "continue in to CDS service when groupID is not cached and redirectToECCEnabled is set to true and no email is cached for Registration journey " in {
+    "continue to CDS when groupID is cached and redirectRegToECC is set to true for Reg journey" in {
+      when(
+        mockEnrolmentStoreProxyService
+          .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
+      ).thenReturn(Future.successful(false))
+
+      when(
+        mockSave4LaterConnector
+          .get[CacheIds](any[String], any[String])(
+            any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]]
+          )
+      ).thenReturn(Future.successful(Future.successful(Some(cacheIds))))
+
+      when(mockSubscriptionStatusService.getStatus(any[String], any[String])(any[HeaderCarrier], any[Request[_]]))
+        .thenReturn(Future.successful(SubscriptionProcessing))
+
+      val result: Result = service.checksToProceed(
+        groupId, internalId, redirectSubToECC = false, redirectRegToECC = true, Journey.GetYourEORI
+      ) { continue } {groupIsEnrolled } { userIsInProcess }
+      { existingApplicationInProgress } { otherUserWithinGroupIsInProcess }.futureValue
+
+      result.header.headers(LOCATION) shouldBe "/blocked/existingApplicationInProgress"
+    }
+
+    "continue to CDS when groupID is not cached and EmailStatus is cached and redirectRegToECC is set to true for Reg journey" in {
       when(
         mockEnrolmentStoreProxyService
           .isEnrolmentAssociatedToGroup(any[GroupId])(any[HeaderCarrier], any[ExecutionContext])
@@ -284,17 +360,25 @@ class UserGroupIdSubscriptionStatusCheckServiceSpec
           .get[CacheIds](any[String], any[String])(any[HeaderCarrier], any[Reads[CacheIds]], any[Writes[CacheIds]])
       ).thenReturn(Future.successful(None))
 
-      when(mockAppConfig.subscribeLinkSubscribe)
-        .thenReturn("/customs-enrolment-services/cds/subscribe")
+      when(mockAppConfig.eccRegistrationEntryPoint)
+        .thenReturn("/customs-registration-services/eori-only/register/check-user")
+
+      when(
+        mockSave4LaterConnector
+          .get[EmailStatus](
+            ArgumentMatchers.eq(internalId.id),
+            ArgumentMatchers.eq("email")
+          )(any[HeaderCarrier], any[Reads[EmailStatus]], any[Writes[EmailStatus]])
+      ).thenReturn(Future.successful(Some(EmailStatus("test@email.com", true, Some(true)))))
 
       val result: Result =
-        service. checksToProceed(groupId, internalId,redirectToECCEnabled = true, Journey.GetYourEORI)
-        { continue } { groupIsEnrolled } { userIsInProcess }
-        { existingApplicationInProgress }{ otherUserWithinGroupIsInProcess }.futureValue
+        service.checksToProceed(groupId, internalId, redirectSubToECC = false, redirectRegToECC = true, Journey.GetYourEORI)
+          {continue} {groupIsEnrolled} {userIsInProcess}
+          {existingApplicationInProgress} {otherUserWithinGroupIsInProcess}
+          .futureValue
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some("/continue")
+      result.header.headers(LOCATION) shouldBe "/continue"
     }
-
   }
 }

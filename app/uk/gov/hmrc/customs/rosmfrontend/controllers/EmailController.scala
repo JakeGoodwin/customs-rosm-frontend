@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,9 @@ class EmailController @Inject()(
             }
           case None => {
             userGroupIdSubscriptionStatusCheckService
-              .checksToProceed(GroupId(user.groupId), InternalId(user.internalId), redirectToECCEnabled, journey) {
+              .checksToProceed(
+                GroupId(user.groupId), InternalId(user.internalId), redirectSubToECC, redirectRegToECC, journey
+              ) {
                 continue(journey)
               } { groupIsEnrolled(journey) } {
                 userIsInProcess(journey)
@@ -101,8 +103,9 @@ class EmailController @Inject()(
         }
       } else {
         //subscription journey
-        userGroupIdSubscriptionStatusCheckService
-          .checksToProceed(GroupId(user.groupId), InternalId(user.internalId), redirectToECCEnabled, journey) {
+        userGroupIdSubscriptionStatusCheckService.checksToProceed(
+          GroupId(user.groupId), InternalId(user.internalId), redirectSubToECC, redirectRegToECC, journey
+        ) {
           continue(journey)
         } { groupIsEnrolled(journey) } {
           userIsInProcess(journey)
