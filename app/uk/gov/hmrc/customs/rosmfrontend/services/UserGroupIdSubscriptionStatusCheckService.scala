@@ -63,15 +63,17 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
             case Some(cacheIds) =>
               journey match {
                 case Journey.GetYourEORI =>
+                  redirectUser(journey, redirectSubToECC, redirectRegToECC) {
                     processUserWithCachedId(cacheIds, groupId, internalId)
                       {continue}{userIsInProcess}{existingApplicationInProcess}{otherUserWithinGroupIsInProcess}
+                    }
                 case Journey.Migrate =>
-                  redirectUser(journey, redirectSubToECC, redirectRegToECC, internalId) {
+                  redirectUser(journey, redirectSubToECC, redirectRegToECC) {
                     processUserWithCachedId(cacheIds, groupId, internalId)
                       {continue}{userIsInProcess}{existingApplicationInProcess}{otherUserWithinGroupIsInProcess}
                   }
               }
-            case _ => redirectUser(journey, redirectSubToECC, redirectRegToECC, internalId)(continue)
+            case _ => redirectUser(journey, redirectSubToECC, redirectRegToECC)(continue)
           }
     }
   }
@@ -104,20 +106,17 @@ class UserGroupIdSubscriptionStatusCheckService @Inject()(
   private def redirectUser(
     journey: Journey.Value,
     redirectSubToECC: Boolean,
-    redirectRegToECC: Boolean,
-    internalId: InternalId
-  ) (action: => Future[Result])
-    (implicit request: Request[AnyContent], hc: HeaderCarrier) =
+    redirectRegToECC: Boolean
+  ) (action: => Future[Result]) =
     journey match {
       case Journey.GetYourEORI =>
-          save4LaterConnector.get[EmailStatus](internalId.id, CachedData.emailKey).flatMap {
-            case None if redirectRegToECC =>
-              CdsLogger.info(s"redirectRegToECC flag is enabled and no email cached - redirecting to ECC")
-              Future.successful(Redirect(appConfig.eccRegistrationEntryPoint))
-            case _ =>
-              CdsLogger.info(s"redirectRegToECC flag is $redirectRegToECC and no email cached - continue to CDS")
-              action
-          }
+        if (redirectRegToECC) {
+          CdsLogger.info(s"redirectRegToECC flag is enabled - redirecting to ECC")
+          Future.successful(Redirect(appConfig.eccRegistrationEntryPoint))
+        } else {
+          CdsLogger.info(s"redirectRegToECC flag is $redirectRegToECC - continue to CDS")
+          action
+        }
       case Journey.Migrate =>
         if (redirectSubToECC) {
           CdsLogger.debug("redirectToECCEnabled flag is enabled. Redirecting to ECC")
