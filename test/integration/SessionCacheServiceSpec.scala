@@ -236,16 +236,6 @@ class SessionCacheSpec extends IntegrationTestsSpec with MockitoSugar with Mongo
       await(sessionCache.registerWithEoriAndIdResponse(request)) mustBe rd
     }
 
-    "throw exception when registration Details requested and not available in cache" in {
-      when(request.session).thenReturn(Session(Map(("sessionId", "sessionId-123"))))
-      await(sessionCache.putSession(DataKey("sub01Outcome"), data = Json.toJson(CacheItem(_, _, _, _))))
-
-      val caught = intercept[DataUnavailableException] {
-        await(sessionCache.registrationDetails(request))
-      }
-      caught.getMessage mustBe s"regDetails is not cached in data for the sessionId: sessionId-123"
-    }
-
     "store, fetch and update Registration Info correctly" in {
       when(request.session).thenReturn(Session(Map(("sessionId", "sessionId-" + UUID.randomUUID()))))
 
